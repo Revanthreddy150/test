@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USEAS - Secure Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700&family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-light: #f8fafc;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --accent-indigo: #6366f1;
+            --accent-purple: #a855f7;
+            --text-main: #1e293b;
+            --error-red: #ef4444;
+            --gradient: linear-gradient(135deg, var(--accent-indigo) 0%, var(--accent-purple) 100%);
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-light);
+            display: flex; align-items: center; justify-content: center; 
+            min-height: 100vh; margin: 0; color: var(--text-main);
+            background-image: radial-gradient(circle at 50% 50%, #e2e8f0 0%, #f8fafc 100%);
+        }
+
+        #loader { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-light); display: flex; align-items: center;
+            justify-content: center; z-index: 9999; font-family: 'Plus Jakarta Sans';
+            color: var(--accent-indigo); font-weight: 700;
+        }
+
+        /* --- ANIMATED COLOR RING --- */
+        .avatar-wrapper {
+            position: relative; width: 120px; height: 120px;
+            margin: 0 auto 15px; display: flex; align-items: center; justify-content: center;
+        }
+
+        .animated-ring {
+            position: absolute; width: 100%; height: 100%; border-radius: 50%;
+            background: linear-gradient(45deg, #6366f1, #a855f7, #ec4899, #06b6d4, #6366f1);
+            background-size: 300% 300%;
+            animation: ringRotate 4s linear infinite, colorShift 8s ease infinite;
+        }
+
+        @keyframes ringRotate { 100% { transform: rotate(360deg); } }
+        @keyframes colorShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        #main-avatar { 
+            width: 108px; height: 108px; border-radius: 50%; border: 4px solid white; 
+            object-fit: cover; position: relative; z-index: 2; background: white;
+        }
+
+        .card { 
+            background: var(--card-bg); padding: 30px; border-radius: 24px; 
+            border: 1px solid rgba(99, 102, 241, 0.1); width: 90%; max-width: 400px; 
+            text-align: center; backdrop-filter: blur(10px); box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+            display: none; 
+        }
+
+        .card.visible { display: block; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
+
+        /* --- INPUTS & ICONS --- */
+        .input-group { position: relative; margin: 10px 0; }
+        input { 
+            width: 100%; padding: 12px 40px 12px 12px; background: #f8fafc; 
+            border: 1px solid #e2e8f0; border-radius: 10px; box-sizing: border-box; font-family: inherit;
+        }
+        .toggle-pass { 
+            position: absolute; right: 12px; top: 50%; transform: translateY(-50%); 
+            cursor: pointer; color: #94a3b8; font-size: 0.9rem; 
+        }
+
+        .avatar-grid {
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
+            margin: 15px 0; padding: 10px; background: #f1f5f9; border-radius: 12px;
+            max-height: 180px; overflow-y: auto;
+        }
+
+        .avatar-option {
+            width: 100%; aspect-ratio: 1; border-radius: 50%; border: 2px solid transparent;
+            cursor: pointer; transition: 0.2s; background: white;
+        }
+        .avatar-option.selected { border-color: var(--accent-indigo); transform: scale(1.1); }
+
+        button { width: 100%; padding: 14px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; margin-top: 10px; text-transform: uppercase; transition: 0.3s; }
+        .btn-primary { background: var(--gradient); color: #fff; }
+        .btn-google { background: #fff; color: #444; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; gap: 10px; text-transform: none; }
+        .btn-outline { background: transparent; border: 1.5px solid var(--accent-indigo); color: var(--accent-indigo); margin-top: 15px; }
+        .btn-logout { background: none; color: var(--error-red); font-size: 0.8rem; border: none; margin-top: 15px; font-weight: 600; }
+        
+        .hidden { display: none !important; }
+        
+        #custom-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.5); display: flex; align-items: center; 
+            justify-content: center; z-index: 10000; opacity: 0; pointer-events: none; transition: 0.3s;
+        }
+        #custom-modal.active { opacity: 1; pointer-events: all; }
+        .modal-content { background: #fff; padding: 25px; border-radius: 20px; width: 300px; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <div id="loader">INITIALIZING...</div>
+
+    <div id="custom-modal">
+        <div class="modal-content">
+            <h4 id="modal-title" style="color: var(--accent-indigo); margin:0;">SYSTEM</h4>
+            <div id="modal-msg" style="font-size: 0.85rem; margin: 15px 0 20px;"></div>
+            <div id="modal-extra-input" class="hidden">
+                 <input type="password" id="modal-pass-input" placeholder="Set Password">
+                 <input type="password" id="modal-conf-input" placeholder="Confirm Password">
+                 <button id="modal-action-btn" class="btn-primary">Set Password</button>
+            </div>
+            <button id="modal-close-btn" onclick="document.getElementById('custom-modal').classList.remove('active')" class="btn-primary" style="padding: 10px;">OK</button>
+        </div>
+    </div>
+
+    <div id="auth-card" class="card">
+        <h2 style="font-family: 'Plus Jakarta Sans';">Access Portal</h2>
+        <input type="email" id="email" placeholder="EMAIL ADDRESS">
+        <div class="input-group">
+            <input type="password" id="password" placeholder="PASSWORD">
+            <i class="fa-solid fa-eye toggle-pass" onclick="toggleVisibility('password', this)"></i>
+        </div>
+        <button id="login-btn" class="btn-primary">LOGIN</button>
+        <button id="signup-btn" class="btn-primary hidden">CREATE ACCOUNT</button>
+        
+        <div id="google-section">
+            <div style="margin: 15px 0; color: #cbd5e1; font-size: 0.7rem;">OR</div>
+            <button id="google-btn" class="btn-google">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18">
+                Continue with Google
+            </button>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; margin-top: 15px; font-size: 0.75rem;">
+            <span id="toggle-text" style="cursor:pointer; color: var(--accent-indigo); font-weight: 600;">New User? Register</span>
+            <span id="forgot-pass-btn" style="cursor:pointer; color: #64748b;">Forgot Password?</span>
+        </div>
+    </div>
+
+    <div id="profile-card" class="card">
+        <h3 style="font-family: 'Plus Jakarta Sans'; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-top: 0;">USER PROFILE</h3>
+        
+        <div class="avatar-wrapper">
+            <div class="animated-ring"></div>
+            <img id="main-avatar" src="" alt="Profile">
+        </div>
+
+        <div id="display-name" style="font-weight: 700; font-size: 1.2rem;">---</div>
+        <div id="display-email" style="font-size: 0.8rem; color: #64748b; margin-bottom: 10px;">---</div>
+
+        <div id="edit-box" class="hidden" style="border-top: 1px solid #eee; padding-top: 10px;">
+            <p style="font-size: 0.7rem; color: var(--accent-indigo); font-weight: 700;">SELECT AVATAR (50 MODELS)</p>
+            <div class="avatar-grid" id="avatar-selector"></div>
+            <input type="text" id="edit-name-input" placeholder="New Display Name">
+            <button id="save-btn" class="btn-primary">UPDATE PROFILE</button>
+        </div>
+
+        <div id="password-box" class="hidden" style="border-top: 1px solid #eee; padding-top: 10px; margin-top: 10px;">
+            <p style="font-size: 0.7rem; color: var(--accent-purple); font-weight: 700;">SECURITY SETTINGS</p>
+            <div id="standard-pw-fields">
+                <div class="input-group">
+                    <input type="password" id="old-pass" placeholder="Old Password">
+                </div>
+            </div>
+            <div class="input-group">
+                <input type="password" id="new-pass" placeholder="New Password">
+            </div>
+            <div class="input-group">
+                <input type="password" id="confirm-pass" placeholder="Confirm Password">
+            </div>
+            <button id="confirm-pass-btn" class="btn-primary">UPDATE PASSWORD</button>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+            <button id="toggle-edit-btn" class="btn-outline" style="font-size: 0.7rem;"><i class="fa-solid fa-user-pen"></i> EDIT</button>
+            <button id="toggle-pass-btn" class="btn-outline" style="font-size: 0.7rem;"><i class="fa-solid fa-lock"></i> SECURITY</button>
+        </div>
+        
+        <button id="logout-btn" class="btn-logout">Logout Account</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { 
+            getAuth, onAuthStateChanged, updateProfile, signInWithEmailAndPassword, 
+            createUserWithEmailAndPassword, signOut, sendPasswordResetEmail,
+            updatePassword, EmailAuthProvider, reauthenticateWithCredential,
+            GoogleAuthProvider, signInWithPopup, linkWithCredential
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyArqJycgZtlLpM7KQ2T9h-e2eJUHtMg-TY",
+            authDomain: "tff-earns.firebaseapp.com",
+            projectId: "tff-earns",
+            storageBucket: "tff-earns.firebasestorage.app",
+            messagingSenderId: "762695597074",
+            appId: "1:762695597074:web:bd7a8df2df2806d5b26ccb"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+
+        window.toggleVisibility = (id, icon) => {
+            const input = document.getElementById(id);
+            input.type = input.type === "password" ? "text" : "password";
+            icon.classList.toggle('fa-eye'); icon.classList.toggle('fa-eye-slash');
+        };
+
+        const grid = document.getElementById('avatar-selector');
+        for (let i = 1; i <= 50; i++) {
+            const img = document.createElement('img');
+            const url = `https://api.dicebear.com/7.x/adventurer/svg?seed=${i + 88}`;
+            img.src = url; img.className = 'avatar-option';
+            img.onclick = () => {
+                document.querySelectorAll('.avatar-option').forEach(el => el.classList.remove('selected'));
+                img.classList.add('selected'); img.dataset.url = url;
+            };
+            grid.appendChild(img);
+        }
+
+        const showNotice = (title, msg) => {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-msg').innerText = msg;
+            document.getElementById('modal-extra-input').classList.add('hidden');
+            document.getElementById('modal-close-btn').classList.remove('hidden');
+            document.getElementById('custom-modal').classList.add('active');
+        };
+
+        // --- AUTH STATE & GOOGLE PW PROMPT ---
+        onAuthStateChanged(auth, (user) => {
+            document.getElementById('loader').style.display = 'none';
+            if (user) {
+                document.getElementById('auth-card').classList.remove('visible');
+                document.getElementById('profile-card').classList.add('visible');
+                document.getElementById('display-name').innerText = user.displayName || "USEAS Member";
+                document.getElementById('display-email').innerText = user.email;
+                document.getElementById('main-avatar').src = user.photoURL || `https://api.dicebear.com/7.x/adventurer/svg?seed=1`;
+
+                // Check if user is Google-only (no password)
+                const isGoogleUser = user.providerData.some(p => p.providerId === 'google.com');
+                const hasPassword = user.providerData.some(p => p.providerId === 'password');
+                
+                if(isGoogleUser && !hasPassword) {
+                    document.getElementById('modal-title').innerText = "SECURITY ALERT";
+                    document.getElementById('modal-msg').innerText = "You joined via Google. Please set a password for account recovery.";
+                    document.getElementById('modal-extra-input').classList.remove('hidden');
+                    document.getElementById('modal-close-btn').classList.add('hidden');
+                    document.getElementById('custom-modal').classList.add('active');
+                    document.getElementById('standard-pw-fields').classList.add('hidden'); // Hide old pass field for google users
+                } else {
+                    document.getElementById('standard-pw-fields').classList.remove('hidden');
+                }
+            } else {
+                document.getElementById('profile-card').classList.remove('visible');
+                document.getElementById('auth-card').classList.add('visible');
+            }
+        });
+
+        // SET PASSWORD FOR GOOGLE USERS
+        document.getElementById('modal-action-btn').onclick = async () => {
+            const pw = document.getElementById('modal-pass-input').value;
+            const cp = document.getElementById('modal-conf-input').value;
+            if(pw.length < 6) return alert("Password must be 6+ chars");
+            if(pw !== cp) return alert("Passwords don't match");
+
+            try {
+                await updatePassword(auth.currentUser, pw);
+                showNotice("SUCCESS", "Password set! You can now login with email or Google.");
+            } catch (e) { alert(e.message); }
+        };
+
+        // GOOGLE LOGIN
+        document.getElementById('google-btn').onclick = () => signInWithPopup(auth, provider).catch(e => showNotice("ERROR", e.message));
+
+        // STANDARD PASSWORD CHANGE
+        document.getElementById('confirm-pass-btn').onclick = async () => {
+            const user = auth.currentUser;
+            const oldP = document.getElementById('old-pass').value;
+            const newP = document.getElementById('new-pass').value;
+            
+            try {
+                if(!document.getElementById('standard-pw-fields').classList.contains('hidden')) {
+                    const cred = EmailAuthProvider.credential(user.email, oldP);
+                    await reauthenticateWithCredential(user, cred);
+                }
+                await updatePassword(user, newP);
+                showNotice("SUCCESS", "Password Updated!");
+            } catch (e) { showNotice("ERROR", e.message); }
+        };
+
+        // LOGIN / SIGNUP / LOGOUT
+        document.getElementById('login-btn').onclick = () => signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value).catch(e => showNotice("AUTH ERROR", e.message));
+        document.getElementById('signup-btn').onclick = () => createUserWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value).catch(e => showNotice("AUTH ERROR", e.message));
+        document.getElementById('logout-btn').onclick = () => signOut(auth);
+        document.getElementById('forgot-pass-btn').onclick = () => {
+            const em = document.getElementById('email').value;
+            if(!em) return showNotice("SYSTEM", "Enter email first");
+            sendPasswordResetEmail(auth, em).then(() => showNotice("SENT", "Check your email")).catch(e => showNotice("ERROR", e.message));
+        };
+
+        // TOGGLES
+        document.getElementById('toggle-edit-btn').onclick = () => { document.getElementById('edit-box').classList.toggle('hidden'); document.getElementById('password-box').classList.add('hidden'); };
+        document.getElementById('toggle-pass-btn').onclick = () => { document.getElementById('password-box').classList.toggle('hidden'); document.getElementById('edit-box').classList.add('hidden'); };
+        document.getElementById('toggle-text').onclick = function() {
+            const isL = !document.getElementById('login-btn').classList.contains('hidden');
+            document.getElementById('login-btn').classList.toggle('hidden');
+            document.getElementById('signup-btn').classList.toggle('hidden');
+            document.getElementById('google-section').classList.toggle('hidden');
+            this.innerText = isL ? "Back to Login" : "New User? Register";
+        };
+
+        document.getElementById('save-btn').onclick = async () => {
+            const sel = document.querySelector('.avatar-option.selected');
+            const name = document.getElementById('edit-name-input').value;
+            await updateProfile(auth.currentUser, { displayName: name || auth.currentUser.displayName, photoURL: sel ? sel.dataset.url : auth.currentUser.photoURL });
+            location.reload();
+        };
+    </script>
+</body>
+</html>
+
