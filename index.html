@@ -43,7 +43,6 @@
         .unit-item:hover { background: rgba(255,255,255,0.1); }
         .unit-actions { display: flex; gap: 15px; align-items: center; }
         .unit-actions i { cursor: pointer; transition: 0.2s; }
-        .unit-actions i:hover { color: #00f2ff; scale: 1.2; }
 
         /* Full Screen PDF Lightbox */
         #pdf-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 3000; flex-direction: column; }
@@ -72,7 +71,7 @@
 </div>
 
 <div class="top-actions">
-    <div class="action-btn" onclick="handleGlobalShare()" title="Share Study Hub"><i class="fa-solid fa-share-nodes"></i></div>
+    <div class="action-btn" onclick="sharePage('Check out Study Hub for premium notes!')" title="Share Hub"><i class="fa-solid fa-share-nodes"></i></div>
     <div class="action-btn" onclick="location.reload()" title="Refresh Page"><i class="fa-solid fa-rotate-right"></i></div>
     <div class="action-btn" onclick="openAbout()" title="About Developers"><i class="fa-solid fa-info"></i></div>
 </div>
@@ -143,49 +142,26 @@
     let selectedIdx = null;
     let fCount = 0, hCount = 0;
 
-    // --- CORE SHARE LOGIC ---
-    window.handleGlobalShare = async () => {
-        const shareText = "Hey! Check out Study Hub for all your academic notes and PDFs. 🚀";
-        const shareUrl = window.location.href;
+    // --- GLOBAL SHARE FUNCTION (Shares Website Link) ---
+    window.sharePage = async (msg) => {
+        const shareData = {
+            title: 'Study Hub',
+            text: msg,
+            url: window.location.href // This ensures the website link is shared
+        };
 
-        if (navigator.share) {
-            try {
-                await navigator.share({ title: 'Study Hub', text: shareText, url: shareUrl });
-            } catch (err) { console.log("Share cancelled or failed"); }
-        } else {
-            copyToClipboard(shareUrl, "Hub link copied to clipboard!");
+        try {
+            if (navigator.share) {
+                await navigator.share(shareData);
+            } else {
+                await navigator.clipboard.writeText(window.location.href);
+                alert("Page link copied to clipboard!");
+            }
+        } catch (err) {
+            console.error("Error sharing:", err);
         }
     };
 
-    window.shareUnit = (index) => {
-        const unitName = subjectData[currentKey].units[index];
-        const unitUrl = subjectData[currentKey].links[index];
-        const text = `Check out these notes for ${unitName} on Study Hub!`;
-
-        if (unitUrl === "#") {
-            alert("No link available for this unit yet.");
-            return;
-        }
-
-        if (navigator.share) {
-            navigator.share({ title: unitName, text: text, url: unitUrl })
-            .catch(() => copyToClipboard(unitUrl, "Unit link copied!"));
-        } else {
-            copyToClipboard(unitUrl, "Unit link copied to clipboard!");
-        }
-    };
-
-    function copyToClipboard(text, msg) {
-        const el = document.createElement('textarea');
-        el.value = text;
-        document.body.appendChild(el);
-        el.select();
-        document.execCommand('copy');
-        document.body.removeChild(el);
-        alert(msg);
-    }
-
-    // --- ADMIN & DATA ---
     document.getElementById('fTrig').onclick = () => { if(++fCount === 5) { openModal('infoModal'); fCount = 0; } };
     window.hClick = () => {
         if(++hCount === 5) {
@@ -215,7 +191,7 @@
             grid.innerHTML += `
                 <div class="card" onclick="openSubject('${k}')">
                     <div class="admin-card-tools" style="${isAdmin ? 'display:flex' : ''}">
-                        <i class="fa-solid fa-pen" onclick="event.stopPropagation(); editSubject('${k}')"></i>
+                        <i class="fa-solid fa-edit" onclick="event.stopPropagation(); editSubject('${k}')"></i>
                         <i class="fa-solid fa-up-down" onclick="event.stopPropagation(); setPosition('${k}')"></i>
                         <i class="fa-solid fa-trash" onclick="event.stopPropagation(); deleteSubject('${k}')"></i>
                     </div>
@@ -243,8 +219,8 @@
                 <div class="unit-item" onclick="viewNote(${i})">
                     <span>${u}</span>
                     <div class="unit-actions">
-                        <i class="fa-solid fa-share-nodes" style="color:#00f2ff;" onclick="event.stopPropagation(); shareUnit(${i})" title="Share Unit"></i>
-                        ${isAdmin ? `<i class="fa-solid fa-trash" style="color:#ff5252;" onclick="event.stopPropagation(); deleteUnit(${i})"></i>` : ''}
+                        <i class="fa-solid fa-share-nodes" style="color:#00f2ff; margin-right:10px;" onclick="event.stopPropagation(); sharePage('Check out ${u} on Study Hub!')"></i>
+                        ${isAdmin ? `<i class="fa-solid fa-trash" style="color:#ff5252; margin-right:15px;" onclick="event.stopPropagation(); deleteUnit(${i})"></i>` : ''}
                         <i class="fa-solid fa-file-pdf" style="color:#e74c3c;"></i>
                     </div>
                 </div>`;
@@ -295,7 +271,7 @@
     };
 
     window.editSubject = async (k) => {
-        let n = prompt("New Subject Name:", subjectData[k].title);
+        let n = prompt("Edit Subject Name:", subjectData[k].title);
         if(n) { subjectData[k].title = n; await updateCloud(); }
     };
 
@@ -327,6 +303,11 @@
             await updateCloud();
         }
     };
+
+    window.setPosition = async (k) => {
+        let p = prompt("Set Position (number):", subjectData[k].pos || 0);
+        if(p) { subjectData[k].pos = parseInt(p); await updateCloud(); }
+    }
 
     window.openAbout = () => openModal('aboutModal');
     function openModal(id) { document.getElementById('overlay').style.display = 'block'; document.getElementById(id).style.display = 'block'; }
