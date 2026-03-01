@@ -22,6 +22,12 @@
         }
         .action-btn:hover { background: rgba(0, 242, 255, 0.2); box-shadow: 0 0 15px #00f2ff; }
 
+        /* Custom Toast */
+        #toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 9999; pointer-events: none; }
+        .toast { background: rgba(0, 242, 255, 0.9); color: #000; padding: 12px 25px; border-radius: 50px; font-weight: 600; font-size: 0.9rem; margin-top: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); animation: slideUp 0.4s ease-out, fadeOut 0.4s ease-in 2.5s forwards; }
+        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeOut { to { opacity: 0; transform: translateY(-20px); } }
+
         #admin-panel { display: none; background: #2ecc71; color: white; padding: 10px; text-align: center; position: sticky; top: 0; z-index: 1000; font-weight: bold;}
         .owner-btn { background: #00f2ff; color: #000; border: none; padding: 8px 15px; border-radius: 50px; font-weight: bold; cursor: pointer; margin: 5px; font-size: 0.8rem; }
 
@@ -42,9 +48,7 @@
         .unit-item { background: rgba(255,255,255,0.05); margin: 8px 0; padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; }
         .unit-item:hover { background: rgba(255,255,255,0.1); }
         .unit-actions { display: flex; gap: 15px; align-items: center; }
-        .unit-actions i { cursor: pointer; transition: 0.2s; }
 
-        /* Full Screen PDF Lightbox */
         #pdf-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 3000; flex-direction: column; }
         .viewer-controls { background: #111; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
         #pdf-frame { flex-grow: 1; border: none; width: 100%; height: 100%; background: #222; }
@@ -58,6 +62,7 @@
 <body>
 
 <div id="stars-container"></div>
+<div id="toast-container"></div>
 
 <div id="pdf-overlay">
     <div class="viewer-controls">
@@ -71,7 +76,7 @@
 </div>
 
 <div class="top-actions">
-    <div class="action-btn" onclick="sharePage('Check out Study Hub for premium notes!')" title="Share Hub"><i class="fa-solid fa-share-nodes"></i></div>
+    <div class="action-btn" onclick="shareHubLink('Study Hub: Check out our premium notes collection!')" title="Share Hub"><i class="fa-solid fa-share-nodes"></i></div>
     <div class="action-btn" onclick="location.reload()" title="Refresh Page"><i class="fa-solid fa-rotate-right"></i></div>
     <div class="action-btn" onclick="openAbout()" title="About Developers"><i class="fa-solid fa-info"></i></div>
 </div>
@@ -142,23 +147,36 @@
     let selectedIdx = null;
     let fCount = 0, hCount = 0;
 
-    // --- GLOBAL SHARE FUNCTION (Shares Website Link) ---
-    window.sharePage = async (msg) => {
+    // --- CUSTOM TOAST SYSTEM ---
+    window.showToast = (msg) => {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerText = `Study Hub: ${msg}`;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    };
+
+    // --- PAGE SHARE LOGIC ---
+    window.shareHubLink = async (customMsg) => {
         const shareData = {
             title: 'Study Hub',
-            text: msg,
-            url: window.location.href // This ensures the website link is shared
+            text: customMsg,
+            url: window.location.href 
         };
 
-        try {
-            if (navigator.share) {
+        if (navigator.share) {
+            try {
                 await navigator.share(shareData);
-            } else {
-                await navigator.clipboard.writeText(window.location.href);
-                alert("Page link copied to clipboard!");
-            }
-        } catch (err) {
-            console.error("Error sharing:", err);
+            } catch (err) { console.log("Share skipped"); }
+        } else {
+            const el = document.createElement('textarea');
+            el.value = window.location.href;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            showToast("Page link copied to clipboard!");
         }
     };
 
@@ -168,6 +186,7 @@
             if(prompt("System Pass:") === "study11") {
                 isAdmin = true;
                 document.getElementById('admin-panel').style.display = 'block';
+                showToast("Admin Mode Activated!");
                 closeAll();
                 renderSubjects();
             }
@@ -181,7 +200,7 @@
         if(currentKey) renderUnits();
     });
 
-    const updateCloud = async () => { try { await setDoc(docRef, subjectData); } catch(e) { alert("Cloud Sync Failed."); } };
+    const updateCloud = async () => { try { await setDoc(docRef, subjectData); } catch(e) { showToast("Cloud Sync Failed!"); } };
 
     window.renderSubjects = () => {
         const grid = document.getElementById('mainGrid');
@@ -191,7 +210,7 @@
             grid.innerHTML += `
                 <div class="card" onclick="openSubject('${k}')">
                     <div class="admin-card-tools" style="${isAdmin ? 'display:flex' : ''}">
-                        <i class="fa-solid fa-edit" onclick="event.stopPropagation(); editSubject('${k}')"></i>
+                        <i class="fa-solid fa-pen" onclick="event.stopPropagation(); editSubject('${k}')"></i>
                         <i class="fa-solid fa-up-down" onclick="event.stopPropagation(); setPosition('${k}')"></i>
                         <i class="fa-solid fa-trash" onclick="event.stopPropagation(); deleteSubject('${k}')"></i>
                     </div>
@@ -219,8 +238,8 @@
                 <div class="unit-item" onclick="viewNote(${i})">
                     <span>${u}</span>
                     <div class="unit-actions">
-                        <i class="fa-solid fa-share-nodes" style="color:#00f2ff; margin-right:10px;" onclick="event.stopPropagation(); sharePage('Check out ${u} on Study Hub!')"></i>
-                        ${isAdmin ? `<i class="fa-solid fa-trash" style="color:#ff5252; margin-right:15px;" onclick="event.stopPropagation(); deleteUnit(${i})"></i>` : ''}
+                        <i class="fa-solid fa-share-nodes" style="color:#00f2ff; margin-right:12px; cursor:pointer;" onclick="event.stopPropagation(); shareHubLink('Study Hub: Check out the notes for ${u}!')"></i>
+                        ${isAdmin ? `<i class="fa-solid fa-trash" style="color:#ff5252; margin-right:12px; cursor:pointer;" onclick="event.stopPropagation(); deleteUnit(${i})"></i>` : ''}
                         <i class="fa-solid fa-file-pdf" style="color:#e74c3c;"></i>
                     </div>
                 </div>`;
@@ -233,7 +252,7 @@
         if(isAdmin) document.getElementById('url-input-area').style.display = 'block';
         
         if(!rawUrl || rawUrl === "#") {
-             if(isAdmin) alert("Admin: Please paste a link below.");
+             if(isAdmin) showToast("Admin: Paste link below");
              return;
         }
 
@@ -265,14 +284,14 @@
             subjectData[currentKey].links[selectedIdx] = val;
             await updateCloud();
             document.getElementById('unitUrl').value = '';
-            alert("Saved!");
+            showToast("Unit Link Saved!");
             viewNote(selectedIdx);
         }
     };
 
     window.editSubject = async (k) => {
-        let n = prompt("Edit Subject Name:", subjectData[k].title);
-        if(n) { subjectData[k].title = n; await updateCloud(); }
+        let n = prompt("New Subject Name:", subjectData[k].title);
+        if(n) { subjectData[k].title = n; await updateCloud(); showToast("Subject Renamed!"); }
     };
 
     window.addSubject = async () => {
@@ -281,10 +300,11 @@
             let k = "id_" + Date.now();
             subjectData[k] = { title: n, units: [], links: [], pos: Object.keys(subjectData).length + 1 };
             await updateCloud();
+            showToast("Subject Added!");
         }
     };
 
-    window.deleteSubject = async (k) => { if(confirm("Delete?")) { delete subjectData[k]; await updateCloud(); } };
+    window.deleteSubject = async (k) => { if(confirm("Delete?")) { delete subjectData[k]; await updateCloud(); showToast("Subject Deleted"); } };
 
     window.addUnit = async () => {
         let n = prompt("Unit Name:");
@@ -293,6 +313,7 @@
             subjectData[currentKey].units.push(n);
             subjectData[currentKey].links.push("#");
             await updateCloud();
+            showToast("Unit Added!");
         }
     };
 
@@ -301,12 +322,13 @@
             subjectData[currentKey].units.splice(i, 1);
             subjectData[currentKey].links.splice(i, 1);
             await updateCloud();
+            showToast("Unit Deleted");
         }
     };
 
     window.setPosition = async (k) => {
-        let p = prompt("Set Position (number):", subjectData[k].pos || 0);
-        if(p) { subjectData[k].pos = parseInt(p); await updateCloud(); }
+        let p = prompt("New Position Number:", subjectData[k].pos || 0);
+        if(p) { subjectData[k].pos = parseInt(p); await updateCloud(); showToast("Position Updated!"); }
     }
 
     window.openAbout = () => openModal('aboutModal');
