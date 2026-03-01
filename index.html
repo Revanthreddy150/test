@@ -22,11 +22,11 @@
         }
         .action-btn:hover { background: rgba(0, 242, 255, 0.2); box-shadow: 0 0 15px #00f2ff; }
 
-        /* Custom Toast */
-        #toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 9999; pointer-events: none; }
-        .toast { background: rgba(0, 242, 255, 0.9); color: #000; padding: 12px 25px; border-radius: 50px; font-weight: 600; font-size: 0.9rem; margin-top: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); animation: slideUp 0.4s ease-out, fadeOut 0.4s ease-in 2.5s forwards; }
-        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes fadeOut { to { opacity: 0; transform: translateY(-20px); } }
+        /* Custom Toast Notification */
+        #toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 10000; pointer-events: none; }
+        .toast { background: rgba(0, 242, 255, 0.95); color: #000; padding: 12px 25px; border-radius: 50px; font-weight: 600; font-size: 0.9rem; margin-top: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.4); animation: toastIn 0.4s ease-out, toastOut 0.4s ease-in 2.5s forwards; min-width: 250px; text-align: center; }
+        @keyframes toastIn { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes toastOut { to { opacity: 0; transform: translateY(-20px); } }
 
         #admin-panel { display: none; background: #2ecc71; color: white; padding: 10px; text-align: center; position: sticky; top: 0; z-index: 1000; font-weight: bold;}
         .owner-btn { background: #00f2ff; color: #000; border: none; padding: 8px 15px; border-radius: 50px; font-weight: bold; cursor: pointer; margin: 5px; font-size: 0.8rem; }
@@ -49,9 +49,11 @@
         .unit-item:hover { background: rgba(255,255,255,0.1); }
         .unit-actions { display: flex; gap: 15px; align-items: center; }
 
-        #pdf-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 3000; flex-direction: column; }
-        .viewer-controls { background: #111; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
-        #pdf-frame { flex-grow: 1; border: none; width: 100%; height: 100%; background: #222; }
+        /* FIXED PDF OVERLAY & SCROLLING */
+        #pdf-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 3000; flex-direction: column; overflow: hidden; }
+        .viewer-controls { background: #111; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; z-index: 3001; }
+        .pdf-wrapper { flex-grow: 1; width: 100%; height: 100%; -webkit-overflow-scrolling: touch; overflow-y: auto; }
+        #pdf-frame { width: 100%; height: 100%; border: none; background: #222; display: block; }
 
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1500; }
         .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; padding: 25px; border-radius: 15px; border: 1px solid #00f2ff; z-index: 2000; text-align: center; width: 320px; }
@@ -72,11 +74,13 @@
             <button class="owner-btn" style="background:#ff5252; color:#fff;" onclick="closeViewer()">Close</button>
         </div>
     </div>
-    <iframe id="pdf-frame" src=""></iframe>
+    <div class="pdf-wrapper">
+        <iframe id="pdf-frame" src="" allow="autoplay"></iframe>
+    </div>
 </div>
 
 <div class="top-actions">
-    <div class="action-btn" onclick="shareHubLink('Study Hub: Check out our premium notes collection!')" title="Share Hub"><i class="fa-solid fa-share-nodes"></i></div>
+    <div class="action-btn" onclick="shareHubLink('Study Hub: Access all your premium study materials here!')" title="Share Hub"><i class="fa-solid fa-share-nodes"></i></div>
     <div class="action-btn" onclick="location.reload()" title="Refresh Page"><i class="fa-solid fa-rotate-right"></i></div>
     <div class="action-btn" onclick="openAbout()" title="About Developers"><i class="fa-solid fa-info"></i></div>
 </div>
@@ -157,11 +161,11 @@
         setTimeout(() => toast.remove(), 3000);
     };
 
-    // --- PAGE SHARE LOGIC ---
-    window.shareHubLink = async (customMsg) => {
+    // --- SHARE PAGE LINK LOGIC ---
+    window.shareHubLink = async (msg) => {
         const shareData = {
             title: 'Study Hub',
-            text: customMsg,
+            text: msg,
             url: window.location.href 
         };
 
@@ -176,7 +180,7 @@
             el.select();
             document.execCommand('copy');
             document.body.removeChild(el);
-            showToast("Page link copied to clipboard!");
+            showToast("Hub link copied to clipboard!");
         }
     };
 
@@ -200,7 +204,7 @@
         if(currentKey) renderUnits();
     });
 
-    const updateCloud = async () => { try { await setDoc(docRef, subjectData); } catch(e) { showToast("Cloud Sync Failed!"); } };
+    const updateCloud = async () => { try { await setDoc(docRef, subjectData); } catch(e) { showToast("Cloud Sync Error!"); } };
 
     window.renderSubjects = () => {
         const grid = document.getElementById('mainGrid');
@@ -238,8 +242,8 @@
                 <div class="unit-item" onclick="viewNote(${i})">
                     <span>${u}</span>
                     <div class="unit-actions">
-                        <i class="fa-solid fa-share-nodes" style="color:#00f2ff; margin-right:12px; cursor:pointer;" onclick="event.stopPropagation(); shareHubLink('Study Hub: Check out the notes for ${u}!')"></i>
-                        ${isAdmin ? `<i class="fa-solid fa-trash" style="color:#ff5252; margin-right:12px; cursor:pointer;" onclick="event.stopPropagation(); deleteUnit(${i})"></i>` : ''}
+                        <i class="fa-solid fa-share-nodes" style="color:#00f2ff; cursor:pointer;" onclick="event.stopPropagation(); shareHubLink('Study Hub: Check out the notes for ${u}!')"></i>
+                        ${isAdmin ? `<i class="fa-solid fa-trash" style="color:#ff5252; cursor:pointer;" onclick="event.stopPropagation(); deleteUnit(${i})"></i>` : ''}
                         <i class="fa-solid fa-file-pdf" style="color:#e74c3c;"></i>
                     </div>
                 </div>`;
@@ -252,15 +256,15 @@
         if(isAdmin) document.getElementById('url-input-area').style.display = 'block';
         
         if(!rawUrl || rawUrl === "#") {
-             if(isAdmin) showToast("Admin: Paste link below");
+             if(isAdmin) showToast("Admin: Please add a link");
              return;
         }
 
         let finalViewerUrl = "";
         if(rawUrl.includes('drive.google.com')) {
             let fileId = rawUrl.includes('/d/') ? rawUrl.split('/d/')[1].split('/')[0] : new URL(rawUrl).searchParams.get('id');
-            let directLink = `https://drive.google.com/uc?export=download&id=${fileId}`;
-            finalViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(directLink)}&embedded=true`;
+            // Using the 'preview' endpoint often helps with scrolling/viewing issues
+            finalViewerUrl = `https://drive.google.com/file/d/${fileId}/preview`;
         } else {
             finalViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(rawUrl)}&embedded=true`;
         }
@@ -284,14 +288,14 @@
             subjectData[currentKey].links[selectedIdx] = val;
             await updateCloud();
             document.getElementById('unitUrl').value = '';
-            showToast("Unit Link Saved!");
+            showToast("Unit Link Updated!");
             viewNote(selectedIdx);
         }
     };
 
     window.editSubject = async (k) => {
-        let n = prompt("New Subject Name:", subjectData[k].title);
-        if(n) { subjectData[k].title = n; await updateCloud(); showToast("Subject Renamed!"); }
+        let n = prompt("Edit Subject Name:", subjectData[k].title);
+        if(n) { subjectData[k].title = n; await updateCloud(); showToast("Subject Updated!"); }
     };
 
     window.addSubject = async () => {
@@ -300,11 +304,11 @@
             let k = "id_" + Date.now();
             subjectData[k] = { title: n, units: [], links: [], pos: Object.keys(subjectData).length + 1 };
             await updateCloud();
-            showToast("Subject Added!");
+            showToast("New Subject Created!");
         }
     };
 
-    window.deleteSubject = async (k) => { if(confirm("Delete?")) { delete subjectData[k]; await updateCloud(); showToast("Subject Deleted"); } };
+    window.deleteSubject = async (k) => { if(confirm("Delete this subject?")) { delete subjectData[k]; await updateCloud(); showToast("Subject Deleted!"); } };
 
     window.addUnit = async () => {
         let n = prompt("Unit Name:");
@@ -313,7 +317,7 @@
             subjectData[currentKey].units.push(n);
             subjectData[currentKey].links.push("#");
             await updateCloud();
-            showToast("Unit Added!");
+            showToast("Unit Added Successfully!");
         }
     };
 
@@ -322,13 +326,13 @@
             subjectData[currentKey].units.splice(i, 1);
             subjectData[currentKey].links.splice(i, 1);
             await updateCloud();
-            showToast("Unit Deleted");
+            showToast("Unit Removed!");
         }
     };
 
     window.setPosition = async (k) => {
-        let p = prompt("New Position Number:", subjectData[k].pos || 0);
-        if(p) { subjectData[k].pos = parseInt(p); await updateCloud(); showToast("Position Updated!"); }
+        let p = prompt("Enter Position Number:", subjectData[k].pos || 0);
+        if(p) { subjectData[k].pos = parseInt(p); await updateCloud(); showToast("Position Reordered!"); }
     }
 
     window.openAbout = () => openModal('aboutModal');
