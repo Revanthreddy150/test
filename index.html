@@ -3,330 +3,339 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>USEAS - Secure Portal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700&family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+    <title>Study Hub | Premium PDF Viewer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
-        :root {
-            --bg-light: #f8fafc;
-            --card-bg: rgba(255, 255, 255, 0.95);
-            --accent-indigo: #6366f1;
-            --accent-purple: #a855f7;
-            --text-main: #1e293b;
-            --error-red: #ef4444;
-            --gradient: linear-gradient(135deg, var(--accent-indigo) 0%, var(--accent-purple) 100%);
-        }
-
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: var(--bg-light);
-            display: flex; align-items: center; justify-content: center; 
-            min-height: 100vh; margin: 0; color: var(--text-main);
-            background-image: radial-gradient(circle at 50% 50%, #e2e8f0 0%, #f8fafc 100%);
-        }
-
-        #loader { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-light); display: flex; align-items: center;
-            justify-content: center; z-index: 9999; font-family: 'Plus Jakarta Sans';
-            color: var(--accent-indigo); font-weight: 700;
-        }
-
-        /* --- ANIMATED COLOR RING --- */
-        .avatar-wrapper {
-            position: relative; width: 120px; height: 120px;
-            margin: 0 auto 15px; display: flex; align-items: center; justify-content: center;
-        }
-
-        .animated-ring {
-            position: absolute; width: 100%; height: 100%; border-radius: 50%;
-            background: linear-gradient(45deg, #6366f1, #a855f7, #ec4899, #06b6d4, #6366f1);
-            background-size: 300% 300%;
-            animation: ringRotate 4s linear infinite, colorShift 8s ease infinite;
-        }
-
-        @keyframes ringRotate { 100% { transform: rotate(360deg); } }
-        @keyframes colorShift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-
-        #main-avatar { 
-            width: 108px; height: 108px; border-radius: 50%; border: 4px solid white; 
-            object-fit: cover; position: relative; z-index: 2; background: white;
-        }
-
-        .card { 
-            background: var(--card-bg); padding: 30px; border-radius: 24px; 
-            border: 1px solid rgba(99, 102, 241, 0.1); width: 90%; max-width: 400px; 
-            text-align: center; backdrop-filter: blur(10px); box-shadow: 0 20px 40px rgba(0,0,0,0.06);
-            display: none; 
-        }
-
-        .card.visible { display: block; animation: fadeIn 0.5s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
-
-        /* --- INPUTS & ICONS --- */
-        .input-group { position: relative; margin: 10px 0; }
-        input { 
-            width: 100%; padding: 12px 40px 12px 12px; background: #f8fafc; 
-            border: 1px solid #e2e8f0; border-radius: 10px; box-sizing: border-box; font-family: inherit;
-        }
-        .toggle-pass { 
-            position: absolute; right: 12px; top: 50%; transform: translateY(-50%); 
-            cursor: pointer; color: #94a3b8; font-size: 0.9rem; 
-        }
-
-        .avatar-grid {
-            display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
-            margin: 15px 0; padding: 10px; background: #f1f5f9; border-radius: 12px;
-            max-height: 180px; overflow-y: auto;
-        }
-
-        .avatar-option {
-            width: 100%; aspect-ratio: 1; border-radius: 50%; border: 2px solid transparent;
-            cursor: pointer; transition: 0.2s; background: white;
-        }
-        .avatar-option.selected { border-color: var(--accent-indigo); transform: scale(1.1); }
-
-        button { width: 100%; padding: 14px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; margin-top: 10px; text-transform: uppercase; transition: 0.3s; }
-        .btn-primary { background: var(--gradient); color: #fff; }
-        .btn-google { background: #fff; color: #444; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; gap: 10px; text-transform: none; }
-        .btn-outline { background: transparent; border: 1.5px solid var(--accent-indigo); color: var(--accent-indigo); margin-top: 15px; }
-        .btn-logout { background: none; color: var(--error-red); font-size: 0.8rem; border: none; margin-top: 15px; font-weight: 600; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
+        body { background: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%); color: white; min-height: 100vh; overflow-x: hidden; }
+        #stars-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: url('https://www.transparenttextures.com/patterns/stardust.png'); animation: moveStars 100s linear infinite; opacity: 0.5; }
+        @keyframes moveStars { from { background-position: 0 0; } to { background-position: 10000px 5000px; } }
         
-        .hidden { display: none !important; }
-        
-        #custom-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.5); display: flex; align-items: center; 
-            justify-content: center; z-index: 10000; opacity: 0; pointer-events: none; transition: 0.3s;
+        /* Top Action Buttons */
+        .top-actions { position: fixed; top: 20px; right: 20px; z-index: 1100; display: flex; gap: 12px; }
+        .action-btn { 
+            font-size: 1.1rem; color: #00f2ff; cursor: pointer; background: rgba(0,0,0,0.4); 
+            width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; 
+            justify-content: center; border: 1px solid #00f2ff; transition: 0.3s; backdrop-filter: blur(5px);
         }
-        #custom-modal.active { opacity: 1; pointer-events: all; }
-        .modal-content { background: #fff; padding: 25px; border-radius: 20px; width: 300px; text-align: center; }
+        .action-btn:hover { background: rgba(0, 242, 255, 0.2); box-shadow: 0 0 15px #00f2ff; }
+
+        #admin-panel { display: none; background: #2ecc71; color: white; padding: 10px; text-align: center; position: sticky; top: 0; z-index: 1000; font-weight: bold;}
+        .owner-btn { background: #00f2ff; color: #000; border: none; padding: 8px 15px; border-radius: 50px; font-weight: bold; cursor: pointer; margin: 5px; font-size: 0.8rem; }
+
+        .header { text-align: center; padding: 60px 20px 20px; }
+        .logo { font-size: 35px; font-weight: bold; text-shadow: 0 0 15px #00f2ff; letter-spacing: 2px; }
+        .search-container { max-width: 500px; margin: 20px auto; }
+        .search-container input { width: 100%; padding: 12px 20px; border-radius: 50px; border: 1px solid #00f2ff; background: rgba(0, 0, 0, 0.6); color: white; outline: none; }
+
+        .subjects { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; padding: 20px; max-width: 1000px; margin: 0 auto; }
+        .card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.1); padding: 25px; border-radius: 15px; text-align: center; cursor: pointer; transition: 0.3s; backdrop-filter: blur(5px); position: relative; }
+        .card:hover { transform: translateY(-5px); background: rgba(255, 255, 255, 0.1); border-color: #00f2ff; }
+        .card i { font-size: 2.5rem; margin-bottom: 10px; color: #00f2ff; }
+        
+        .admin-card-tools { position: absolute; top: 10px; right: 10px; display: none; gap: 8px; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 8px; }
+        .admin-card-tools i { font-size: 0.9rem; margin: 0; cursor: pointer; }
+
+        .notes-section { display: none; padding: 20px; max-width: 900px; margin: 20px auto; background: rgba(0,0,0,0.85); border-radius: 20px; border: 1px solid #00f2ff; }
+        .unit-item { background: rgba(255,255,255,0.05); margin: 8px 0; padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; }
+        .unit-item:hover { background: rgba(255,255,255,0.1); }
+        .unit-actions { display: flex; gap: 15px; align-items: center; }
+        .unit-actions i { cursor: pointer; transition: 0.2s; }
+        .unit-actions i:hover { color: #00f2ff; scale: 1.2; }
+
+        /* Full Screen PDF Lightbox */
+        #pdf-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 3000; flex-direction: column; }
+        .viewer-controls { background: #111; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
+        #pdf-frame { flex-grow: 1; border: none; width: 100%; height: 100%; background: #222; }
+
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1500; }
+        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; padding: 25px; border-radius: 15px; border: 1px solid #00f2ff; z-index: 2000; text-align: center; width: 320px; }
+
+        footer { padding: 40px; text-align: center; opacity: 0.4; font-size: 0.8rem; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div id="loader">INITIALIZING...</div>
+<div id="stars-container"></div>
 
-    <div id="custom-modal">
-        <div class="modal-content">
-            <h4 id="modal-title" style="color: var(--accent-indigo); margin:0;">SYSTEM</h4>
-            <div id="modal-msg" style="font-size: 0.85rem; margin: 15px 0 20px;"></div>
-            <div id="modal-extra-input" class="hidden">
-                 <input type="password" id="modal-pass-input" placeholder="Set Password">
-                 <input type="password" id="modal-conf-input" placeholder="Confirm Password">
-                 <button id="modal-action-btn" class="btn-primary">Set Password</button>
-            </div>
-            <button id="modal-close-btn" onclick="document.getElementById('custom-modal').classList.remove('active')" class="btn-primary" style="padding: 10px;">OK</button>
+<div id="pdf-overlay">
+    <div class="viewer-controls">
+        <span id="viewer-title" style="color: #00f2ff; font-weight: 600; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 50%;">Loading...</span>
+        <div style="display:flex; gap: 8px;">
+            <button id="main-dl" class="owner-btn" style="background:#2ecc71;">Download</button>
+            <button class="owner-btn" style="background:#ff5252; color:#fff;" onclick="closeViewer()">Close</button>
         </div>
     </div>
+    <iframe id="pdf-frame" src=""></iframe>
+</div>
 
-    <div id="auth-card" class="card">
-        <h2 style="font-family: 'Plus Jakarta Sans';">Access Portal</h2>
-        <input type="email" id="email" placeholder="EMAIL ADDRESS">
-        <div class="input-group">
-            <input type="password" id="password" placeholder="PASSWORD">
-            <i class="fa-solid fa-eye toggle-pass" onclick="toggleVisibility('password', this)"></i>
-        </div>
-        <button id="login-btn" class="btn-primary">LOGIN</button>
-        <button id="signup-btn" class="btn-primary hidden">CREATE ACCOUNT</button>
-        
-        <div id="google-section">
-            <div style="margin: 15px 0; color: #cbd5e1; font-size: 0.7rem;">OR</div>
-            <button id="google-btn" class="btn-google">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18">
-                Continue with Google
-            </button>
-        </div>
+<div class="top-actions">
+    <div class="action-btn" onclick="handleGlobalShare()" title="Share Study Hub"><i class="fa-solid fa-share-nodes"></i></div>
+    <div class="action-btn" onclick="location.reload()" title="Refresh Page"><i class="fa-solid fa-rotate-right"></i></div>
+    <div class="action-btn" onclick="openAbout()" title="About Developers"><i class="fa-solid fa-info"></i></div>
+</div>
 
-        <div style="display: flex; justify-content: space-between; margin-top: 15px; font-size: 0.75rem;">
-            <span id="toggle-text" style="cursor:pointer; color: var(--accent-indigo); font-weight: 600;">New User? Register</span>
-            <span id="forgot-pass-btn" style="cursor:pointer; color: #64748b;">Forgot Password?</span>
+<div id="admin-panel">
+    🛡️ ADMIN ACTIVE | 
+    <button class="owner-btn" onclick="addSubject()">+ New Subject</button>
+    <button class="owner-btn" style="background:#ff5252; color:#fff;" onclick="location.reload()">Exit</button>
+</div>
+
+<div class="header">
+    <div class="logo">🚀 STUDY HUB</div>
+    <div class="search-container"><input type="text" id="mSearch" placeholder="Search subjects..." onkeyup="doSearch()"></div>
+</div>
+
+<div class="subjects" id="mainGrid"></div>
+
+<div class="notes-section" id="notesArea">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h2 id="noteTitle" style="color:#00f2ff;"></h2>
+        <button class="owner-btn" style="background:#444; color:white;" onclick="hideNotes()">Back</button>
+    </div>
+    
+    <div id="unitList" style="margin-top:15px;"></div>
+    
+    <div id="admin-unit-tools" style="display:none; margin-top:20px; border-top:1px solid #333; padding-top:15px;">
+        <button class="owner-btn" onclick="addUnit()">+ Add Unit</button>
+        <div id="url-input-area" style="display:none; margin-top:10px;">
+            <input type="text" id="unitUrl" placeholder="Paste Google Drive Link" style="width:100%; padding:10px; border-radius:8px; border:1px solid #00f2ff; background:#000; color:#fff;">
+            <button class="owner-btn" onclick="saveUrl()" style="width:100%; margin-top:10px;">Save Link</button>
         </div>
     </div>
+</div>
 
-    <div id="profile-card" class="card">
-        <h3 style="font-family: 'Plus Jakarta Sans'; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-top: 0;">USER PROFILE</h3>
-        
-        <div class="avatar-wrapper">
-            <div class="animated-ring"></div>
-            <img id="main-avatar" src="" alt="Profile">
-        </div>
+<div class="overlay" id="overlay" onclick="closeAll()"></div>
+<div class="modal" id="infoModal">
+    <h2 id="popHead" onclick="hClick()">STUDY HUB</h2>
+    <p style="margin-top:10px;">Empowering Students.</p>
+</div>
+<div class="modal" id="aboutModal">
+    <h2>Developers</h2>
+    <p style="color:#00f2ff; font-weight:600; font-size:1.1rem; margin:10px 0;">Revanth & Sandeep</p>
+    <button class="owner-btn" onclick="closeAll()">Close</button>
+</div>
 
-        <div id="display-name" style="font-weight: 700; font-size: 1.2rem;">---</div>
-        <div id="display-email" style="font-size: 0.8rem; color: #64748b; margin-bottom: 10px;">---</div>
+<footer id="fTrig">© 2026 Education Portal</footer>
 
-        <div id="edit-box" class="hidden" style="border-top: 1px solid #eee; padding-top: 10px;">
-            <p style="font-size: 0.7rem; color: var(--accent-indigo); font-weight: 700;">SELECT AVATAR (50 MODELS)</p>
-            <div class="avatar-grid" id="avatar-selector"></div>
-            <input type="text" id="edit-name-input" placeholder="New Display Name">
-            <button id="save-btn" class="btn-primary">UPDATE PROFILE</button>
-        </div>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        <div id="password-box" class="hidden" style="border-top: 1px solid #eee; padding-top: 10px; margin-top: 10px;">
-            <p style="font-size: 0.7rem; color: var(--accent-purple); font-weight: 700;">SECURITY SETTINGS</p>
-            <div id="standard-pw-fields">
-                <div class="input-group">
-                    <input type="password" id="old-pass" placeholder="Old Password">
-                </div>
-            </div>
-            <div class="input-group">
-                <input type="password" id="new-pass" placeholder="New Password">
-            </div>
-            <div class="input-group">
-                <input type="password" id="confirm-pass" placeholder="Confirm Password">
-            </div>
-            <button id="confirm-pass-btn" class="btn-primary">UPDATE PASSWORD</button>
-        </div>
+    const firebaseConfig = {
+        apiKey: "AIzaSyDEMuw60DEiC1WDRdQ5vslBKS8LimB_Uj0",
+        authDomain: "studyhub-33164.firebaseapp.com",
+        projectId: "studyhub-33164",
+        storageBucket: "studyhub-33164.firebasestorage.app",
+        messagingSenderId: "918352715015",
+        appId: "1:918352715015:web:ab2ba28aa9456aba32b9a2"
+    };
 
-        <div style="display: flex; gap: 10px;">
-            <button id="toggle-edit-btn" class="btn-outline" style="font-size: 0.7rem;"><i class="fa-solid fa-user-pen"></i> EDIT</button>
-            <button id="toggle-pass-btn" class="btn-outline" style="font-size: 0.7rem;"><i class="fa-solid fa-lock"></i> SECURITY</button>
-        </div>
-        
-        <button id="logout-btn" class="btn-logout">Logout Account</button>
-    </div>
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const docRef = doc(db, "studyhub", "cloudData");
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { 
-            getAuth, onAuthStateChanged, updateProfile, signInWithEmailAndPassword, 
-            createUserWithEmailAndPassword, signOut, sendPasswordResetEmail,
-            updatePassword, EmailAuthProvider, reauthenticateWithCredential,
-            GoogleAuthProvider, signInWithPopup, linkWithCredential
-        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    let subjectData = {};
+    let isAdmin = false;
+    let currentKey = '';
+    let selectedIdx = null;
+    let fCount = 0, hCount = 0;
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyArqJycgZtlLpM7KQ2T9h-e2eJUHtMg-TY",
-            authDomain: "tff-earns.firebaseapp.com",
-            projectId: "tff-earns",
-            storageBucket: "tff-earns.firebasestorage.app",
-            messagingSenderId: "762695597074",
-            appId: "1:762695597074:web:bd7a8df2df2806d5b26ccb"
-        };
+    // --- CORE SHARE LOGIC ---
+    window.handleGlobalShare = async () => {
+        const shareText = "Hey! Check out Study Hub for all your academic notes and PDFs. 🚀";
+        const shareUrl = window.location.href;
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
+        if (navigator.share) {
+            try {
+                await navigator.share({ title: 'Study Hub', text: shareText, url: shareUrl });
+            } catch (err) { console.log("Share cancelled or failed"); }
+        } else {
+            copyToClipboard(shareUrl, "Hub link copied to clipboard!");
+        }
+    };
 
-        window.toggleVisibility = (id, icon) => {
-            const input = document.getElementById(id);
-            input.type = input.type === "password" ? "text" : "password";
-            icon.classList.toggle('fa-eye'); icon.classList.toggle('fa-eye-slash');
-        };
+    window.shareUnit = (index) => {
+        const unitName = subjectData[currentKey].units[index];
+        const unitUrl = subjectData[currentKey].links[index];
+        const text = `Check out these notes for ${unitName} on Study Hub!`;
 
-        const grid = document.getElementById('avatar-selector');
-        for (let i = 1; i <= 50; i++) {
-            const img = document.createElement('img');
-            const url = `https://api.dicebear.com/7.x/adventurer/svg?seed=${i + 88}`;
-            img.src = url; img.className = 'avatar-option';
-            img.onclick = () => {
-                document.querySelectorAll('.avatar-option').forEach(el => el.classList.remove('selected'));
-                img.classList.add('selected'); img.dataset.url = url;
-            };
-            grid.appendChild(img);
+        if (unitUrl === "#") {
+            alert("No link available for this unit yet.");
+            return;
         }
 
-        const showNotice = (title, msg) => {
-            document.getElementById('modal-title').innerText = title;
-            document.getElementById('modal-msg').innerText = msg;
-            document.getElementById('modal-extra-input').classList.add('hidden');
-            document.getElementById('modal-close-btn').classList.remove('hidden');
-            document.getElementById('custom-modal').classList.add('active');
-        };
+        if (navigator.share) {
+            navigator.share({ title: unitName, text: text, url: unitUrl })
+            .catch(() => copyToClipboard(unitUrl, "Unit link copied!"));
+        } else {
+            copyToClipboard(unitUrl, "Unit link copied to clipboard!");
+        }
+    };
 
-        // --- AUTH STATE & GOOGLE PW PROMPT ---
-        onAuthStateChanged(auth, (user) => {
-            document.getElementById('loader').style.display = 'none';
-            if (user) {
-                document.getElementById('auth-card').classList.remove('visible');
-                document.getElementById('profile-card').classList.add('visible');
-                document.getElementById('display-name').innerText = user.displayName || "USEAS Member";
-                document.getElementById('display-email').innerText = user.email;
-                document.getElementById('main-avatar').src = user.photoURL || `https://api.dicebear.com/7.x/adventurer/svg?seed=1`;
+    function copyToClipboard(text, msg) {
+        const el = document.createElement('textarea');
+        el.value = text;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+        alert(msg);
+    }
 
-                // Check if user is Google-only (no password)
-                const isGoogleUser = user.providerData.some(p => p.providerId === 'google.com');
-                const hasPassword = user.providerData.some(p => p.providerId === 'password');
-                
-                if(isGoogleUser && !hasPassword) {
-                    document.getElementById('modal-title').innerText = "SECURITY ALERT";
-                    document.getElementById('modal-msg').innerText = "You joined via Google. Please set a password for account recovery.";
-                    document.getElementById('modal-extra-input').classList.remove('hidden');
-                    document.getElementById('modal-close-btn').classList.add('hidden');
-                    document.getElementById('custom-modal').classList.add('active');
-                    document.getElementById('standard-pw-fields').classList.add('hidden'); // Hide old pass field for google users
-                } else {
-                    document.getElementById('standard-pw-fields').classList.remove('hidden');
-                }
-            } else {
-                document.getElementById('profile-card').classList.remove('visible');
-                document.getElementById('auth-card').classList.add('visible');
+    // --- ADMIN & DATA ---
+    document.getElementById('fTrig').onclick = () => { if(++fCount === 5) { openModal('infoModal'); fCount = 0; } };
+    window.hClick = () => {
+        if(++hCount === 5) {
+            if(prompt("System Pass:") === "study11") {
+                isAdmin = true;
+                document.getElementById('admin-panel').style.display = 'block';
+                closeAll();
+                renderSubjects();
             }
+            hCount = 0;
+        }
+    };
+
+    onSnapshot(docRef, (s) => {
+        if(s.exists()) subjectData = s.data();
+        renderSubjects();
+        if(currentKey) renderUnits();
+    });
+
+    const updateCloud = async () => { try { await setDoc(docRef, subjectData); } catch(e) { alert("Cloud Sync Failed."); } };
+
+    window.renderSubjects = () => {
+        const grid = document.getElementById('mainGrid');
+        grid.innerHTML = '';
+        const keys = Object.keys(subjectData).sort((a, b) => (subjectData[a].pos || 999) - (subjectData[b].pos || 999));
+        keys.forEach(k => {
+            grid.innerHTML += `
+                <div class="card" onclick="openSubject('${k}')">
+                    <div class="admin-card-tools" style="${isAdmin ? 'display:flex' : ''}">
+                        <i class="fa-solid fa-pen" onclick="event.stopPropagation(); editSubject('${k}')"></i>
+                        <i class="fa-solid fa-up-down" onclick="event.stopPropagation(); setPosition('${k}')"></i>
+                        <i class="fa-solid fa-trash" onclick="event.stopPropagation(); deleteSubject('${k}')"></i>
+                    </div>
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <h3>${subjectData[k].title}</h3>
+                </div>`;
         });
+    };
 
-        // SET PASSWORD FOR GOOGLE USERS
-        document.getElementById('modal-action-btn').onclick = async () => {
-            const pw = document.getElementById('modal-pass-input').value;
-            const cp = document.getElementById('modal-conf-input').value;
-            if(pw.length < 6) return alert("Password must be 6+ chars");
-            if(pw !== cp) return alert("Passwords don't match");
+    window.openSubject = (k) => {
+        currentKey = k;
+        document.getElementById('mainGrid').style.display = 'none';
+        document.getElementById('notesArea').style.display = 'block';
+        document.getElementById('noteTitle').innerText = subjectData[k].title;
+        document.getElementById('admin-unit-tools').style.display = isAdmin ? 'block' : 'none';
+        renderUnits();
+    };
 
-            try {
-                await updatePassword(auth.currentUser, pw);
-                showNotice("SUCCESS", "Password set! You can now login with email or Google.");
-            } catch (e) { alert(e.message); }
-        };
+    window.renderUnits = () => {
+        const list = document.getElementById('unitList');
+        list.innerHTML = '';
+        const units = subjectData[currentKey].units || [];
+        units.forEach((u, i) => {
+            list.innerHTML += `
+                <div class="unit-item" onclick="viewNote(${i})">
+                    <span>${u}</span>
+                    <div class="unit-actions">
+                        <i class="fa-solid fa-share-nodes" style="color:#00f2ff;" onclick="event.stopPropagation(); shareUnit(${i})" title="Share Unit"></i>
+                        ${isAdmin ? `<i class="fa-solid fa-trash" style="color:#ff5252;" onclick="event.stopPropagation(); deleteUnit(${i})"></i>` : ''}
+                        <i class="fa-solid fa-file-pdf" style="color:#e74c3c;"></i>
+                    </div>
+                </div>`;
+        });
+    };
 
-        // GOOGLE LOGIN
-        document.getElementById('google-btn').onclick = () => signInWithPopup(auth, provider).catch(e => showNotice("ERROR", e.message));
+    window.viewNote = (i) => {
+        selectedIdx = i;
+        let rawUrl = subjectData[currentKey].links[i];
+        if(isAdmin) document.getElementById('url-input-area').style.display = 'block';
+        
+        if(!rawUrl || rawUrl === "#") {
+             if(isAdmin) alert("Admin: Please paste a link below.");
+             return;
+        }
 
-        // STANDARD PASSWORD CHANGE
-        document.getElementById('confirm-pass-btn').onclick = async () => {
-            const user = auth.currentUser;
-            const oldP = document.getElementById('old-pass').value;
-            const newP = document.getElementById('new-pass').value;
-            
-            try {
-                if(!document.getElementById('standard-pw-fields').classList.contains('hidden')) {
-                    const cred = EmailAuthProvider.credential(user.email, oldP);
-                    await reauthenticateWithCredential(user, cred);
-                }
-                await updatePassword(user, newP);
-                showNotice("SUCCESS", "Password Updated!");
-            } catch (e) { showNotice("ERROR", e.message); }
-        };
+        let finalViewerUrl = "";
+        if(rawUrl.includes('drive.google.com')) {
+            let fileId = rawUrl.includes('/d/') ? rawUrl.split('/d/')[1].split('/')[0] : new URL(rawUrl).searchParams.get('id');
+            let directLink = `https://drive.google.com/uc?export=download&id=${fileId}`;
+            finalViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(directLink)}&embedded=true`;
+        } else {
+            finalViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(rawUrl)}&embedded=true`;
+        }
 
-        // LOGIN / SIGNUP / LOGOUT
-        document.getElementById('login-btn').onclick = () => signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value).catch(e => showNotice("AUTH ERROR", e.message));
-        document.getElementById('signup-btn').onclick = () => createUserWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value).catch(e => showNotice("AUTH ERROR", e.message));
-        document.getElementById('logout-btn').onclick = () => signOut(auth);
-        document.getElementById('forgot-pass-btn').onclick = () => {
-            const em = document.getElementById('email').value;
-            if(!em) return showNotice("SYSTEM", "Enter email first");
-            sendPasswordResetEmail(auth, em).then(() => showNotice("SENT", "Check your email")).catch(e => showNotice("ERROR", e.message));
-        };
+        document.getElementById('viewer-title').innerText = subjectData[currentKey].units[i];
+        document.getElementById('pdf-frame').src = finalViewerUrl;
+        document.getElementById('pdf-overlay').style.display = 'flex';
+        document.getElementById('main-dl').onclick = () => window.open(rawUrl, '_blank');
+        document.body.style.overflow = 'hidden'; 
+    };
 
-        // TOGGLES
-        document.getElementById('toggle-edit-btn').onclick = () => { document.getElementById('edit-box').classList.toggle('hidden'); document.getElementById('password-box').classList.add('hidden'); };
-        document.getElementById('toggle-pass-btn').onclick = () => { document.getElementById('password-box').classList.toggle('hidden'); document.getElementById('edit-box').classList.add('hidden'); };
-        document.getElementById('toggle-text').onclick = function() {
-            const isL = !document.getElementById('login-btn').classList.contains('hidden');
-            document.getElementById('login-btn').classList.toggle('hidden');
-            document.getElementById('signup-btn').classList.toggle('hidden');
-            document.getElementById('google-section').classList.toggle('hidden');
-            this.innerText = isL ? "Back to Login" : "New User? Register";
-        };
+    window.closeViewer = () => {
+        document.getElementById('pdf-overlay').style.display = 'none';
+        document.getElementById('pdf-frame').src = "";
+        document.body.style.overflow = 'auto';
+    };
 
-        document.getElementById('save-btn').onclick = async () => {
-            const sel = document.querySelector('.avatar-option.selected');
-            const name = document.getElementById('edit-name-input').value;
-            await updateProfile(auth.currentUser, { displayName: name || auth.currentUser.displayName, photoURL: sel ? sel.dataset.url : auth.currentUser.photoURL });
-            location.reload();
-        };
-    </script>
+    window.saveUrl = async () => {
+        const val = document.getElementById('unitUrl').value;
+        if(selectedIdx !== null && val) {
+            subjectData[currentKey].links[selectedIdx] = val;
+            await updateCloud();
+            document.getElementById('unitUrl').value = '';
+            alert("Saved!");
+            viewNote(selectedIdx);
+        }
+    };
+
+    window.editSubject = async (k) => {
+        let n = prompt("New Subject Name:", subjectData[k].title);
+        if(n) { subjectData[k].title = n; await updateCloud(); }
+    };
+
+    window.addSubject = async () => {
+        let n = prompt("Subject Name:");
+        if(n) {
+            let k = "id_" + Date.now();
+            subjectData[k] = { title: n, units: [], links: [], pos: Object.keys(subjectData).length + 1 };
+            await updateCloud();
+        }
+    };
+
+    window.deleteSubject = async (k) => { if(confirm("Delete?")) { delete subjectData[k]; await updateCloud(); } };
+
+    window.addUnit = async () => {
+        let n = prompt("Unit Name:");
+        if(n) {
+            if(!subjectData[currentKey].units) { subjectData[currentKey].units = []; subjectData[currentKey].links = []; }
+            subjectData[currentKey].units.push(n);
+            subjectData[currentKey].links.push("#");
+            await updateCloud();
+        }
+    };
+
+    window.deleteUnit = async (i) => {
+        if(confirm("Delete Unit?")) {
+            subjectData[currentKey].units.splice(i, 1);
+            subjectData[currentKey].links.splice(i, 1);
+            await updateCloud();
+        }
+    };
+
+    window.openAbout = () => openModal('aboutModal');
+    function openModal(id) { document.getElementById('overlay').style.display = 'block'; document.getElementById(id).style.display = 'block'; }
+    window.closeAll = () => document.querySelectorAll('.modal, .overlay').forEach(e => e.style.display = 'none');
+    window.hideNotes = () => { currentKey = ''; document.getElementById('mainGrid').style.display = 'grid'; document.getElementById('notesArea').style.display = 'none'; };
+    window.doSearch = () => {
+        let q = document.getElementById('mSearch').value.toLowerCase();
+        document.querySelectorAll('.card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(q) ? 'block' : 'none');
+    };
+</script>
 </body>
 </html>
-
