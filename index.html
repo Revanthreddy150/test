@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Study Hub | Premium PDF Viewer</title>
+    <title>Study Hub | Premium PDF & Video Viewer</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -13,7 +13,6 @@
         #stars-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: url('https://www.transparenttextures.com/patterns/stardust.png'); animation: moveStars 100s linear infinite; opacity: 0.5; }
         @keyframes moveStars { from { background-position: 0 0; } to { background-position: 10000px 5000px; } }
         
-        /* Top Action Buttons */
         .top-actions { position: fixed; top: 20px; right: 20px; z-index: 1100; display: flex; gap: 12px; }
         .action-btn { 
             font-size: 1.1rem; color: #00f2ff; cursor: pointer; background: rgba(0,0,0,0.4); 
@@ -22,7 +21,6 @@
         }
         .action-btn:hover { background: rgba(0, 242, 255, 0.2); box-shadow: 0 0 15px #00f2ff; }
 
-        /* Custom Toast Notification */
         #toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 10000; pointer-events: none; }
         .toast { background: rgba(0, 242, 255, 0.95); color: #000; padding: 12px 25px; border-radius: 50px; font-weight: 600; font-size: 0.9rem; margin-top: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.4); animation: toastIn 0.4s ease-out, toastOut 0.4s ease-in 2.5s forwards; min-width: 250px; text-align: center; }
         @keyframes toastIn { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -49,16 +47,18 @@
         .unit-item:hover { background: rgba(255,255,255,0.1); }
         .unit-actions { display: flex; gap: 15px; align-items: center; }
 
-        /* FIXED PDF OVERLAY & SCROLLING */
-        #pdf-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 3000; flex-direction: column; overflow: hidden; }
+        /* Media Overlays (PDF & Video) */
+        #pdf-overlay, #video-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 3000; flex-direction: column; overflow: hidden; }
         .viewer-controls { background: #111; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; z-index: 3001; }
-        .pdf-wrapper { flex-grow: 1; width: 100%; height: 100%; -webkit-overflow-scrolling: touch; overflow-y: auto; }
-        #pdf-frame { width: 100%; height: 100%; border: none; background: #222; display: block; }
+        .media-wrapper { flex-grow: 1; width: 100%; height: 100%; position: relative; }
+        #pdf-frame, #video-frame { width: 100%; height: 100%; border: none; background: #000; display: block; }
 
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1500; }
         .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; padding: 25px; border-radius: 15px; border: 1px solid #00f2ff; z-index: 2000; text-align: center; width: 320px; }
 
         footer { padding: 40px; text-align: center; opacity: 0.4; font-size: 0.8rem; cursor: pointer; }
+        .tab-btn { background: #333; color: #fff; border: 1px solid #444; padding: 5px 10px; cursor: pointer; border-radius: 5px; font-size: 0.7rem;}
+        .tab-btn.active { background: #00f2ff; color: #000; }
     </style>
 </head>
 <body>
@@ -74,13 +74,23 @@
             <button class="owner-btn" style="background:#ff5252; color:#fff;" onclick="closeViewer()">Close</button>
         </div>
     </div>
-    <div class="pdf-wrapper">
+    <div class="media-wrapper">
         <iframe id="pdf-frame" src="" allow="autoplay"></iframe>
     </div>
 </div>
 
+<div id="video-overlay">
+    <div class="viewer-controls">
+        <span id="video-title" style="color: #00f2ff; font-weight: 600;">Video Lesson</span>
+        <button class="owner-btn" style="background:#ff5252; color:#fff;" onclick="closeVideo()">Close</button>
+    </div>
+    <div class="media-wrapper">
+        <iframe id="video-frame" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+    </div>
+</div>
+
 <div class="top-actions">
-    <div class="action-btn" onclick="shareHubLink('Study Hub: Access all your premium study materials here!')" title="Share Hub"><i class="fa-solid fa-share-nodes"></i></div>
+    <div class="action-btn" onclick="handleSmartShare('Check out Study Hub for all your notes!')" title="Share Hub"><i class="fa-solid fa-share-nodes"></i></div>
     <div class="action-btn" onclick="location.reload()" title="Refresh Page"><i class="fa-solid fa-rotate-right"></i></div>
     <div class="action-btn" onclick="openAbout()" title="About Developers"><i class="fa-solid fa-info"></i></div>
 </div>
@@ -107,19 +117,23 @@
     <div id="unitList" style="margin-top:15px;"></div>
     
     <div id="admin-unit-tools" style="display:none; margin-top:20px; border-top:1px solid #333; padding-top:15px;">
-        <button class="owner-btn" onclick="addUnit()">+ Add Unit</button>
-        <div id="url-input-area" style="display:none; margin-top:10px;">
-            <input type="text" id="unitUrl" placeholder="Paste Google Drive Link" style="width:100%; padding:10px; border-radius:8px; border:1px solid #00f2ff; background:#000; color:#fff;">
-            <button class="owner-btn" onclick="saveUrl()" style="width:100%; margin-top:10px;">Save Link</button>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <button class="owner-btn" onclick="addUnit()">+ Add Unit</button>
+            <div id="edit-indicator" style="font-size: 0.7rem; color: #00f2ff; font-style: italic;">Select a unit to edit links</div>
+        </div>
+        
+        <div id="url-input-area" style="display:none; margin-top:10px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px;">
+            <div style="display:flex; gap:5px; margin-bottom:10px;">
+                <button id="tabPdf" class="tab-btn active" onclick="switchLinkType('pdf')">PDF Link</button>
+                <button id="tabVid" class="tab-btn" onclick="switchLinkType('vid')">YouTube Link</button>
+            </div>
+            <input type="text" id="unitUrl" placeholder="Paste Link here..." style="width:100%; padding:10px; border-radius:8px; border:1px solid #00f2ff; background:#000; color:#fff;">
+            <button class="owner-btn" onclick="saveUrl()" style="width:100%; margin-top:10px;">Update Link</button>
         </div>
     </div>
 </div>
 
 <div class="overlay" id="overlay" onclick="closeAll()"></div>
-<div class="modal" id="infoModal">
-    <h2 id="popHead" onclick="hClick()">STUDY HUB</h2>
-    <p style="margin-top:10px;">Empowering Students.</p>
-</div>
 <div class="modal" id="aboutModal">
     <h2>Developers</h2>
     <p style="color:#00f2ff; font-weight:600; font-size:1.1rem; margin:10px 0;">Revanth & Sandeep</p>
@@ -149,9 +163,9 @@
     let isAdmin = false;
     let currentKey = '';
     let selectedIdx = null;
-    let fCount = 0, hCount = 0;
+    let activeLinkType = 'pdf'; // or 'vid'
+    let fCount = 0;
 
-    // --- CUSTOM TOAST SYSTEM ---
     window.showToast = (msg) => {
         const container = document.getElementById('toast-container');
         const toast = document.createElement('div');
@@ -161,40 +175,31 @@
         setTimeout(() => toast.remove(), 3000);
     };
 
-    // --- SHARE PAGE LINK LOGIC ---
-    window.shareHubLink = async (msg) => {
-        const shareData = {
-            title: 'Study Hub',
-            text: msg,
-            url: window.location.href 
-        };
-
+    window.handleSmartShare = async (msg) => {
+        const shareUrl = window.location.href.split('?')[0];
+        const fullText = `${msg}\nLink: ${shareUrl}`;
         if (navigator.share) {
-            try {
-                await navigator.share(shareData);
-            } catch (err) { console.log("Share skipped"); }
-        } else {
-            const el = document.createElement('textarea');
-            el.value = window.location.href;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
-            showToast("Hub link copied to clipboard!");
+            try { await navigator.share({ title: 'Study Hub', text: msg, url: shareUrl }); return; } catch (err) {}
         }
+        try {
+            const textArea = document.createElement("textarea");
+            textArea.value = fullText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            showToast("Link Copied!");
+        } catch (err) { prompt("Copy link:", shareUrl); }
     };
 
-    document.getElementById('fTrig').onclick = () => { if(++fCount === 5) { openModal('infoModal'); fCount = 0; } };
+    document.getElementById('fTrig').onclick = () => { if(++fCount === 5) { hClick(); fCount = 0; } };
     window.hClick = () => {
-        if(++hCount === 5) {
-            if(prompt("System Pass:") === "study11") {
-                isAdmin = true;
-                document.getElementById('admin-panel').style.display = 'block';
-                showToast("Admin Mode Activated!");
-                closeAll();
-                renderSubjects();
-            }
-            hCount = 0;
+        const pass = prompt("System Pass:");
+        if(pass === "study11") {
+            isAdmin = true;
+            document.getElementById('admin-panel').style.display = 'block';
+            showToast("Admin Mode Active!");
+            renderSubjects();
         }
     };
 
@@ -204,7 +209,7 @@
         if(currentKey) renderUnits();
     });
 
-    const updateCloud = async () => { try { await setDoc(docRef, subjectData); } catch(e) { showToast("Cloud Sync Error!"); } };
+    const updateCloud = async () => { try { await setDoc(docRef, subjectData); } catch(e) { showToast("Sync Error!"); } };
 
     window.renderSubjects = () => {
         const grid = document.getElementById('mainGrid');
@@ -237,12 +242,16 @@
         const list = document.getElementById('unitList');
         list.innerHTML = '';
         const units = subjectData[currentKey].units || [];
+        const vids = subjectData[currentKey].vids || [];
+        
         units.forEach((u, i) => {
+            const hasVid = vids[i] && vids[i] !== "#";
             list.innerHTML += `
-                <div class="unit-item" onclick="viewNote(${i})">
+                <div class="unit-item" onclick="handleUnitClick(${i})">
                     <span>${u}</span>
                     <div class="unit-actions">
-                        <i class="fa-solid fa-share-nodes" style="color:#00f2ff; cursor:pointer;" onclick="event.stopPropagation(); shareHubLink('Study Hub: Check out the notes for ${u}!')"></i>
+                        <i class="fa-solid fa-share-nodes" style="color:#00f2ff; cursor:pointer;" onclick="event.stopPropagation(); handleSmartShare('Check out ${u} notes!')"></i>
+                        ${hasVid ? `<i class="fa-brands fa-youtube" style="color:#ff0000; font-size:1.3rem;" onclick="event.stopPropagation(); openVideo(${i})"></i>` : ''}
                         ${isAdmin ? `<i class="fa-solid fa-trash" style="color:#ff5252; cursor:pointer;" onclick="event.stopPropagation(); deleteUnit(${i})"></i>` : ''}
                         <i class="fa-solid fa-file-pdf" style="color:#e74c3c;"></i>
                     </div>
@@ -250,20 +259,36 @@
         });
     };
 
-    window.viewNote = (i) => {
+    window.handleUnitClick = (i) => {
         selectedIdx = i;
-        let rawUrl = subjectData[currentKey].links[i];
-        if(isAdmin) document.getElementById('url-input-area').style.display = 'block';
-        
-        if(!rawUrl || rawUrl === "#") {
-             if(isAdmin) showToast("Admin: Please add a link");
-             return;
+        if(isAdmin) {
+            document.getElementById('url-input-area').style.display = 'block';
+            document.getElementById('edit-indicator').innerText = `Editing: ${subjectData[currentKey].units[i]}`;
+            switchLinkType(activeLinkType); 
         }
+        viewNote(i);
+    };
+
+    window.switchLinkType = (type) => {
+        activeLinkType = type;
+        document.getElementById('tabPdf').className = type === 'pdf' ? 'tab-btn active' : 'tab-btn';
+        document.getElementById('tabVid').className = type === 'vid' ? 'tab-btn active' : 'tab-btn';
+        
+        if(selectedIdx !== null) {
+            const val = type === 'pdf' ? 
+                subjectData[currentKey].links[selectedIdx] : 
+                (subjectData[currentKey].vids ? subjectData[currentKey].vids[selectedIdx] : "#");
+            document.getElementById('unitUrl').value = (val === "#") ? "" : val;
+        }
+    };
+
+    window.viewNote = (i) => {
+        let rawUrl = subjectData[currentKey].links[i];
+        if(!rawUrl || rawUrl === "#") return;
 
         let finalViewerUrl = "";
         if(rawUrl.includes('drive.google.com')) {
             let fileId = rawUrl.includes('/d/') ? rawUrl.split('/d/')[1].split('/')[0] : new URL(rawUrl).searchParams.get('id');
-            // Using the 'preview' endpoint often helps with scrolling/viewing issues
             finalViewerUrl = `https://drive.google.com/file/d/${fileId}/preview`;
         } else {
             finalViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(rawUrl)}&embedded=true`;
@@ -276,25 +301,76 @@
         document.body.style.overflow = 'hidden'; 
     };
 
+    window.openVideo = (i) => {
+        let rawUrl = subjectData[currentKey].vids[i];
+        if(!rawUrl || rawUrl === "#") return;
+
+        let videoId = "";
+        if(rawUrl.includes('youtu.be/')) videoId = rawUrl.split('youtu.be/')[1].split('?')[0];
+        else if(rawUrl.includes('v=')) videoId = new URL(rawUrl).searchParams.get('v');
+        else if(rawUrl.includes('embed/')) videoId = rawUrl.split('embed/')[1];
+
+        document.getElementById('video-title').innerText = subjectData[currentKey].units[i];
+        document.getElementById('video-frame').src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+        document.getElementById('video-overlay').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    };
+
     window.closeViewer = () => {
         document.getElementById('pdf-overlay').style.display = 'none';
         document.getElementById('pdf-frame').src = "";
         document.body.style.overflow = 'auto';
     };
 
+    window.closeVideo = () => {
+        document.getElementById('video-overlay').style.display = 'none';
+        document.getElementById('video-frame').src = "";
+        document.body.style.overflow = 'auto';
+    };
+
     window.saveUrl = async () => {
-        const val = document.getElementById('unitUrl').value;
-        if(selectedIdx !== null && val) {
-            subjectData[currentKey].links[selectedIdx] = val;
+        const val = document.getElementById('unitUrl').value.trim() || "#";
+        if(selectedIdx !== null) {
+            if(activeLinkType === 'pdf') {
+                subjectData[currentKey].links[selectedIdx] = val;
+            } else {
+                if(!subjectData[currentKey].vids) subjectData[currentKey].vids = new Array(subjectData[currentKey].units.length).fill("#");
+                subjectData[currentKey].vids[selectedIdx] = val;
+            }
             await updateCloud();
-            document.getElementById('unitUrl').value = '';
-            showToast("Unit Link Updated!");
-            viewNote(selectedIdx);
+            showToast("Updated!");
+        }
+    };
+
+    window.addUnit = async () => {
+        let n = prompt("Unit Name:");
+        if(n) {
+            if(!subjectData[currentKey].units) { 
+                subjectData[currentKey].units = []; 
+                subjectData[currentKey].links = []; 
+                subjectData[currentKey].vids = []; 
+            }
+            subjectData[currentKey].units.push(n);
+            subjectData[currentKey].links.push("#");
+            if(!subjectData[currentKey].vids) subjectData[currentKey].vids = [];
+            subjectData[currentKey].vids.push("#");
+            await updateCloud();
+            showToast("Unit Added!");
+        }
+    };
+
+    window.deleteUnit = async (i) => {
+        if(confirm("Delete?")) {
+            subjectData[currentKey].units.splice(i, 1);
+            subjectData[currentKey].links.splice(i, 1);
+            if(subjectData[currentKey].vids) subjectData[currentKey].vids.splice(i, 1);
+            await updateCloud();
+            showToast("Removed!");
         }
     };
 
     window.editSubject = async (k) => {
-        let n = prompt("Edit Subject Name:", subjectData[k].title);
+        let n = prompt("New Subject Name:", subjectData[k].title);
         if(n) { subjectData[k].title = n; await updateCloud(); showToast("Subject Updated!"); }
     };
 
@@ -302,42 +378,21 @@
         let n = prompt("Subject Name:");
         if(n) {
             let k = "id_" + Date.now();
-            subjectData[k] = { title: n, units: [], links: [], pos: Object.keys(subjectData).length + 1 };
+            subjectData[k] = { title: n, units: [], links: [], vids: [], pos: Object.keys(subjectData).length + 1 };
             await updateCloud();
-            showToast("New Subject Created!");
+            showToast("Added!");
         }
     };
 
-    window.deleteSubject = async (k) => { if(confirm("Delete this subject?")) { delete subjectData[k]; await updateCloud(); showToast("Subject Deleted!"); } };
-
-    window.addUnit = async () => {
-        let n = prompt("Unit Name:");
-        if(n) {
-            if(!subjectData[currentKey].units) { subjectData[currentKey].units = []; subjectData[currentKey].links = []; }
-            subjectData[currentKey].units.push(n);
-            subjectData[currentKey].links.push("#");
-            await updateCloud();
-            showToast("Unit Added Successfully!");
-        }
-    };
-
-    window.deleteUnit = async (i) => {
-        if(confirm("Delete Unit?")) {
-            subjectData[currentKey].units.splice(i, 1);
-            subjectData[currentKey].links.splice(i, 1);
-            await updateCloud();
-            showToast("Unit Removed!");
-        }
-    };
+    window.deleteSubject = async (k) => { if(confirm("Delete Subject?")) { delete subjectData[k]; await updateCloud(); showToast("Deleted!"); } };
 
     window.setPosition = async (k) => {
-        let p = prompt("Enter Position Number:", subjectData[k].pos || 0);
-        if(p) { subjectData[k].pos = parseInt(p); await updateCloud(); showToast("Position Reordered!"); }
+        let p = prompt("New Position:", subjectData[k].pos || 0);
+        if(p) { subjectData[k].pos = parseInt(p); await updateCloud(); showToast("Moved!"); }
     }
 
-    window.openAbout = () => openModal('aboutModal');
-    function openModal(id) { document.getElementById('overlay').style.display = 'block'; document.getElementById(id).style.display = 'block'; }
-    window.closeAll = () => document.querySelectorAll('.modal, .overlay').forEach(e => e.style.display = 'none');
+    window.openAbout = () => { document.getElementById('overlay').style.display='block'; document.getElementById('aboutModal').style.display='block'; };
+    window.closeAll = () => { document.getElementById('overlay').style.display='none'; document.getElementById('aboutModal').style.display='none'; };
     window.hideNotes = () => { currentKey = ''; document.getElementById('mainGrid').style.display = 'grid'; document.getElementById('notesArea').style.display = 'none'; };
     window.doSearch = () => {
         let q = document.getElementById('mSearch').value.toLowerCase();
