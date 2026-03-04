@@ -3,401 +3,187 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Study Hub | Premium PDF & Video Viewer</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    <title>Useas App Store</title>
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
-        body { background: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%); color: white; min-height: 100vh; overflow-x: hidden; }
-        #stars-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: url('https://www.transparenttextures.com/patterns/stardust.png'); animation: moveStars 100s linear infinite; opacity: 0.5; }
-        @keyframes moveStars { from { background-position: 0 0; } to { background-position: 10000px 5000px; } }
+        :root { --play-green: #01875f; --bg: #f1f3f4; --text: #202124; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
         
-        .top-actions { position: fixed; top: 20px; right: 20px; z-index: 1100; display: flex; gap: 12px; }
-        .action-btn { 
-            font-size: 1.1rem; color: #00f2ff; cursor: pointer; background: rgba(0,0,0,0.4); 
-            width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; 
-            justify-content: center; border: 1px solid #00f2ff; transition: 0.3s; backdrop-filter: blur(5px);
-        }
-        .action-btn:hover { background: rgba(0, 242, 255, 0.2); box-shadow: 0 0 15px #00f2ff; }
+        /* Layout */
+        header { background: #fff; padding: 15px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-align: center; margin-bottom: 25px; }
+        #logo-trigger { cursor: pointer; margin: 0; color: #5f6368; }
+        .container { max-width: 900px; margin: auto; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
 
-        #toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 10000; pointer-events: none; }
-        .toast { background: rgba(0, 242, 255, 0.95); color: #000; padding: 12px 25px; border-radius: 50px; font-weight: 600; font-size: 0.9rem; margin-top: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.4); animation: toastIn 0.4s ease-out, toastOut 0.4s ease-in 2.5s forwards; min-width: 250px; text-align: center; }
-        @keyframes toastIn { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes toastOut { to { opacity: 0; transform: translateY(-20px); } }
+        /* App Card */
+        .card { background: #fff; padding: 15px; border-radius: 18px; text-align: center; border: 1px solid #e0e0e0; position: relative; }
+        .card img { width: 80px; height: 80px; border-radius: 18px; object-fit: cover; background: #f9f9f9; }
+        .app-title { font-weight: 600; margin: 12px 0 4px; font-size: 15px; }
+        .app-meta { font-size: 12px; color: #70757a; margin-bottom: 12px; }
 
-        #admin-panel { display: none; background: #2ecc71; color: white; padding: 10px; text-align: center; position: sticky; top: 0; z-index: 1000; font-weight: bold;}
-        .owner-btn { background: #00f2ff; color: #000; border: none; padding: 8px 15px; border-radius: 50px; font-weight: bold; cursor: pointer; margin: 5px; font-size: 0.8rem; }
+        /* Progress Bar */
+        .prog-cont { display: none; width: 100%; background: #eee; height: 8px; border-radius: 10px; overflow: hidden; margin: 10px 0; }
+        .prog-bar { width: 0%; height: 100%; background: var(--play-green); transition: width 0.1s; }
+        .prog-text { font-size: 11px; color: var(--play-green); font-weight: bold; }
 
-        .header { text-align: center; padding: 60px 20px 20px; }
-        .logo { font-size: 35px; font-weight: bold; text-shadow: 0 0 15px #00f2ff; letter-spacing: 2px; }
-        .search-container { max-width: 500px; margin: 20px auto; }
-        .search-container input { width: 100%; padding: 12px 20px; border-radius: 50px; border: 1px solid #00f2ff; background: rgba(0, 0, 0, 0.6); color: white; outline: none; }
+        .install-btn { background: var(--play-green); color: white; border: none; width: 100%; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-        .subjects { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; padding: 20px; max-width: 1000px; margin: 0 auto; }
-        .card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.1); padding: 25px; border-radius: 15px; text-align: center; cursor: pointer; transition: 0.3s; backdrop-filter: blur(5px); position: relative; }
-        .card:hover { transform: translateY(-5px); background: rgba(255, 255, 255, 0.1); border-color: #00f2ff; }
-        .card i { font-size: 2.5rem; margin-bottom: 10px; color: #00f2ff; }
-        
-        .admin-card-tools { position: absolute; top: 10px; right: 10px; display: none; gap: 8px; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 8px; }
-        .admin-card-tools i { font-size: 0.9rem; margin: 0; cursor: pointer; }
-
-        .notes-section { display: none; padding: 20px; max-width: 900px; margin: 20px auto; background: rgba(0,0,0,0.85); border-radius: 20px; border: 1px solid #00f2ff; }
-        .unit-item { background: rgba(255,255,255,0.05); margin: 8px 0; padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; }
-        .unit-item:hover { background: rgba(255,255,255,0.1); }
-        .unit-actions { display: flex; gap: 15px; align-items: center; }
-
-        /* Media Overlays (PDF & Video) */
-        #pdf-overlay, #video-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 3000; flex-direction: column; overflow: hidden; }
-        .viewer-controls { background: #111; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; z-index: 3001; }
-        .media-wrapper { flex-grow: 1; width: 100%; height: 100%; position: relative; }
-        #pdf-frame, #video-frame { width: 100%; height: 100%; border: none; background: #000; display: block; }
-
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1500; }
-        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; padding: 25px; border-radius: 15px; border: 1px solid #00f2ff; z-index: 2000; text-align: center; width: 320px; }
-
-        footer { padding: 40px; text-align: center; opacity: 0.4; font-size: 0.8rem; cursor: pointer; }
-        .tab-btn { background: #333; color: #fff; border: 1px solid #444; padding: 5px 10px; cursor: pointer; border-radius: 5px; font-size: 0.7rem;}
-        .tab-btn.active { background: #00f2ff; color: #000; }
+        /* Admin Tools */
+        #admin-panel { display: none; background: white; padding: 20px; border-radius: 15px; border: 2px solid var(--play-green); margin-bottom: 25px; }
+        input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .admin-btns { display: flex; gap: 10px; }
+        .delete-btn { color: red; cursor: pointer; font-size: 12px; margin-top: 10px; background: none; border: none; }
     </style>
 </head>
 <body>
 
-<div id="stars-container"></div>
-<div id="toast-container"></div>
+<div class="container">
+    <header>
+        <h1 id="logo-trigger">Useas App Store</h1>
+    </header>
 
-<div id="pdf-overlay">
-    <div class="viewer-controls">
-        <span id="viewer-title" style="color: #00f2ff; font-weight: 600; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 50%;">Loading...</span>
-        <div style="display:flex; gap: 8px;">
-            <button id="main-dl" class="owner-btn" style="background:#2ecc71;">Download</button>
-            <button class="owner-btn" style="background:#ff5252; color:#fff;" onclick="closeViewer()">Close</button>
+    <div id="admin-panel">
+        <h3>Add New App</h3>
+        <input type="text" id="name" placeholder="App Name">
+        <input type="text" id="icon" placeholder="Icon Link (GitHub or Image URL)">
+        <input type="text" id="apk" placeholder="GitHub Release APK Link">
+        <div class="admin-btns">
+            <button class="install-btn" onclick="saveApp()">Save to Store</button>
+            <button class="install-btn" style="background:#5f6368" onclick="closeAdmin()">Close</button>
         </div>
+        <div id="manage-list"></div>
     </div>
-    <div class="media-wrapper">
-        <iframe id="pdf-frame" src="" allow="autoplay"></iframe>
-    </div>
+
+    <div class="grid" id="app-grid"></div>
 </div>
 
-<div id="video-overlay">
-    <div class="viewer-controls">
-        <span id="video-title" style="color: #00f2ff; font-weight: 600;">Video Lesson</span>
-        <button class="owner-btn" style="background:#ff5252; color:#fff;" onclick="closeVideo()">Close</button>
-    </div>
-    <div class="media-wrapper">
-        <iframe id="video-frame" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-    </div>
-</div>
+<script>
+    let clicks = 0;
+    const STORAGE_KEY = "useas_github_store";
 
-<div class="top-actions">
-    <div class="action-btn" onclick="handleSmartShare('Check out Study Hub for all your notes!')" title="Share Hub"><i class="fa-solid fa-share-nodes"></i></div>
-    <div class="action-btn" onclick="location.reload()" title="Refresh Page"><i class="fa-solid fa-rotate-right"></i></div>
-    <div class="action-btn" onclick="openAbout()" title="About Developers"><i class="fa-solid fa-info"></i></div>
-</div>
-
-<div id="admin-panel">
-    🛡️ ADMIN ACTIVE | 
-    <button class="owner-btn" onclick="addSubject()">+ New Subject</button>
-    <button class="owner-btn" style="background:#ff5252; color:#fff;" onclick="location.reload()">Exit</button>
-</div>
-
-<div class="header">
-    <div class="logo">🚀 STUDY HUB</div>
-    <div class="search-container"><input type="text" id="mSearch" placeholder="Search subjects..." onkeyup="doSearch()"></div>
-</div>
-
-<div class="subjects" id="mainGrid"></div>
-
-<div class="notes-section" id="notesArea">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h2 id="noteTitle" style="color:#00f2ff;"></h2>
-        <button class="owner-btn" style="background:#444; color:white;" onclick="hideNotes()">Back</button>
-    </div>
-    
-    <div id="unitList" style="margin-top:15px;"></div>
-    
-    <div id="admin-unit-tools" style="display:none; margin-top:20px; border-top:1px solid #333; padding-top:15px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <button class="owner-btn" onclick="addUnit()">+ Add Unit</button>
-            <div id="edit-indicator" style="font-size: 0.7rem; color: #00f2ff; font-style: italic;">Select a unit to edit links</div>
-        </div>
-        
-        <div id="url-input-area" style="display:none; margin-top:10px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px;">
-            <div style="display:flex; gap:5px; margin-bottom:10px;">
-                <button id="tabPdf" class="tab-btn active" onclick="switchLinkType('pdf')">PDF Link</button>
-                <button id="tabVid" class="tab-btn" onclick="switchLinkType('vid')">YouTube Link</button>
-            </div>
-            <input type="text" id="unitUrl" placeholder="Paste Link here..." style="width:100%; padding:10px; border-radius:8px; border:1px solid #00f2ff; background:#000; color:#fff;">
-            <button class="owner-btn" onclick="saveUrl()" style="width:100%; margin-top:10px;">Update Link</button>
-        </div>
-    </div>
-</div>
-
-<div class="overlay" id="overlay" onclick="closeAll()"></div>
-<div class="modal" id="aboutModal">
-    <h2>Developers</h2>
-    <p style="color:#00f2ff; font-weight:600; font-size:1.1rem; margin:10px 0;">Revanth & Sandeep</p>
-    <button class="owner-btn" onclick="closeAll()">Close</button>
-</div>
-
-<footer id="fTrig">© 2026 Education Portal</footer>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyDEMuw60DEiC1WDRdQ5vslBKS8LimB_Uj0",
-        authDomain: "studyhub-33164.firebaseapp.com",
-        projectId: "studyhub-33164",
-        storageBucket: "studyhub-33164.firebasestorage.app",
-        messagingSenderId: "918352715015",
-        appId: "1:918352715015:web:ab2ba28aa9456aba32b9a2"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const docRef = doc(db, "studyhub", "cloudData");
-
-    let subjectData = {};
-    let isAdmin = false;
-    let currentKey = '';
-    let selectedIdx = null;
-    let activeLinkType = 'pdf'; // or 'vid'
-    let fCount = 0;
-
-    window.showToast = (msg) => {
-        const container = document.getElementById('toast-container');
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.innerText = `Study Hub: ${msg}`;
-        container.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
-    };
-
-    window.handleSmartShare = async (msg) => {
-        const shareUrl = window.location.href.split('?')[0];
-        const fullText = `${msg}\nLink: ${shareUrl}`;
-        if (navigator.share) {
-            try { await navigator.share({ title: 'Study Hub', text: msg, url: shareUrl }); return; } catch (err) {}
-        }
-        try {
-            const textArea = document.createElement("textarea");
-            textArea.value = fullText;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            showToast("Link Copied!");
-        } catch (err) { prompt("Copy link:", shareUrl); }
-    };
-
-    document.getElementById('fTrig').onclick = () => { if(++fCount === 5) { hClick(); fCount = 0; } };
-    window.hClick = () => {
-        const pass = prompt("System Pass:");
-        if(pass === "study11") {
-            isAdmin = true;
-            document.getElementById('admin-panel').style.display = 'block';
-            showToast("Admin Mode Active!");
-            renderSubjects();
-        }
-    };
-
-    onSnapshot(docRef, (s) => {
-        if(s.exists()) subjectData = s.data();
-        renderSubjects();
-        if(currentKey) renderUnits();
-    });
-
-    const updateCloud = async () => { try { await setDoc(docRef, subjectData); } catch(e) { showToast("Sync Error!"); } };
-
-    window.renderSubjects = () => {
-        const grid = document.getElementById('mainGrid');
-        grid.innerHTML = '';
-        const keys = Object.keys(subjectData).sort((a, b) => (subjectData[a].pos || 999) - (subjectData[b].pos || 999));
-        keys.forEach(k => {
-            grid.innerHTML += `
-                <div class="card" onclick="openSubject('${k}')">
-                    <div class="admin-card-tools" style="${isAdmin ? 'display:flex' : ''}">
-                        <i class="fa-solid fa-pen" onclick="event.stopPropagation(); editSubject('${k}')"></i>
-                        <i class="fa-solid fa-up-down" onclick="event.stopPropagation(); setPosition('${k}')"></i>
-                        <i class="fa-solid fa-trash" onclick="event.stopPropagation(); deleteSubject('${k}')"></i>
-                    </div>
-                    <i class="fa-solid fa-graduation-cap"></i>
-                    <h3>${subjectData[k].title}</h3>
-                </div>`;
-        });
-    };
-
-    window.openSubject = (k) => {
-        currentKey = k;
-        document.getElementById('mainGrid').style.display = 'none';
-        document.getElementById('notesArea').style.display = 'block';
-        document.getElementById('noteTitle').innerText = subjectData[k].title;
-        document.getElementById('admin-unit-tools').style.display = isAdmin ? 'block' : 'none';
-        renderUnits();
-    };
-
-    window.renderUnits = () => {
-        const list = document.getElementById('unitList');
-        list.innerHTML = '';
-        const units = subjectData[currentKey].units || [];
-        const vids = subjectData[currentKey].vids || [];
-        
-        units.forEach((u, i) => {
-            const hasVid = vids[i] && vids[i] !== "#";
-            list.innerHTML += `
-                <div class="unit-item" onclick="handleUnitClick(${i})">
-                    <span>${u}</span>
-                    <div class="unit-actions">
-                        <i class="fa-solid fa-share-nodes" style="color:#00f2ff; cursor:pointer;" onclick="event.stopPropagation(); handleSmartShare('Check out ${u} notes!')"></i>
-                        ${hasVid ? `<i class="fa-brands fa-youtube" style="color:#ff0000; font-size:1.3rem;" onclick="event.stopPropagation(); openVideo(${i})"></i>` : ''}
-                        ${isAdmin ? `<i class="fa-solid fa-trash" style="color:#ff5252; cursor:pointer;" onclick="event.stopPropagation(); deleteUnit(${i})"></i>` : ''}
-                        <i class="fa-solid fa-file-pdf" style="color:#e74c3c;"></i>
-                    </div>
-                </div>`;
-        });
-    };
-
-    window.handleUnitClick = (i) => {
-        selectedIdx = i;
-        if(isAdmin) {
-            document.getElementById('url-input-area').style.display = 'block';
-            document.getElementById('edit-indicator').innerText = `Editing: ${subjectData[currentKey].units[i]}`;
-            switchLinkType(activeLinkType); 
-        }
-        viewNote(i);
-    };
-
-    window.switchLinkType = (type) => {
-        activeLinkType = type;
-        document.getElementById('tabPdf').className = type === 'pdf' ? 'tab-btn active' : 'tab-btn';
-        document.getElementById('tabVid').className = type === 'vid' ? 'tab-btn active' : 'tab-btn';
-        
-        if(selectedIdx !== null) {
-            const val = type === 'pdf' ? 
-                subjectData[currentKey].links[selectedIdx] : 
-                (subjectData[currentKey].vids ? subjectData[currentKey].vids[selectedIdx] : "#");
-            document.getElementById('unitUrl').value = (val === "#") ? "" : val;
-        }
-    };
-
-    window.viewNote = (i) => {
-        let rawUrl = subjectData[currentKey].links[i];
-        if(!rawUrl || rawUrl === "#") return;
-
-        let finalViewerUrl = "";
-        if(rawUrl.includes('drive.google.com')) {
-            let fileId = rawUrl.includes('/d/') ? rawUrl.split('/d/')[1].split('/')[0] : new URL(rawUrl).searchParams.get('id');
-            finalViewerUrl = `https://drive.google.com/file/d/${fileId}/preview`;
-        } else {
-            finalViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(rawUrl)}&embedded=true`;
-        }
-
-        document.getElementById('viewer-title').innerText = subjectData[currentKey].units[i];
-        document.getElementById('pdf-frame').src = finalViewerUrl;
-        document.getElementById('pdf-overlay').style.display = 'flex';
-        document.getElementById('main-dl').onclick = () => window.open(rawUrl, '_blank');
-        document.body.style.overflow = 'hidden'; 
-    };
-
-    window.openVideo = (i) => {
-        let rawUrl = subjectData[currentKey].vids[i];
-        if(!rawUrl || rawUrl === "#") return;
-
-        let videoId = "";
-        if(rawUrl.includes('youtu.be/')) videoId = rawUrl.split('youtu.be/')[1].split('?')[0];
-        else if(rawUrl.includes('v=')) videoId = new URL(rawUrl).searchParams.get('v');
-        else if(rawUrl.includes('embed/')) videoId = rawUrl.split('embed/')[1];
-
-        document.getElementById('video-title').innerText = subjectData[currentKey].units[i];
-        document.getElementById('video-frame').src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
-        document.getElementById('video-overlay').style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-    };
-
-    window.closeViewer = () => {
-        document.getElementById('pdf-overlay').style.display = 'none';
-        document.getElementById('pdf-frame').src = "";
-        document.body.style.overflow = 'auto';
-    };
-
-    window.closeVideo = () => {
-        document.getElementById('video-overlay').style.display = 'none';
-        document.getElementById('video-frame').src = "";
-        document.body.style.overflow = 'auto';
-    };
-
-    window.saveUrl = async () => {
-        const val = document.getElementById('unitUrl').value.trim() || "#";
-        if(selectedIdx !== null) {
-            if(activeLinkType === 'pdf') {
-                subjectData[currentKey].links[selectedIdx] = val;
-            } else {
-                if(!subjectData[currentKey].vids) subjectData[currentKey].vids = new Array(subjectData[currentKey].units.length).fill("#");
-                subjectData[currentKey].vids[selectedIdx] = val;
+    // 1. Admin Logic
+    document.getElementById('logo-trigger').onclick = () => {
+        clicks++;
+        if (clicks === 5) {
+            if (prompt("Password") === "admin123") {
+                document.getElementById('admin-panel').style.display = 'block';
+                renderAdminList();
             }
-            await updateCloud();
-            showToast("Updated!");
+            clicks = 0;
         }
     };
 
-    window.addUnit = async () => {
-        let n = prompt("Unit Name:");
-        if(n) {
-            if(!subjectData[currentKey].units) { 
-                subjectData[currentKey].units = []; 
-                subjectData[currentKey].links = []; 
-                subjectData[currentKey].vids = []; 
-            }
-            subjectData[currentKey].units.push(n);
-            subjectData[currentKey].links.push("#");
-            if(!subjectData[currentKey].vids) subjectData[currentKey].vids = [];
-            subjectData[currentKey].vids.push("#");
-            await updateCloud();
-            showToast("Unit Added!");
-        }
-    };
+    function closeAdmin() { document.getElementById('admin-panel').style.display = 'none'; }
 
-    window.deleteUnit = async (i) => {
-        if(confirm("Delete?")) {
-            subjectData[currentKey].units.splice(i, 1);
-            subjectData[currentKey].links.splice(i, 1);
-            if(subjectData[currentKey].vids) subjectData[currentKey].vids.splice(i, 1);
-            await updateCloud();
-            showToast("Removed!");
-        }
-    };
+    // 2. Save App
+    function saveApp() {
+        const name = document.getElementById('name').value;
+        const icon = document.getElementById('icon').value;
+        const apk = document.getElementById('apk').value;
+        const date = new Date().toLocaleDateString();
 
-    window.editSubject = async (k) => {
-        let n = prompt("New Subject Name:", subjectData[k].title);
-        if(n) { subjectData[k].title = n; await updateCloud(); showToast("Subject Updated!"); }
-    };
+        if(!name || !apk) return alert("Fill Name and APK link!");
 
-    window.addSubject = async () => {
-        let n = prompt("Subject Name:");
-        if(n) {
-            let k = "id_" + Date.now();
-            subjectData[k] = { title: n, units: [], links: [], vids: [], pos: Object.keys(subjectData).length + 1 };
-            await updateCloud();
-            showToast("Added!");
-        }
-    };
-
-    window.deleteSubject = async (k) => { if(confirm("Delete Subject?")) { delete subjectData[k]; await updateCloud(); showToast("Deleted!"); } };
-
-    window.setPosition = async (k) => {
-        let p = prompt("New Position:", subjectData[k].pos || 0);
-        if(p) { subjectData[k].pos = parseInt(p); await updateCloud(); showToast("Moved!"); }
+        const apps = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        apps.push({ name, icon, apk, date, installs: 0 });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(apps));
+        
+        location.reload();
     }
 
-    window.openAbout = () => { document.getElementById('overlay').style.display='block'; document.getElementById('aboutModal').style.display='block'; };
-    window.closeAll = () => { document.getElementById('overlay').style.display='none'; document.getElementById('aboutModal').style.display='none'; };
-    window.hideNotes = () => { currentKey = ''; document.getElementById('mainGrid').style.display = 'grid'; document.getElementById('notesArea').style.display = 'none'; };
-    window.doSearch = () => {
-        let q = document.getElementById('mSearch').value.toLowerCase();
-        document.querySelectorAll('.card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(q) ? 'block' : 'none');
-    };
+    // 3. Download with Progress
+    async function startDownload(index, url, filename) {
+        const card = document.getElementsByClassName('card')[index];
+        const pCont = card.querySelector('.prog-cont');
+        const pBar = card.querySelector('.prog-bar');
+        const pText = card.querySelector('.prog-text');
+        const btn = card.querySelector('.install-btn');
+
+        btn.style.display = 'none';
+        pCont.style.display = 'block';
+
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error();
+            
+            const reader = response.body.getReader();
+            const total = +response.headers.get('Content-Length');
+            let loaded = 0;
+            let chunks = [];
+
+            while(true) {
+                const {done, value} = await reader.read();
+                if (done) break;
+                chunks.push(value);
+                loaded += value.length;
+                let perc = ((loaded / total) * 100).toFixed(0);
+                pBar.style.width = perc + "%";
+                pText.innerText = "Downloading: " + perc + "%";
+            }
+
+            const blob = new Blob(chunks);
+            const blobUrl = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = filename + ".apk";
+            a.click();
+
+            // Update Install Count
+            let apps = JSON.parse(localStorage.getItem(STORAGE_KEY));
+            apps[index].installs++;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(apps));
+            
+            pText.innerText = "Installation Ready!";
+            setTimeout(() => location.reload(), 2000);
+
+        } catch (e) {
+            alert("Live progress failed. Starting standard download...");
+            window.location.href = url;
+        }
+    }
+
+    // 4. UI Rendering
+    function renderStore() {
+        const apps = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        const grid = document.getElementById('app-grid');
+        
+        if(apps.length === 0) {
+            grid.innerHTML = "<p>No apps yet. Click 'Useas App Store' 5 times.</p>";
+            return;
+        }
+
+        grid.innerHTML = apps.map((app, i) => `
+            <div class="card">
+                <img src="${app.icon || 'https://via.placeholder.com/80'}">
+                <div class="app-title">${app.name}</div>
+                <div class="app-meta">${app.installs} installs • ${app.date}</div>
+                <div class="prog-cont"><div class="prog-bar"></div></div>
+                <div class="prog-text"></div>
+                <button class="install-btn" onclick="startDownload(${i}, '${app.apk}', '${app.name}')">Install</button>
+            </div>
+        `).join('');
+    }
+
+    function renderAdminList() {
+        const apps = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        const list = document.getElementById('manage-list');
+        list.innerHTML = apps.map((app, i) => `
+            <div style="display:flex; justify-content:space-between; margin-top:10px; font-size:13px;">
+                <span>${app.name}</span>
+                <button class="delete-btn" onclick="deleteApp(${i})">Delete</button>
+            </div>
+        `).join('');
+    }
+
+    function deleteApp(i) {
+        let apps = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        apps.splice(i, 1);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(apps));
+        renderStore();
+        renderAdminList();
+    }
+
+    window.onload = renderStore;
 </script>
+
 </body>
 </html>
