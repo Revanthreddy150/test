@@ -1,189 +1,303 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon.png">
+    <link rel="apple-touch-icon" href="/favicon.png">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Useas App Store</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>USEAS | Student Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --play-green: #01875f; --bg: #f1f3f4; --text: #202124; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
-        
-        /* Layout */
-        header { background: #fff; padding: 15px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-align: center; margin-bottom: 25px; }
-        #logo-trigger { cursor: pointer; margin: 0; color: #5f6368; }
-        .container { max-width: 900px; margin: auto; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
 
-        /* App Card */
-        .card { background: #fff; padding: 15px; border-radius: 18px; text-align: center; border: 1px solid #e0e0e0; position: relative; }
-        .card img { width: 80px; height: 80px; border-radius: 18px; object-fit: cover; background: #f9f9f9; }
-        .app-title { font-weight: 600; margin: 12px 0 4px; font-size: 15px; }
-        .app-meta { font-size: 12px; color: #70757a; margin-bottom: 12px; }
+        :root {
+            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            --accent-gradient: linear-gradient(90deg, #6366f1, #a855f7, #6366f1);
+            --card-glass: rgba(255, 255, 255, 0.95);
+            --primary: #4f46e5;
+            --text-dark: #1e293b;
+        }
 
-        /* Progress Bar */
-        .prog-cont { display: none; width: 100%; background: #eee; height: 8px; border-radius: 10px; overflow: hidden; margin: 10px 0; }
-        .prog-bar { width: 0%; height: 100%; background: var(--play-green); transition: width 0.1s; }
-        .prog-text { font-size: 11px; color: var(--play-green); font-weight: bold; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
 
-        .install-btn { background: var(--play-green); color: white; border: none; width: 100%; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        body {
+            background: var(--bg-gradient);
+            height: 100vh;
+            width: 100vw;
+            color: var(--text-dark);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-        /* Admin Tools */
-        #admin-panel { display: none; background: white; padding: 20px; border-radius: 15px; border: 2px solid var(--play-green); margin-bottom: 25px; }
-        input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        .admin-btns { display: flex; gap: 10px; }
-        .delete-btn { color: red; cursor: pointer; font-size: 12px; margin-top: 10px; background: none; border: none; }
+        /* --- Header --- */
+        header {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0; 
+            width: 100%;
+            z-index: 9999; 
+            background: var(--card-glass);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        header.minimal {
+            background: transparent !important;
+            border-bottom: none !important;
+            backdrop-filter: none !important;
+            pointer-events: none; 
+        }
+
+        .header-btn {
+            pointer-events: auto; 
+            background: white;
+            color: var(--primary); 
+            border: none;
+            width: 40px; height: 40px; 
+            border-radius: 12px; 
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        header.minimal .logo-container, header.minimal #help-btn { 
+            opacity: 0; 
+            visibility: hidden; 
+        }
+
+        .logo-container {
+            font-weight: 800; font-size: 1.6rem; letter-spacing: -1.5px;
+            background: var(--accent-gradient); background-size: 200% auto;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: textShine 3s linear infinite;
+        }
+        @keyframes textShine { to { background-position: 200% center; } }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            position: fixed; top: 0; left: -280px; width: 280px; height: 100%;
+            background: white; z-index: 10000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 10px 0 30px rgba(0,0,0,0.1); padding: 40px 20px;
+        }
+        .sidebar.active { left: 0; }
+        .sidebar-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.3); z-index: 9998; display: none; backdrop-filter: blur(2px);
+        }
+
+        .menu-link { 
+            padding: 14px; border-radius: 12px; display: flex; align-items: center; 
+            gap: 15px; cursor: pointer; color: var(--text-dark); font-weight: 600; 
+            text-decoration: none; margin-bottom: 5px; transition: 0.2s;
+        }
+        .menu-link:hover { background: #f1f5f9; color: var(--primary); }
+
+        /* --- Content Layout --- */
+        .content-area {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            position: relative;
+        }
+
+        .iframe-container { 
+            width: 100%; 
+            height: 100vh; 
+            border: none; 
+            display: none; 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            z-index: 100;
+            background: white; 
+        }
+        .iframe-container.active { display: block; }
+
+        .page { 
+            display: none; 
+            padding: 100px 20px; 
+            width: 100%;
+            max-width: 800px; 
+            margin: 0 auto;
+            animation: slideUp 0.4s ease-out; 
+            overflow-y: auto;
+        }
+        .page.active { display: block; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .hero-card { background: var(--accent-gradient); border-radius: 24px; padding: 35px; color: white; margin-bottom: 25px; }
+        .grid-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding-bottom: 100px; }
+        .grid-item { background: white; padding: 25px 15px; border-radius: 20px; text-align: center; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .grid-item:active { transform: scale(0.95); }
+        .icon-circle { width: 55px; height: 55px; border-radius: 18px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
+
+        /* --- Navigation --- */
+        #bottom-nav {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 500px; background: #0f172a; padding: 12px 5px; 
+            border-radius: 24px; display: flex; justify-content: space-around; 
+            z-index: 9000; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        @media (min-width: 1024px) {
+            #bottom-nav {
+                left: auto; right: 20px; top: 50%; bottom: auto;
+                transform: translateY(-50%);
+                width: 75px; height: auto; flex-direction: column;
+                padding: 30px 0; gap: 20px;
+            }
+            .iframe-container { width: calc(100% - 95px); left: 0; }
+        }
+
+        .nav-btn { color: #64748b; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 0.65rem; cursor: pointer; transition: 0.2s; }
+        .nav-btn.active { color: #fff; }
+        .nav-btn i { font-size: 1.2rem; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header>
-        <h1 id="logo-trigger">Useas App Store</h1>
-    </header>
-
-    <div id="admin-panel">
-        <h3>Add New App</h3>
-        <input type="text" id="name" placeholder="App Name">
-        <input type="text" id="icon" placeholder="Icon Link (GitHub or Image URL)">
-        <input type="text" id="apk" placeholder="GitHub Release APK Link">
-        <div class="admin-btns">
-            <button class="install-btn" onclick="saveApp()">Save to Store</button>
-            <button class="install-btn" style="background:#5f6368" onclick="closeAdmin()">Close</button>
-        </div>
-        <div id="manage-list"></div>
+    <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+    
+    <div class="sidebar" id="sidebar">
+        <h2 style="margin-bottom: 25px; letter-spacing: -1px;">USEAS MENU</h2>
+        <div class="menu-link" onclick="showPage('home')"><i class="fa-solid fa-house"></i> Home</div>
+        <div class="menu-link" onclick="showProfile()"><i class="fa-solid fa-circle-user"></i> My Profile</div>
+        <div class="menu-link" onclick="showPDFTools()"><i class="fa-solid fa-file-pdf"></i> PDF Tools</div>
+        <div class="menu-link" onclick="showChatbot()"><i class="fa-solid fa-comment-dots"></i> Support Chat</div>
+        <div class="menu-link" onclick="showNotifications()"><i class="fa-solid fa-bell"></i> Notifications</div>
+        <div class="menu-link" onclick="showAboutUs()"><i class="fa-solid fa-circle-info"></i> About Us</div>
+        <div class="menu-link" onclick="showTerms()"><i class="fa-solid fa-file-shield"></i> Terms & Conditions</div>
     </div>
 
-    <div class="grid" id="app-grid"></div>
-</div>
+    <header id="main-header">
+        <button class="header-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars-staggered"></i></button>
+        <div class="logo-container">USEAS</div>
+        <button class="header-btn" id="help-btn" onclick="showChatbot()"><i class="fa-solid fa-circle-question"></i></button>
+    </header>
 
-<script>
-    let clicks = 0;
-    const STORAGE_KEY = "useas_github_store";
-
-    // 1. Admin Logic
-    document.getElementById('logo-trigger').onclick = () => {
-        clicks++;
-        if (clicks === 5) {
-            if (prompt("Password") === "admin123") {
-                document.getElementById('admin-panel').style.display = 'block';
-                renderAdminList();
-            }
-            clicks = 0;
-        }
-    };
-
-    function closeAdmin() { document.getElementById('admin-panel').style.display = 'none'; }
-
-    // 2. Save App
-    function saveApp() {
-        const name = document.getElementById('name').value;
-        const icon = document.getElementById('icon').value;
-        const apk = document.getElementById('apk').value;
-        const date = new Date().toLocaleDateString();
-
-        if(!name || !apk) return alert("Fill Name and APK link!");
-
-        const apps = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-        apps.push({ name, icon, apk, date, installs: 0 });
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(apps));
+    <div class="content-area">
+        <iframe id="profileFrame" class="iframe-container" src="https://revanthreddy150.github.io/anikingloginuseas/"></iframe>
+        <iframe id="labFrame" class="iframe-container" src="https://tinyurl.com/abhyaslabkeys1"></iframe>
+        <iframe id="pdfFrame" class="iframe-container" src="https://revanthreddy150.github.io/useaspdftools/"></iframe>
         
-        location.reload();
-    }
-
-    // 3. Download with Progress
-    async function startDownload(index, url, filename) {
-        const card = document.getElementsByClassName('card')[index];
-        const pCont = card.querySelector('.prog-cont');
-        const pBar = card.querySelector('.prog-bar');
-        const pText = card.querySelector('.prog-text');
-        const btn = card.querySelector('.install-btn');
-
-        btn.style.display = 'none';
-        pCont.style.display = 'block';
-
-        try {
-            const response = await fetch(url);
-            if (!response.ok) throw new Error();
-            
-            const reader = response.body.getReader();
-            const total = +response.headers.get('Content-Length');
-            let loaded = 0;
-            let chunks = [];
-
-            while(true) {
-                const {done, value} = await reader.read();
-                if (done) break;
-                chunks.push(value);
-                loaded += value.length;
-                let perc = ((loaded / total) * 100).toFixed(0);
-                pBar.style.width = perc + "%";
-                pText.innerText = "Downloading: " + perc + "%";
-            }
-
-            const blob = new Blob(chunks);
-            const blobUrl = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = blobUrl;
-            a.download = filename + ".apk";
-            a.click();
-
-            // Update Install Count
-            let apps = JSON.parse(localStorage.getItem(STORAGE_KEY));
-            apps[index].installs++;
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(apps));
-            
-            pText.innerText = "Installation Ready!";
-            setTimeout(() => location.reload(), 2000);
-
-        } catch (e) {
-            alert("Live progress failed. Starting standard download...");
-            window.location.href = url;
-        }
-    }
-
-    // 4. UI Rendering
-    function renderStore() {
-        const apps = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-        const grid = document.getElementById('app-grid');
+        <iframe id="notesFrame" class="iframe-container" src="https://www.useas.online/studyhub"></iframe>
+        <iframe id="shortNotesFrame" class="iframe-container" src="https://revanthreddy150.github.io/studyhublite/"></iframe>
         
-        if(apps.length === 0) {
-            grid.innerHTML = "<p>No apps yet. Click 'Useas App Store' 5 times.</p>";
-            return;
+        <iframe id="chatFrame" class="iframe-container" src="https://revanthreddy150.github.io/useaschatbot/"></iframe>
+        <iframe id="notificationFrame" class="iframe-container" src="https://revanthreddy150.github.io/notifications/"></iframe>
+        <iframe id="papersFrame" class="iframe-container" src="https://www.useas.online/paperhub"></iframe>
+        <iframe id="aboutFrame" class="iframe-container" src="https://revanthreddy150.github.io/aboutus/"></iframe>
+        <iframe id="termsFrame" class="iframe-container" src="https://revanthreddy150.github.io/termsandconditions/"></iframe>
+
+        <div id="home" class="page active">
+            <div class="hero-card">
+                <h2 style="font-weight: 800;">Welcome back!</h2>
+                <p style="opacity: 0.9;">Select a tool to get started.</p>
+            </div>
+            <div class="grid-menu">
+                <div class="grid-item" onclick="showNotes()">
+                    <div class="icon-circle" style="background: #eef2ff; color: #4f46e5;"><i class="fa-solid fa-book"></i></div>
+                    <b>Notes</b>
+                </div>
+                <div class="grid-item" onclick="showPapers()">
+                    <div class="icon-circle" style="background: #fdf2f8; color: #db2777;"><i class="fa-solid fa-file-lines"></i></div>
+                    <b>Papers</b>
+                </div>
+                <div class="grid-item" onclick="showExternal('labFrame', 'lab')">
+                    <div class="icon-circle" style="background: #f0fdf4; color: #16a34a;"><i class="fa-solid fa-terminal"></i></div>
+                    <b>Lab Codes</b>
+                </div>
+                <div class="grid-item" onclick="showNotifications()">
+                    <div class="icon-circle" style="background: #fff1f2; color: #e11d48;"><i class="fa-solid fa-bell"></i></div>
+                    <b>Alerts</b>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav id="bottom-nav">
+        <div class="nav-btn active" id="btn-home" onclick="showPage('home')"><i class="fa-solid fa-house"></i><span>Home</span></div>
+        <div class="nav-btn" id="btn-papers" onclick="showPapers()"><i class="fa-solid fa-file-lines"></i><span>Papers</span></div>
+        <div class="nav-btn" id="btn-notes" onclick="showNotes()"><i class="fa-solid fa-book"></i><span>Notes</span></div>
+        <div class="nav-btn" id="btn-shorts" onclick="showShortNotes()"><i class="fa-solid fa-clone"></i><span>Shorts</span></div>
+        <div class="nav-btn" id="btn-lab" onclick="showExternal('labFrame', 'lab')"><i class="fa-solid fa-code"></i><span>Lab</span></div>
+        <div class="nav-btn" id="btn-alerts" onclick="showNotifications()"><i class="fa-solid fa-bell"></i><span>Alerts</span></div>
+    </nav>
+
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const bottomNav = document.getElementById('bottom-nav');
+        const mainHeader = document.getElementById('main-header');
+        let isHome = true;
+
+        window.history.pushState({page: 'home'}, "");
+
+        window.addEventListener('popstate', function (event) {
+            if (!isHome) {
+                showPage('home', false);
+                window.history.pushState({page: 'home'}, "");
+            }
+        });
+
+        function resetViews(showFullHeader) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.iframe-container').forEach(f => f.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            bottomNav.style.display = 'flex';
+            if (showFullHeader) {
+                mainHeader.classList.remove('minimal');
+            } else {
+                mainHeader.classList.add('minimal');
+            }
         }
 
-        grid.innerHTML = apps.map((app, i) => `
-            <div class="card">
-                <img src="${app.icon || 'https://via.placeholder.com/80'}">
-                <div class="app-title">${app.name}</div>
-                <div class="app-meta">${app.installs} installs • ${app.date}</div>
-                <div class="prog-cont"><div class="prog-bar"></div></div>
-                <div class="prog-text"></div>
-                <button class="install-btn" onclick="startDownload(${i}, '${app.apk}', '${app.name}')">Install</button>
-            </div>
-        `).join('');
-    }
+        function showPage(pageId, shouldPush = true) {
+            resetViews(pageId === 'home');
+            document.getElementById(pageId).classList.add('active');
+            const btn = document.getElementById('btn-' + pageId);
+            if(btn) btn.classList.add('active');
+            isHome = (pageId === 'home');
+            if (!isHome && shouldPush) window.history.pushState({page: pageId}, "");
+            closeSidebar();
+        }
 
-    function renderAdminList() {
-        const apps = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-        const list = document.getElementById('manage-list');
-        list.innerHTML = apps.map((app, i) => `
-            <div style="display:flex; justify-content:space-between; margin-top:10px; font-size:13px;">
-                <span>${app.name}</span>
-                <button class="delete-btn" onclick="deleteApp(${i})">Delete</button>
-            </div>
-        `).join('');
-    }
+        function showNotes() { resetViews(false); document.getElementById('notesFrame').classList.add('active'); document.getElementById('btn-notes').classList.add('active'); isHome = false; window.history.pushState({page: 'notes'}, ""); closeSidebar(); }
+        function showPapers() { resetViews(false); document.getElementById('papersFrame').classList.add('active'); document.getElementById('btn-papers').classList.add('active'); isHome = false; window.history.pushState({page: 'papers'}, ""); closeSidebar(); }
+        function showShortNotes() { resetViews(false); document.getElementById('shortNotesFrame').classList.add('active'); document.getElementById('btn-shorts').classList.add('active'); isHome = false; window.history.pushState({page: 'shorts'}, ""); closeSidebar(); }
+        function showNotifications() { resetViews(false); document.getElementById('notificationFrame').classList.add('active'); document.getElementById('btn-alerts').classList.add('active'); isHome = false; window.history.pushState({page: 'alerts'}, ""); closeSidebar(); }
+        function showExternal(fId, bId) { resetViews(false); document.getElementById(fId).classList.add('active'); if(bId) document.getElementById('btn-'+bId).classList.add('active'); isHome = false; window.history.pushState({page: bId}, ""); closeSidebar(); }
+        
+        function showProfile() { resetViews(false); document.getElementById('profileFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'profile'}, ""); if(window.innerWidth < 1024) bottomNav.style.display = 'none'; closeSidebar(); }
+        function showPDFTools() { resetViews(false); document.getElementById('pdfFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'pdf'}, ""); if(window.innerWidth < 1024) bottomNav.style.display = 'none'; closeSidebar(); }
+        function showChatbot() { resetViews(false); document.getElementById('chatFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'chat'}, ""); if(window.innerWidth < 1024) bottomNav.style.display = 'none'; closeSidebar(); }
+        function showAboutUs() { resetViews(false); document.getElementById('aboutFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'about'}, ""); if(window.innerWidth < 1024) bottomNav.style.display = 'none'; closeSidebar(); }
 
-    function deleteApp(i) {
-        let apps = JSON.parse(localStorage.getItem(STORAGE_KEY));
-        apps.splice(i, 1);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(apps));
-        renderStore();
-        renderAdminList();
-    }
+        // Added Terms & Conditions Function
+        function showTerms() { 
+            resetViews(false); 
+            document.getElementById('termsFrame').classList.add('active'); 
+            isHome = false; 
+            window.history.pushState({page: 'terms'}, ""); 
+            if(window.innerWidth < 1024) bottomNav.style.display = 'none'; 
+            closeSidebar(); 
+        }
 
-    window.onload = renderStore;
-</script>
-
+        function toggleSidebar() { 
+            sidebar.classList.toggle('active'); 
+            document.getElementById('overlay').style.display = sidebar.classList.contains('active') ? 'block' : 'none'; 
+        }
+        function closeSidebar() { 
+            sidebar.classList.remove('active'); 
+            document.getElementById('overlay').style.display = 'none'; 
+        }
+    </script>
 </body>
 </html>
