@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Thodu – Real-time Journey</title>
 
-  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
   <style>
@@ -58,6 +56,36 @@
     .btn-primary{background:var(--primary);color:#fff;box-shadow:0 4px 14px rgba(40,167,69,.35);}
     .btn-primary:hover{background:#218838;}
     .btn-secondary{background:#f0f0f0;color:var(--dark);}
+    
+    /* Google Button Styling */
+    .btn-google {
+      background: #fff;
+      color: #444;
+      border: 2px solid #eee;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .btn-google img { width: 20px; }
+    .btn-google:hover { background: #f9f9f9; border-color: #ddd; }
+    
+    .divider {
+      margin: 20px 0;
+      display: flex;
+      align-items: center;
+      text-align: center;
+      color: #ccc;
+      font-size: 0.8rem;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid #eee;
+    }
+    .divider:not(:empty)::before { margin-right: .5em; }
+    .divider:not(:empty)::after { margin-left: .5em; }
 
     /* ── HOME ──────────────────────────────────────────────────────── */
     #home-screen{justify-content:flex-start;background:var(--light-bg);}
@@ -71,10 +99,10 @@
 
     /* rides list */
     .section-title{font-family:'Montserrat',sans-serif;font-size:1.3rem;
-                   margin-bottom:14px;color:var(--dark);}
+                    margin-bottom:14px;color:var(--dark);}
     .ride-card{background:#fff;padding:18px;border-radius:var(--radius);
-               margin-bottom:12px;box-shadow:var(--shadow);border-left:5px solid var(--primary);
-               transition:.2s;}
+                margin-bottom:12px;box-shadow:var(--shadow);border-left:5px solid var(--primary);
+                transition:.2s;}
     .ride-card:hover{transform:translateY(-2px);}
     .ride-route{font-weight:700;font-size:1rem;color:var(--dark);margin-bottom:6px;}
     .ride-meta{display:flex;gap:10px;flex-wrap:wrap;font-size:.8rem;color:var(--gray);}
@@ -113,7 +141,7 @@
 
     /* doc upload cards */
     .doc-section-title{font-weight:600;font-size:.9rem;color:var(--gray);
-                       margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;}
+                        margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;}
     .doc-card{background:#fff;border-radius:var(--radius);padding:18px;
               margin-bottom:14px;box-shadow:var(--shadow);display:flex;
               align-items:center;gap:14px;cursor:pointer;transition:all .2s;
@@ -225,7 +253,6 @@
 </head>
 <body>
 
-<!-- ════════════════ SPLASH ════════════════ -->
 <div id="splash-screen" class="screen active">
   <div id="main-text" class="brand-name">
     <span class="letter t">T</span><span class="letter h">H</span>
@@ -235,16 +262,13 @@
   <p id="tagline" style="margin-top:15px;color:#888;font-size:.95rem;"></p>
 </div>
 
-<!-- ════════════════ LOGIN ════════════════ -->
 <div id="login-screen" class="screen">
   <div class="auth-card" id="auth-container"></div>
 </div>
 
-<!-- ════════════════ HOME ════════════════ -->
 <div id="home-screen" class="screen">
   <div id="content" class="content-area"></div>
 
-  <!-- FAB -->
   <button id="fab-btn" onclick="handleFABClick()">＋</button>
 
   <nav class="bottom-nav">
@@ -257,7 +281,6 @@
   </nav>
 </div>
 
-<!-- ════════════════ ADD RIDE ════════════════ -->
 <div id="add-ride-screen" class="screen">
   <div class="ar-header">
     <button class="back-btn" onclick="goHome()">←</button>
@@ -265,7 +288,6 @@
   </div>
   <div class="ar-body">
 
-    <!-- From / To -->
     <div class="form-card">
       <label class="form-label">📍 From</label>
       <div class="loc-input-wrap" style="margin-bottom:12px;">
@@ -279,7 +301,6 @@
       </div>
     </div>
 
-    <!-- Vehicle -->
     <div class="form-card">
       <label class="form-label">🚘 Vehicle Type</label>
       <div class="vehicle-grid">
@@ -295,7 +316,6 @@
       </div>
     </div>
 
-    <!-- Spaces -->
     <div class="form-card">
       <label class="form-label">🪑 Available Spaces</label>
       <div class="spaces-row">
@@ -308,7 +328,6 @@
       </div>
     </div>
 
-    <!-- Map -->
     <div class="form-card">
       <label class="form-label">🗺️ Select Route on Map</label>
       <div class="map-mode-bar">
@@ -329,20 +348,17 @@
   </div>
 </div>
 
-<!-- TOAST -->
 <div id="toast"></div>
 
-<!-- ═══════════════════════════════════════════════
-     SCRIPT  (Firebase v10 modular + Leaflet)
-══════════════════════════════════════════════════ -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script type="module">
 /* ── FIREBASE IMPORTS ───────────────────────────────────────────── */
-import { initializeApp }                              from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { initializeApp }                               from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword,
          signInWithEmailAndPassword, sendEmailVerification,
-         updateProfile, onAuthStateChanged, signOut, reload }
-                                                      from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+         updateProfile, onAuthStateChanged, signOut, reload,
+         GoogleAuthProvider, signInWithPopup }
+                                                       from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc,
          updateDoc, collection, onSnapshot, addDoc,
          serverTimestamp, query, where, orderBy }      from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -362,12 +378,13 @@ const app     = initializeApp(firebaseConfig);
 const auth    = getAuth(app);
 const db      = getFirestore(app);
 const storage = getStorage(app);
+const googleProvider = new GoogleAuthProvider();
 
 /* ── STATE ──────────────────────────────────────────────────────── */
 let currentUser       = null;
 let userData          = null;
-let activeTab         = 'rides';
-let userUnsub         = null;
+let activeTab          = 'rides';
+let userUnsub          = null;
 let ridesUnsub        = null;
 let verifyInterval    = null;
 let mapInstance       = null;
@@ -385,6 +402,7 @@ let endPoint          = null;
 ══════════════════════════════════════════════════════════════════ */
 function showToast(msg, dur = 2800) {
   const t = document.getElementById('toast');
+  if(!t) return;
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), dur);
@@ -418,11 +436,20 @@ window.setAuthState = (state) => {
       <div class="input-box"><input type="email"    id="email"    placeholder="Email" /></div>
       <div class="input-box"><input type="password" id="password" placeholder="Password" /></div>
       <button class="btn btn-primary" id="btn-login">Login</button>
+      
+      <div class="divider">OR</div>
+      
+      <button class="btn btn-google" id="btn-google-login">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/layout/google.svg" alt="G">
+        Continue with Google
+      </button>
+
       <p style="margin-top:18px;color:#999;font-size:.88rem;">
         New here? <span style="color:var(--primary);cursor:pointer;font-weight:600;"
           onclick="setAuthState('signup')">Sign Up</span>
       </p>`;
     document.getElementById('btn-login').onclick = doLogin;
+    document.getElementById('btn-google-login').onclick = doGoogleLogin;
   } else if (state === 'signup') {
     c.innerHTML = `
       <h2>Create Account</h2>
@@ -454,6 +481,30 @@ window.setAuthState = (state) => {
     }, 3000);
   }
 };
+
+async function doGoogleLogin() {
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    const user = result.user;
+    
+    // Check if user document exists, if not, create it
+    const userDoc = await getDoc(doc(db, 'users', user.uid));
+    if (!userDoc.exists()) {
+      await setDoc(doc(db, 'users', user.uid), {
+        name: user.displayName,
+        email: user.email,
+        licenseStatus: 'none', 
+        aadhaarStatus: 'none',
+        licenseUrl: '', 
+        aadhaarUrl: '',
+        createdAt: serverTimestamp()
+      });
+    }
+    showToast('Welcome ' + (user.displayName || ''));
+  } catch (e) {
+    showToast('❌ Google Login failed: ' + e.message);
+  }
+}
 
 async function doSignup() {
   const name  = document.getElementById('name').value.trim();
@@ -530,15 +581,15 @@ function startUserListener(uid) {
 window.switchTab = (tab, el) => {
   activeTab = tab;
   document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('nav-active'));
-  el.classList.add('nav-active');
+  if(el) el.classList.add('nav-active');
   const fab = document.getElementById('fab-btn');
 
   if (tab === 'rides') {
-    fab.style.display = 'flex';
+    if(fab) fab.style.display = 'flex';
     renderRidesTab();
     startRidesListener();
   } else {
-    fab.style.display = 'none';
+    if(fab) fab.style.display = 'none';
     if (ridesUnsub) { ridesUnsub(); ridesUnsub = null; }
     renderProfileTab();
   }
@@ -613,7 +664,6 @@ function renderProfileTab() {
 
     <p class="doc-section-title">📄 Document Verification</p>
 
-    <!-- LICENCE CARD -->
     <div class="doc-card st-${licSt}" id="lic-card" onclick="triggerUpload('license')">
       <div class="doc-icon">🪪</div>
       <div class="doc-info">
@@ -630,7 +680,6 @@ function renderProfileTab() {
       </span>
     </div>
 
-    <!-- AADHAAR CARD -->
     <div class="doc-card st-${aadSt}" id="aad-card" onclick="triggerUpload('aadhaar')">
       <div class="doc-icon">🪪</div>
       <div class="doc-info">
@@ -660,7 +709,6 @@ function renderProfileTab() {
 /* ── DOCUMENT UPLOAD ─────────────────────────────────────────────── */
 window.triggerUpload = (type) => {
   const ud = userData || {};
-  // Allow re-upload only if not verified
   if (ud[type + 'Status'] === 'verified') {
     showToast('✅ Already verified – no action needed');
     return;
@@ -676,12 +724,11 @@ window.triggerUpload = (type) => {
 };
 
 async function uploadDoc(type, file) {
-  const uid        = auth.currentUser.uid;
-  const cardId     = type === 'license' ? 'lic-card' : 'aad-card';
-  const barId      = type === 'license' ? 'lic-bar'  : 'aad-bar';
+  const uid         = auth.currentUser.uid;
+  const cardId      = type === 'license' ? 'lic-card' : 'aad-card';
+  const barId       = type === 'license' ? 'lic-bar'  : 'aad-bar';
   const progWrapId = type === 'license' ? 'lic-progress' : 'aad-progress';
 
-  // Show spinner in card
   const card = document.getElementById(cardId);
   if (card) {
     const subEl = card.querySelector('.doc-sub');
@@ -741,8 +788,8 @@ function showVerifyModal(licOk, aadOk) {
       <div class="modal-icon">🔒</div>
       <h3>Verification Required</h3>
       <p>To add a ride you must first get your documents verified:<br>
-         <strong>${missing.join(' &amp; ')}</strong><br><br>
-         Go to <b>Profile</b> tab → upload your documents → wait for admin approval.
+          <strong>${missing.join(' &amp; ')}</strong><br><br>
+          Go to <b>Profile</b> tab → upload your documents → wait for admin approval.
       </p>
       <div class="modal-actions">
         <button class="m-primary" onclick="
@@ -762,7 +809,6 @@ function showVerifyModal(licOk, aadOk) {
    ADD RIDE SCREEN
 ══════════════════════════════════════════════════════════════════ */
 function openAddRide() {
-  // Reset state
   selectedVehicle = null;
   selectedSpaces  = null;
   startPoint      = null;
@@ -777,7 +823,6 @@ function openAddRide() {
 
   showScreen('add-ride-screen');
 
-  // Init or refresh map
   setTimeout(() => {
     if (!mapInstance) initMap();
     else              mapInstance.invalidateSize();
@@ -786,7 +831,8 @@ function openAddRide() {
 
 window.goHome = () => {
   showScreen('home-screen');
-  document.getElementById('fab-btn').style.display = 'flex';
+  const fab = document.getElementById('fab-btn');
+  if(fab) fab.style.display = 'flex';
 };
 
 /* ── MAP ─────────────────────────────────────────────────────────── */
@@ -796,7 +842,6 @@ function initMap() {
     attribution: '© OpenStreetMap contributors', maxZoom: 19
   }).addTo(mapInstance);
 
-  // Try center on user
   navigator.geolocation?.getCurrentPosition(pos => {
     mapInstance.setView([pos.coords.latitude, pos.coords.longitude], 14);
   });
@@ -863,7 +908,7 @@ window.submitRide = async () => {
   const toVal   = document.getElementById('to-input').value.trim();
 
   if (!fromVal || !toVal)       return showToast('⚠️ Enter From & To locations');
-  if (!selectedVehicle)         return showToast('⚠️ Select a vehicle type');
+  if (!selectedVehicle)          return showToast('⚠️ Select a vehicle type');
   if (!selectedSpaces)          return showToast('⚠️ Select available spaces');
   if (!startPoint || !endPoint) return showToast('⚠️ Drop Start & End pins on the map');
 
@@ -888,7 +933,8 @@ window.submitRide = async () => {
     });
     showToast('🎉 Ride posted successfully!');
     showScreen('home-screen');
-    document.getElementById('fab-btn').style.display = 'flex';
+    const fab = document.getElementById('fab-btn');
+    if(fab) fab.style.display = 'flex';
     switchTab('rides', document.getElementById('nav-rides'));
   } catch (err) {
     showToast('❌ Failed: ' + err.message);
@@ -899,27 +945,34 @@ window.submitRide = async () => {
 };
 
 /* ══════════════════════════════════════════════════════════════════
-   AUTH STATE OBSERVER  (boot logic)
+   BOOT LOGIC
 ══════════════════════════════════════════════════════════════════ */
 setAuthState('login');
 
 // Splash animations
-setTimeout(() => document.getElementById('main-text').classList.add('finished-green'), 2500);
-setTimeout(() => { document.getElementById('tagline').textContent = 'mee prayanam maa bhadyatha'; }, 3000);
+setTimeout(() => {
+  const mt = document.getElementById('main-text');
+  if(mt) mt.classList.add('finished-green');
+}, 2500);
+
+setTimeout(() => { 
+  const tl = document.getElementById('tagline');
+  if(tl) tl.textContent = 'mee prayanam maa bhadyatha'; 
+}, 3000);
 
 // After splash, watch auth
 setTimeout(() => {
   onAuthStateChanged(auth, user => {
     currentUser = user;
-    if (user && user.emailVerified) {
+    if (user && (user.emailVerified || user.providerData[0].providerId === 'google.com')) {
       showScreen('home-screen');
-      document.getElementById('fab-btn').style.display = 'flex';
+      const fab = document.getElementById('fab-btn');
+      if(fab) fab.style.display = 'flex';
       startUserListener(user.uid);
       switchTab('rides', document.getElementById('nav-rides'));
     } else if (!user) {
       showScreen('login-screen');
     }
-    // if user exists but not verified – auth card already showing verify-waiting
   });
 }, 5000);
 </script>
