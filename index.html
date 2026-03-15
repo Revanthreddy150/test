@@ -1,303 +1,288 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="/favicon.png">
-    <link rel="apple-touch-icon" href="/favicon.png">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>USEAS | Student Portal</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thodu - Mee Prayanam</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Poppins:wght@400;600&display=swap');
 
         :root {
-            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            --accent-gradient: linear-gradient(90deg, #6366f1, #a855f7, #6366f1);
-            --card-glass: rgba(255, 255, 255, 0.95);
-            --primary: #4f46e5;
-            --text-dark: #1e293b;
+            --primary-green: #28a745;
+            --dark-text: #1a1a1a;
+            --light-gray: #f4f4f4;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-
-        body {
-            background: var(--bg-gradient);
-            height: 100vh;
-            width: 100vw;
-            color: var(--text-dark);
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            font-family: 'Poppins', sans-serif;
+            background-color: #ffffff;
             overflow: hidden;
+        }
+
+        .screen {
+            display: none;
+            width: 100%; height: 100vh;
+            position: absolute; top: 0; left: 0;
+            flex-direction: column; justify-content: center; align-items: center;
+        }
+        .active { display: flex; }
+
+        /* --- SPLASH STYLES --- */
+        .logo { width: 140px; margin-bottom: 20px; opacity: 0; transform: scale(0.8); animation: logoKeep 0.8s forwards ease-out; }
+        @keyframes logoKeep { to { opacity: 1; transform: scale(1); } }
+        .brand-name { display: flex; font-size: 5rem; font-weight: 900; letter-spacing: 2px; color: var(--dark-text); transition: all 0.7s ease; }
+        .letter { display: inline-block; opacity: 0; }
+        .t { animation: fromLeft 0.8s forwards 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .h { animation: fromBottom 0.8s forwards 1.0s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .o { animation: zoomIn 0.8s forwards 1.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .d { animation: flashIn 0.5s forwards 1.4s ease-out; }
+        .u { animation: fromRight 0.8s forwards 1.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        @keyframes fromLeft { from { opacity: 0; transform: translateX(-80px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes fromBottom { from { opacity: 0; transform: translateY(60px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes zoomIn { from { opacity: 0; transform: scale(0.3); } to { opacity: 1; transform: scale(1); } }
+        @keyframes flashIn { 0% { opacity: 0; filter: brightness(5); } 100% { opacity: 1; filter: brightness(1); } }
+        @keyframes fromRight { from { opacity: 0; transform: translateX(80px); } to { opacity: 1; transform: translateX(0); } }
+        .finished-green { color: var(--primary-green) !important; filter: drop-shadow(0 0 5px rgba(40,167,69,0.1)); }
+        .tagline { margin-top: 15px; font-size: 1rem; color: #555; min-height: 1.5em; letter-spacing: 1px; }
+        .t-letter { opacity: 0; display: inline-block; transform: translateY(5px); transition: 0.3s; }
+        .type-now { opacity: 1; transform: translateY(0); }
+
+        /* --- LOGIN STYLES --- */
+        .login-card { width: 85%; max-width: 380px; text-align: center; }
+        
+        /* PHONE INPUT SPINNER/PICKER */
+        .phone-input-container {
             display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* --- Header --- */
-        header {
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: fixed;
-            top: 0; 
+            gap: 8px;
             width: 100%;
-            z-index: 9999; 
-            background: var(--card-glass);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
+            margin: 15px 0;
+        }
+        .country-code {
+            flex: 0.35;
+            padding: 14px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            background: #f9f9f9;
+            font-family: 'Poppins';
+            font-size: 0.9rem;
+        }
+        .main-phone-input {
+            flex: 1;
+            padding: 14px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            font-size: 1rem;
+            outline-color: var(--primary-green);
         }
 
-        header.minimal {
-            background: transparent !important;
-            border-bottom: none !important;
-            backdrop-filter: none !important;
-            pointer-events: none; 
+        .login-btn {
+            width: 100%; padding: 15px; margin: 8px 0;
+            border: none; border-radius: 12px;
+            font-weight: 600; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            transition: 0.3s; font-family: 'Poppins';
         }
+        .btn-google { background: #fff; border: 1px solid #ddd; color: #444; }
+        .btn-phone { background: var(--primary-green); color: white; }
+        #recaptcha-container { margin: 10px 0; }
 
-        .header-btn {
-            pointer-events: auto; 
-            background: white;
-            color: var(--primary); 
-            border: none;
-            width: 40px; height: 40px; 
-            border-radius: 12px; 
-            cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        /* --- HOME & NAV --- */
+        #home-screen { justify-content: flex-start; background: #fdfdfd; }
+        .content-area { flex: 1; width: 100%; padding: 25px; box-sizing: border-box; overflow-y: auto; }
+        .bottom-nav {
+            width: 100%; height: 75px; background: white;
+            display: flex; border-top: 1px solid #eee; padding-bottom: env(safe-area-inset-bottom);
         }
-
-        header.minimal .logo-container, header.minimal #help-btn { 
-            opacity: 0; 
-            visibility: hidden; 
+        .nav-item {
+            flex: 1; display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            color: #bbb; cursor: pointer; font-size: 0.85rem; transition: 0.3s;
         }
+        .nav-item.active-nav { color: var(--primary-green); }
+        .nav-icon { font-size: 1.5rem; margin-bottom: 4px; }
 
-        .logo-container {
-            font-weight: 800; font-size: 1.6rem; letter-spacing: -1.5px;
-            background: var(--accent-gradient); background-size: 200% auto;
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            animation: textShine 3s linear infinite;
+        /* UI ELEMENTS */
+        .ride-card { 
+            background: white; padding: 20px; border-radius: 16px; 
+            margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border-left: 5px solid var(--primary-green);
         }
-        @keyframes textShine { to { background-position: 200% center; } }
-
-        /* --- Sidebar --- */
-        .sidebar {
-            position: fixed; top: 0; left: -280px; width: 280px; height: 100%;
-            background: white; z-index: 10000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 10px 0 30px rgba(0,0,0,0.1); padding: 40px 20px;
-        }
-        .sidebar.active { left: 0; }
-        .sidebar-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.3); z-index: 9998; display: none; backdrop-filter: blur(2px);
-        }
-
-        .menu-link { 
-            padding: 14px; border-radius: 12px; display: flex; align-items: center; 
-            gap: 15px; cursor: pointer; color: var(--text-dark); font-weight: 600; 
-            text-decoration: none; margin-bottom: 5px; transition: 0.2s;
-        }
-        .menu-link:hover { background: #f1f5f9; color: var(--primary); }
-
-        /* --- Content Layout --- */
-        .content-area {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            position: relative;
-        }
-
-        .iframe-container { 
-            width: 100%; 
-            height: 100vh; 
-            border: none; 
-            display: none; 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            z-index: 100;
-            background: white; 
-        }
-        .iframe-container.active { display: block; }
-
-        .page { 
-            display: none; 
-            padding: 100px 20px; 
-            width: 100%;
-            max-width: 800px; 
-            margin: 0 auto;
-            animation: slideUp 0.4s ease-out; 
-            overflow-y: auto;
-        }
-        .page.active { display: block; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        .hero-card { background: var(--accent-gradient); border-radius: 24px; padding: 35px; color: white; margin-bottom: 25px; }
-        .grid-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding-bottom: 100px; }
-        .grid-item { background: white; padding: 25px 15px; border-radius: 20px; text-align: center; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .grid-item:active { transform: scale(0.95); }
-        .icon-circle { width: 55px; height: 55px; border-radius: 18px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
-
-        /* --- Navigation --- */
-        #bottom-nav {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 500px; background: #0f172a; padding: 12px 5px; 
-            border-radius: 24px; display: flex; justify-content: space-around; 
-            z-index: 9000; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-        }
-
-        @media (min-width: 1024px) {
-            #bottom-nav {
-                left: auto; right: 20px; top: 50%; bottom: auto;
-                transform: translateY(-50%);
-                width: 75px; height: auto; flex-direction: column;
-                padding: 30px 0; gap: 20px;
-            }
-            .iframe-container { width: calc(100% - 95px); left: 0; }
-        }
-
-        .nav-btn { color: #64748b; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 0.65rem; cursor: pointer; transition: 0.2s; }
-        .nav-btn.active { color: #fff; }
-        .nav-btn i { font-size: 1.2rem; }
+        .profile-header { text-align: center; padding: 30px 0; }
+        .user-img { width: 90px; height: 90px; border-radius: 50%; background: #eee; margin-bottom: 10px; object-fit: cover; }
     </style>
 </head>
 <body>
 
-    <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
-    
-    <div class="sidebar" id="sidebar">
-        <h2 style="margin-bottom: 25px; letter-spacing: -1px;">USEAS MENU</h2>
-        <div class="menu-link" onclick="showPage('home')"><i class="fa-solid fa-house"></i> Home</div>
-        <div class="menu-link" onclick="showProfile()"><i class="fa-solid fa-circle-user"></i> My Profile</div>
-        <div class="menu-link" onclick="showPDFTools()"><i class="fa-solid fa-file-pdf"></i> PDF Tools</div>
-        <div class="menu-link" onclick="showChatbot()"><i class="fa-solid fa-comment-dots"></i> Support Chat</div>
-        <div class="menu-link" onclick="showNotifications()"><i class="fa-solid fa-bell"></i> Notifications</div>
-        <div class="menu-link" onclick="showAboutUs()"><i class="fa-solid fa-circle-info"></i> About Us</div>
-        <div class="menu-link" onclick="showTerms()"><i class="fa-solid fa-file-shield"></i> Terms & Conditions</div>
+    <div id="splash-screen" class="screen active">
+        <img src="https://files.catbox.moe/fyvrej.png" alt="Logo" class="logo">
+        <div id="main-text" class="brand-name">
+            <span class="letter t">T</span><span class="letter h">H</span><span class="letter o">O</span><span class="letter d">D</span><span class="letter u">U</span>
+        </div>
+        <div id="tagline-container" class="tagline"></div>
     </div>
 
-    <header id="main-header">
-        <button class="header-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars-staggered"></i></button>
-        <div class="logo-container">USEAS</div>
-        <button class="header-btn" id="help-btn" onclick="showChatbot()"><i class="fa-solid fa-circle-question"></i></button>
-    </header>
+    <div id="login-screen" class="screen">
+        <div class="login-card">
+            <h2 style="font-family: 'Montserrat'; margin-bottom: 5px;">Welcome Back</h2>
+            <p style="color: #888; margin-bottom: 30px; font-size: 0.9rem;">Sign in to start your journey</p>
+            
+            <div id="phone-auth-ui">
+                <div class="phone-input-container">
+                    <select id="countryCode" class="country-code">
+                        <option value="+91">🇮🇳 +91</option>
+                        <option value="+1">🇺🇸 +1</option>
+                        <option value="+44">🇬🇧 +44</option>
+                        <option value="+971">🇦🇪 +971</option>
+                        <option value="+61">🇦🇺 +61</option>
+                    </select>
+                    <input type="tel" id="phoneNumber" class="main-phone-input" placeholder="Phone Number">
+                </div>
 
-    <div class="content-area">
-        <iframe id="profileFrame" class="iframe-container" src="https://revanthreddy150.github.io/anikingloginuseas/"></iframe>
-        <iframe id="labFrame" class="iframe-container" src="https://tinyurl.com/abhyaslabkeys1"></iframe>
-        <iframe id="pdfFrame" class="iframe-container" src="https://revanthreddy150.github.io/useaspdftools/"></iframe>
-        
-        <iframe id="notesFrame" class="iframe-container" src="https://www.useas.online/studyhub"></iframe>
-        <iframe id="shortNotesFrame" class="iframe-container" src="https://revanthreddy150.github.io/studyhublite/"></iframe>
-        
-        <iframe id="chatFrame" class="iframe-container" src="https://revanthreddy150.github.io/useaschatbot/"></iframe>
-        <iframe id="notificationFrame" class="iframe-container" src="https://revanthreddy150.github.io/notifications/"></iframe>
-        <iframe id="papersFrame" class="iframe-container" src="https://www.useas.online/paperhub"></iframe>
-        <iframe id="aboutFrame" class="iframe-container" src="https://revanthreddy150.github.io/aboutus/"></iframe>
-        <iframe id="termsFrame" class="iframe-container" src="https://revanthreddy150.github.io/termsandconditions/"></iframe>
-
-        <div id="home" class="page active">
-            <div class="hero-card">
-                <h2 style="font-weight: 800;">Welcome back!</h2>
-                <p style="opacity: 0.9;">Select a tool to get started.</p>
-            </div>
-            <div class="grid-menu">
-                <div class="grid-item" onclick="showNotes()">
-                    <div class="icon-circle" style="background: #eef2ff; color: #4f46e5;"><i class="fa-solid fa-book"></i></div>
-                    <b>Notes</b>
-                </div>
-                <div class="grid-item" onclick="showPapers()">
-                    <div class="icon-circle" style="background: #fdf2f8; color: #db2777;"><i class="fa-solid fa-file-lines"></i></div>
-                    <b>Papers</b>
-                </div>
-                <div class="grid-item" onclick="showExternal('labFrame', 'lab')">
-                    <div class="icon-circle" style="background: #f0fdf4; color: #16a34a;"><i class="fa-solid fa-terminal"></i></div>
-                    <b>Lab Codes</b>
-                </div>
-                <div class="grid-item" onclick="showNotifications()">
-                    <div class="icon-circle" style="background: #fff1f2; color: #e11d48;"><i class="fa-solid fa-bell"></i></div>
-                    <b>Alerts</b>
+                <div id="recaptcha-container"></div>
+                <button class="login-btn btn-phone" id="send-otp">Send OTP</button>
+                
+                <div id="otp-section" style="display:none; margin-top: 15px;">
+                    <input type="text" id="otpCode" class="main-phone-input" placeholder="Enter 6-digit OTP" style="width:100%; box-sizing: border-box;">
+                    <button class="login-btn btn-phone" id="verify-otp" style="background:#1a1a1a">Verify OTP</button>
                 </div>
             </div>
+
+            <div style="margin: 20px 0; color: #ccc; font-size: 0.8rem;">OR</div>
+
+            <button class="login-btn btn-google" id="google-login">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_Logo.svg" width="18"> Continue with Google
+            </button>
         </div>
     </div>
 
-    <nav id="bottom-nav">
-        <div class="nav-btn active" id="btn-home" onclick="showPage('home')"><i class="fa-solid fa-house"></i><span>Home</span></div>
-        <div class="nav-btn" id="btn-papers" onclick="showPapers()"><i class="fa-solid fa-file-lines"></i><span>Papers</span></div>
-        <div class="nav-btn" id="btn-notes" onclick="showNotes()"><i class="fa-solid fa-book"></i><span>Notes</span></div>
-        <div class="nav-btn" id="btn-shorts" onclick="showShortNotes()"><i class="fa-solid fa-clone"></i><span>Shorts</span></div>
-        <div class="nav-btn" id="btn-lab" onclick="showExternal('labFrame', 'lab')"><i class="fa-solid fa-code"></i><span>Lab</span></div>
-        <div class="nav-btn" id="btn-alerts" onclick="showNotifications()"><i class="fa-solid fa-bell"></i><span>Alerts</span></div>
-    </nav>
+    <div id="home-screen" class="screen">
+        <div id="content-display" class="content-area"></div>
+        <nav class="bottom-nav">
+            <div class="nav-item active-nav" onclick="switchTab('rides', this)">
+                <span class="nav-icon">🚗</span><span>Rides</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('profile', this)">
+                <span class="nav-icon">👤</span><span>Profile</span>
+            </div>
+        </nav>
+    </div>
 
-    <script>
-        const sidebar = document.getElementById('sidebar');
-        const bottomNav = document.getElementById('bottom-nav');
-        const mainHeader = document.getElementById('main-header');
-        let isHome = true;
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, RecaptchaVerifier, signInWithPhoneNumber, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        window.history.pushState({page: 'home'}, "");
+        const firebaseConfig = {
+            apiKey: "AIzaSyA1QeDf1E_Kb1ZC15ahw1dY8hk3J0gXopY",
+            authDomain: "thodu-65cb9.firebaseapp.com",
+            databaseURL: "https://thodu-65cb9-default-rtdb.firebaseio.com",
+            projectId: "thodu-65cb9",
+            storageBucket: "thodu-65cb9.firebasestorage.app",
+            messagingSenderId: "1070229943496",
+            appId: "1:1070229943496:web:038e2e74c463e7acefa1fd",
+            measurementId: "G-NF17LPGHWV"
+        };
 
-        window.addEventListener('popstate', function (event) {
-            if (!isHome) {
-                showPage('home', false);
-                window.history.pushState({page: 'home'}, "");
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // --- SPLASH ANIMATION ---
+        const mainText = document.getElementById('main-text');
+        const tagline = document.getElementById('tagline-container');
+        const textStr = "mee prayanam maa bhadyatha";
+
+        setTimeout(() => mainText.classList.add('finished-green'), 2500);
+        setTimeout(() => {
+            textStr.split("").forEach((char, index) => {
+                const span = document.createElement('span');
+                span.textContent = char === " " ? "\u00A0" : char;
+                span.className = 't-letter';
+                tagline.appendChild(span);
+                setTimeout(() => span.classList.add('type-now'), index * 60);
+            });
+        }, 3000);
+
+        // Transition Logic
+        setTimeout(() => {
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    window.showScreen('home-screen');
+                    window.switchTab('rides', document.querySelector('.nav-item'));
+                } else {
+                    window.showScreen('login-screen');
+                }
+            });
+        }, 6500);
+
+        // --- AUTH LOGIC ---
+        window.showScreen = (id) => {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        };
+
+        // Google Login
+        document.getElementById('google-login').onclick = async () => {
+            try { await signInWithPopup(auth, new GoogleAuthProvider()); } 
+            catch (e) { alert(e.message); }
+        };
+
+        // Phone Login
+        let confirmationResult;
+        document.getElementById('send-otp').onclick = async () => {
+            const country = document.getElementById('countryCode').value;
+            const number = document.getElementById('phoneNumber').value;
+            const fullNumber = country + number;
+
+            if (number.length < 10) { alert("Please enter a valid number"); return; }
+
+            if (!window.recaptchaVerifier) {
+                window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', { 'size': 'invisible' });
             }
-        });
 
-        function resetViews(showFullHeader) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.iframe-container').forEach(f => f.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            bottomNav.style.display = 'flex';
-            if (showFullHeader) {
-                mainHeader.classList.remove('minimal');
+            try {
+                confirmationResult = await signInWithPhoneNumber(auth, fullNumber, window.recaptchaVerifier);
+                document.getElementById('otp-section').style.display = 'block';
+                document.getElementById('send-otp').style.display = 'none';
+            } catch (e) { 
+                alert("Error: " + e.message); 
+                if(window.recaptchaVerifier) window.recaptchaVerifier.clear();
+            }
+        };
+
+        document.getElementById('verify-otp').onclick = async () => {
+            const code = document.getElementById('otpCode').value;
+            try { await confirmationResult.confirm(code); } 
+            catch (e) { alert("Invalid OTP entered."); }
+        };
+
+        // --- DASHBOARD LOGIC ---
+        window.switchTab = (tab, el) => {
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active-nav'));
+            el.classList.add('active-nav');
+            
+            const user = auth.currentUser;
+            const content = document.getElementById('content-display');
+
+            if (tab === 'rides') {
+                content.innerHTML = `
+                    <h2 style="font-family:'Montserrat'">Available Rides</h2>
+                    <div class="ride-card"><b>Trip to Hyderabad</b><br><small>Hitech City | 5:00 PM</small></div>
+                    <div class="ride-card"><b>Trip to Gachibowli</b><br><small>DLF Cyber City | 6:30 PM</small></div>
+                `;
             } else {
-                mainHeader.classList.add('minimal');
+                content.innerHTML = `
+                    <div class="profile-header">
+                        <img src="${user?.photoURL || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}" class="user-img">
+                        <h3>${user?.displayName || 'Thodu User'}</h3>
+                        <p>${user?.phoneNumber || user?.email || 'No Contact Info'}</p>
+                        <hr style="opacity:0.1; margin: 25px 0;">
+                        <button id="logout-btn" style="color:#dc3545; background:none; border:none; font-weight:600; cursor:pointer; font-size:1rem;">Logout Account</button>
+                    </div>
+                `;
+                document.getElementById('logout-btn').onclick = () => signOut(auth);
             }
-        }
-
-        function showPage(pageId, shouldPush = true) {
-            resetViews(pageId === 'home');
-            document.getElementById(pageId).classList.add('active');
-            const btn = document.getElementById('btn-' + pageId);
-            if(btn) btn.classList.add('active');
-            isHome = (pageId === 'home');
-            if (!isHome && shouldPush) window.history.pushState({page: pageId}, "");
-            closeSidebar();
-        }
-
-        function showNotes() { resetViews(false); document.getElementById('notesFrame').classList.add('active'); document.getElementById('btn-notes').classList.add('active'); isHome = false; window.history.pushState({page: 'notes'}, ""); closeSidebar(); }
-        function showPapers() { resetViews(false); document.getElementById('papersFrame').classList.add('active'); document.getElementById('btn-papers').classList.add('active'); isHome = false; window.history.pushState({page: 'papers'}, ""); closeSidebar(); }
-        function showShortNotes() { resetViews(false); document.getElementById('shortNotesFrame').classList.add('active'); document.getElementById('btn-shorts').classList.add('active'); isHome = false; window.history.pushState({page: 'shorts'}, ""); closeSidebar(); }
-        function showNotifications() { resetViews(false); document.getElementById('notificationFrame').classList.add('active'); document.getElementById('btn-alerts').classList.add('active'); isHome = false; window.history.pushState({page: 'alerts'}, ""); closeSidebar(); }
-        function showExternal(fId, bId) { resetViews(false); document.getElementById(fId).classList.add('active'); if(bId) document.getElementById('btn-'+bId).classList.add('active'); isHome = false; window.history.pushState({page: bId}, ""); closeSidebar(); }
-        
-        function showProfile() { resetViews(false); document.getElementById('profileFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'profile'}, ""); if(window.innerWidth < 1024) bottomNav.style.display = 'none'; closeSidebar(); }
-        function showPDFTools() { resetViews(false); document.getElementById('pdfFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'pdf'}, ""); if(window.innerWidth < 1024) bottomNav.style.display = 'none'; closeSidebar(); }
-        function showChatbot() { resetViews(false); document.getElementById('chatFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'chat'}, ""); if(window.innerWidth < 1024) bottomNav.style.display = 'none'; closeSidebar(); }
-        function showAboutUs() { resetViews(false); document.getElementById('aboutFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'about'}, ""); if(window.innerWidth < 1024) bottomNav.style.display = 'none'; closeSidebar(); }
-
-        // Added Terms & Conditions Function
-        function showTerms() { 
-            resetViews(false); 
-            document.getElementById('termsFrame').classList.add('active'); 
-            isHome = false; 
-            window.history.pushState({page: 'terms'}, ""); 
-            if(window.innerWidth < 1024) bottomNav.style.display = 'none'; 
-            closeSidebar(); 
-        }
-
-        function toggleSidebar() { 
-            sidebar.classList.toggle('active'); 
-            document.getElementById('overlay').style.display = sidebar.classList.contains('active') ? 'block' : 'none'; 
-        }
-        function closeSidebar() { 
-            sidebar.classList.remove('active'); 
-            document.getElementById('overlay').style.display = 'none'; 
-        }
+        };
     </script>
 </body>
 </html>
