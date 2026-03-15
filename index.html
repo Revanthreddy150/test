@@ -9,16 +9,17 @@
 
         :root {
             --primary: #28a745;
-            --dark: #1a1a1a;
-            --gray: #6c757d;
-            --light-bg: #f8f9fa;
+            --dark: #121212;
+            --card-bg: #1f1f1f;
+            --text-main: #ffffff;
+            --text-dim: #b3b3b3;
         }
 
         body, html {
             margin: 0; padding: 0;
             width: 100%; height: 100%;
             font-family: 'Poppins', sans-serif;
-            background-color: #ffffff;
+            background-color: white;
             overflow: hidden;
         }
 
@@ -30,8 +31,8 @@
         }
         .active { display: flex; }
 
-        /* --- SPLASH --- */
-        .brand-name { display: flex; font-size: 5rem; font-weight: 900; color: var(--dark); transition: 0.7s; }
+        /* --- AUTH & SPLASH --- */
+        .brand-name { display: flex; font-size: 5rem; font-weight: 900; color: #1a1a1a; transition: 0.7s; }
         .letter { display: inline-block; opacity: 0; }
         .t { animation: fL 0.8s forwards 0.8s; } .h { animation: fB 0.8s forwards 1.0s; } .o { animation: zI 0.8s forwards 1.2s; } .d { animation: flI 0.5s forwards 1.4s; } .u { animation: fR 0.8s forwards 1.6s; }
         @keyframes fL { from { opacity: 0; transform: translateX(-80px); } to { opacity: 1; transform: translateX(0); } }
@@ -41,62 +42,54 @@
         @keyframes fR { from { opacity: 0; transform: translateX(80px); } to { opacity: 1; transform: translateX(0); } }
         .finished-green { color: var(--primary) !important; transform: scale(1.05); }
 
-        /* --- AUTH CARD --- */
-        .auth-card {
-            width: 88%; max-width: 400px;
-            padding: 35px; background: white;
-            border-radius: 28px; box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-        .input-box { width: 100%; margin-bottom: 15px; text-align: left; }
-        input {
-            width: 100%; padding: 14px; border: 2px solid #f0f0f0; 
-            border-radius: 14px; font-family: 'Poppins'; box-sizing: border-box; outline: none;
-        }
-        .btn {
-            width: 100%; padding: 15px; border: none; border-radius: 14px;
-            font-weight: 600; cursor: pointer; transition: 0.3s; margin-top: 10px;
-        }
+        .auth-card { width: 85%; max-width: 400px; text-align: center; }
+        input { width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 12px; margin-bottom: 10px; box-sizing: border-box; outline: none; }
+        .btn { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: 600; cursor: pointer; margin-top: 5px; }
         .btn-primary { background: var(--primary); color: white; }
-        .btn-google { background: white; border: 1px solid #ddd; color: #555; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-google { background: white; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 15px; }
 
-        /* --- DASHBOARD --- */
-        #home-screen { justify-content: flex-start; background: var(--light-bg); }
-        .content-area { flex: 1; width: 100%; padding: 20px; overflow-y: auto; padding-bottom: 100px; box-sizing: border-box; }
+        /* --- MAIN DASHBOARD --- */
+        #home-screen { justify-content: flex-start; background: #fcfcfc; }
+        .content-area { width: 100%; padding: 20px; box-sizing: border-box; }
         
         .location-bar {
-            background: white; padding: 15px 20px; border-radius: 15px;
-            display: flex; align-items: center; justify-content: space-between;
-            font-size: 0.95rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px;
-            border: 1px solid #eee; cursor: pointer;
+            background: white; padding: 15px; border-radius: 12px;
+            display: flex; align-items: center; gap: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer;
         }
 
-        .location-info { display: flex; align-items: center; gap: 10px; font-weight: 600; color: #333; }
-
-        /* --- LOCATION MODAL --- */
-        .modal {
+        /* --- SEARCH MODAL (Matches Image) --- */
+        .search-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #121212; color: white; z-index: 1000;
+            background: var(--dark); color: white; z-index: 2000;
             display: none; flex-direction: column; padding: 20px; box-sizing: border-box;
+            overflow-y: auto;
         }
-        .search-container { display: flex; align-items: center; background: #1f1f1f; padding: 10px; border-radius: 12px; margin-top: 20px; }
-        .search-container input { background: transparent; border: none; color: white; }
-        .city-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 30px; }
-        .city-item { text-align: center; font-size: 0.8rem; opacity: 0.8; }
-        .city-icon { font-size: 2rem; margin-bottom: 5px; display: block; }
+        .search-header { display: flex; align-items: center; gap: 15px; font-size: 1.2rem; font-weight: 600; }
+        .search-input-container {
+            background: var(--card-bg); border-radius: 10px; padding: 12px;
+            display: flex; align-items: center; gap: 10px; margin: 20px 0;
+        }
+        .search-input-container input { background: transparent; border: none; color: white; margin: 0; padding: 0; flex: 1; }
+        
+        .current-loc-btn {
+            background: rgba(40, 167, 69, 0.1); border: 1px solid var(--primary);
+            padding: 15px; border-radius: 10px; display: flex; justify-content: space-between;
+            align-items: center; color: var(--text-main); margin-bottom: 25px;
+        }
 
-        .ride-card {
-            background: white; padding: 20px; border-radius: 16px;
-            margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.04);
-            border-left: 6px solid var(--primary);
+        .city-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .city-card {
+            background: var(--card-bg); padding: 15px 5px; border-radius: 12px;
+            text-align: center; font-size: 0.8rem; border: 1px solid #333;
         }
+        .city-card span { display: block; font-size: 1.8rem; margin-bottom: 5px; }
 
-        .bottom-nav { 
-            width: 100%; height: 75px; background: white; 
-            border-top: 1px solid #eee; display: flex; 
-            position: fixed; bottom: 0; left: 0; z-index: 100;
-        }
-        .nav-item { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #ccc; cursor: pointer; font-size: 0.8rem; }
+        .search-results { margin-top: 20px; }
+        .result-item { padding: 15px 0; border-bottom: 1px solid #333; cursor: pointer; color: var(--text-dim); }
+
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: white; border-top: 1px solid #eee; display: flex; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.75rem; color: #bbb; }
         .nav-active { color: var(--primary); font-weight: 600; }
     </style>
 </head>
@@ -114,39 +107,60 @@
     </div>
 
     <div id="home-screen" class="screen">
-        <div id="content" class="content-area"></div>
+        <div class="content-area">
+            <div class="location-bar" onclick="openSearch()">
+                <span style="color:var(--primary)">📍</span>
+                <span id="display-loc">Detecting location...</span>
+                <span style="margin-left: auto; font-size: 0.8rem;">▼</span>
+            </div>
+            <h3 style="margin-top:30px;">Nearby Rides</h3>
+            <div style="background:white; padding:15px; border-radius:12px; margin-bottom:10px; border-left:5px solid var(--primary)">
+                <b>Thodu Eco</b><br><small>Arrival in 4 mins</small>
+            </div>
+        </div>
         <nav class="bottom-nav">
-            <div class="nav-item nav-active" id="nav-rides" onclick="switchTab('rides', this)"><span>🚗</span><span>Rides</span></div>
-            <div class="nav-item" id="nav-profile" onclick="switchTab('profile', this)"><span>👤</span><span>Profile</span></div>
+            <div class="nav-item nav-active"><span>🚗</span>Rides</div>
+            <div class="nav-item" onclick="handleLogout()"><span>👤</span>Logout</div>
         </nav>
     </div>
 
-    <div id="location-modal" class="modal">
-        <div onclick="toggleLocationModal(false)" style="font-size: 1.5rem; cursor:pointer;">✕ Location</div>
-        <div class="search-container">
-            <span>🔍</span>
-            <input type="text" id="city-search" placeholder="Search city, area or locality" onkeyup="searchLocation(this.value)">
+    <div id="search-modal" class="search-modal">
+        <div class="search-header">
+            <span onclick="closeSearch()" style="cursor:pointer">✕</span>
+            <span>Location</span>
         </div>
-        <div style="margin-top: 20px; color: #28a745; font-size: 0.9rem;" onclick="getMyLocation(); toggleLocationModal(false)">🎯 Use current location</div>
         
-        <h4 style="margin-top: 30px;">Popular cities</h4>
-        <div class="city-grid">
-            <div class="city-item" onclick="selectCity('Delhi NCR')"><span class="city-icon">🏛️</span>Delhi NCR</div>
-            <div class="city-item" onclick="selectCity('Mumbai')"><span class="city-icon">🌊</span>Mumbai</div>
-            <div class="city-item" onclick="selectCity('Bengaluru')"><span class="city-icon">💻</span>Bengaluru</div>
-            <div class="city-item" onclick="selectCity('Hyderabad')"><span class="city-icon">🕌</span>Hyderabad</div>
-            <div class="city-item" onclick="selectCity('Kolkata')"><span class="city-icon">🌉</span>Kolkata</div>
-            <div class="city-item" onclick="selectCity('Chandigarh')"><span class="city-icon">🌳</span>Chandigarh</div>
+        <div class="search-input-container">
+            <span>🔍</span>
+            <input type="text" id="loc-input" placeholder="Search city, area or locality" oninput="fetchResults(this.value)">
         </div>
+
+        <div class="current-loc-btn" onclick="useGPS()">
+            <div>
+                <div style="font-weight:600">Use current location</div>
+                <div id="gps-subtext" style="font-size:0.75rem; color:var(--text-dim)">Tap to locate</div>
+            </div>
+            <span>〉</span>
+        </div>
+
+        <div id="popular-section">
+            <h4 style="color:var(--text-dim)">Popular cities</h4>
+            <div class="city-grid">
+                <div class="city-card" onclick="setLoc('Delhi NCR')"><span>🏛️</span>Delhi NCR</div>
+                <div class="city-card" onclick="setLoc('Mumbai')"><span>🌊</span>Mumbai</div>
+                <div class="city-card" onclick="setLoc('Kolkata')"><span>🌉</span>Kolkata</div>
+                <div class="city-card" onclick="setLoc('Bengaluru')"><span>🏢</span>Bengaluru</div>
+                <div class="city-card" onclick="setLoc('Hyderabad')"><span>🕌</span>Hyderabad</div>
+                <div class="city-card" onclick="setLoc('Chandigarh')"><span>🌳</span>Chandigarh</div>
+            </div>
+        </div>
+
+        <div id="search-results" class="search-results"></div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { 
-            getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, 
-            sendEmailVerification, updateProfile, onAuthStateChanged, signOut, reload,
-            GoogleAuthProvider, signInWithPopup 
-        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyA1QeDf1E_Kb1ZC15ahw1dY8hk3J0gXopY",
@@ -159,127 +173,74 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const googleProvider = new GoogleAuthProvider();
-        let checkInterval = null;
+        const provider = new GoogleAuthProvider();
 
-        // --- IMPROVED LOCATION LOGIC ---
-        window.getAreaName = async (lat, lon) => {
-            try {
-                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
-                const data = await response.json();
-                const addr = data.address;
-                // Only return the friendly area name, no door numbers
-                return addr.suburb || addr.neighbourhood || addr.village || addr.town || addr.city || "Current Location";
-            } catch (e) { return "Unknown Area"; }
+        // --- LOCATION FUNCTIONS ---
+        window.openSearch = () => { document.getElementById('search-modal').style.display = 'flex'; };
+        window.closeSearch = () => { document.getElementById('search-modal').style.display = 'none'; };
+        
+        window.setLoc = (name) => {
+            document.getElementById('display-loc').innerText = name;
+            closeSearch();
         };
 
-        window.getMyLocation = () => {
-            const locText = document.getElementById('user-loc-text');
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(async (pos) => {
-                    const area = await getAreaName(pos.coords.latitude, pos.coords.longitude);
-                    if(locText) locText.innerText = area;
-                });
-            }
+        window.fetchResults = async (query) => {
+            const resDiv = document.getElementById('search-results');
+            const popular = document.getElementById('popular-section');
+            if(query.length < 3) { resDiv.innerHTML = ""; popular.style.display = "block"; return; }
+            
+            popular.style.display = "none";
+            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}&countrycodes=in&limit=5`);
+            const data = await response.json();
+            
+            resDiv.innerHTML = data.map(item => {
+                const cleanName = item.display_name.split(',').slice(0, 2).join(',');
+                return `<div class="result-item" onclick="setLoc('${cleanName}')">📍 ${item.display_name}</div>`;
+            }).join('');
         };
 
-        window.toggleLocationModal = (show) => {
-            document.getElementById('location-modal').style.display = show ? 'flex' : 'none';
+        window.useGPS = () => {
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+                const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`);
+                const data = await res.json();
+                const area = data.address.suburb || data.address.neighbourhood || data.address.city || "Current Location";
+                setLoc(area);
+            });
         };
 
-        window.selectCity = (cityName) => {
-            document.getElementById('user-loc-text').innerText = cityName;
-            toggleLocationModal(false);
-        };
-
-        // --- AUTH LOGIC ---
-        window.handleGoogleLogin = async () => {
-            try {
-                await signInWithPopup(auth, googleProvider);
-            } catch (e) { alert(e.message); }
-        };
-
+        // --- AUTH UI ---
         window.setAuthState = (state) => {
-            clearInterval(checkInterval);
             const container = document.getElementById('auth-container');
-            if (state === 'login') {
-                container.innerHTML = `
-                    <h2 style="margin-bottom:5px">Welcome back</h2>
-                    <p style="color:#666; font-size:0.9rem; margin-bottom:25px;">Login to continue your journey</p>
-                    <div class="input-box"><input type="email" id="email" placeholder="Email"></div>
-                    <div class="input-box"><input type="password" id="password" placeholder="Password"></div>
-                    <button class="btn btn-primary" id="btn-login">Login</button>
-                    <div style="margin: 15px 0; color: #ccc;">OR</div>
-                    <button class="btn btn-google" onclick="handleGoogleLogin()">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2991/2991148.png" width="18"> Continue with Google
-                    </button>
-                    <p style="margin-top:20px;">New? <span style="color:var(--primary); cursor:pointer;" onclick="setAuthState('signup')">Sign Up</span></p>`;
-            } else if (state === 'signup') {
-                container.innerHTML = `<h2>Create Account</h2><div class="input-box"><input type="text" id="name" placeholder="Full Name"></div><div class="input-box"><input type="email" id="email" placeholder="Email"></div><div class="input-box"><input type="password" id="password" placeholder="Password"></div><button class="btn btn-primary" id="btn-signup">Register</button><p style="margin-top:20px;"><span style="color:var(--primary); cursor:pointer;" onclick="setAuthState('login')">Already have an account? Login</span></p>`;
-            } else if (state === 'verify-waiting') {
-                container.innerHTML = `<h3>Verify Email</h3><p>Check your inbox to enter Thodu.</p><button class="btn" onclick="window.handleLogout()" style="background:#eee;">Cancel</button>`;
-                checkInterval = setInterval(async () => { if(auth.currentUser){ await reload(auth.currentUser); if(auth.currentUser.emailVerified){ clearInterval(checkInterval); location.reload(); } } }, 3000);
-            }
-            if(document.getElementById('btn-login')) document.getElementById('btn-login').onclick = login;
-            if(document.getElementById('btn-signup')) document.getElementById('btn-signup').onclick = signup;
-        };
-
-        async function signup() {
-            try {
-                const cred = await createUserWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value);
-                await updateProfile(cred.user, { displayName: document.getElementById('name').value });
-                await sendEmailVerification(cred.user);
-                setAuthState('verify-waiting');
-            } catch (e) { alert(e.message); }
-        }
-
-        async function login() {
-            try {
-                const cred = await signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value);
-                if (!cred.user.emailVerified) setAuthState('verify-waiting');
-            } catch (e) { alert(e.message); }
-        }
-
-        window.handleLogout = async () => { await signOut(auth); location.reload(); };
-
-        window.switchTab = (tab, el) => {
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('nav-active'));
-            el.classList.add('nav-active');
-            const cont = document.getElementById('content');
-            if(tab === 'rides') {
-                cont.innerHTML = `
-                <div class="location-bar" onclick="toggleLocationModal(true)">
-                    <div class="location-info">
-                        <span style="color:var(--primary)">📍</span>
-                        <span id="user-loc-text">Fetching area...</span>
-                    </div>
-                    <span style="font-size:0.7rem;">▼</span>
-                </div>
-                <h2 style="font-family:'Montserrat';">Nearby Rides</h2>
-                <div class="ride-card"><b>Auto Rickshaw</b><br><small>⚡ Fast arrival • 4.8 ★</small></div>
-                <div class="ride-card"><b>Economy Car</b><br><small>Comfortable • 4.9 ★</small></div>`;
-                window.getMyLocation();
+            if(state === 'login') {
+                container.innerHTML = `<h2>Login</h2><input id="email" type="email" placeholder="Email"><input id="pass" type="password" placeholder="Password"><button class="btn btn-primary" onclick="window.emailLogin()">Login</button><button class="btn btn-google" onclick="window.googleLogin()"><img src="https://cdn-icons-png.flaticon.com/512/2991/2991148.png" width="20"> Google Login</button><p onclick="setAuthState('signup')">New? Sign Up</p>`;
             } else {
-                cont.innerHTML = `<div style="text-align:center; padding-top:40px;"><img src="${auth.currentUser?.photoURL || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}" style="width:80px; border-radius:50%;"><h3>${auth.currentUser?.displayName || 'User'}</h3><p>${auth.currentUser?.email}</p><br><button onclick="window.handleLogout()" style="color:red; background:none; border:none; cursor:pointer; font-weight:600;">Logout</button></div>`;
+                container.innerHTML = `<h2>Sign Up</h2><input id="email" type="email" placeholder="Email"><input id="pass" type="password" placeholder="Password"><button class="btn btn-primary" onclick="window.emailSignup()">Create Account</button><p onclick="setAuthState('login')">Back to Login</p>`;
             }
         };
 
-        // --- INIT ---
+        window.googleLogin = () => signInWithPopup(auth, provider);
+        window.emailLogin = () => signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('pass').value);
+        window.emailSignup = async () => {
+            const cred = await createUserWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('pass').value);
+            await sendEmailVerification(cred.user);
+            alert("Verification email sent!");
+        };
+        window.handleLogout = () => signOut(auth).then(() => location.reload());
+
+        // --- LIFECYCLE ---
         setAuthState('login');
         setTimeout(() => document.getElementById('main-text').classList.add('finished-green'), 2000);
         setTimeout(() => document.getElementById('tagline').innerText = "mee prayanam maa bhadyatha", 2500);
-        setTimeout(() => { 
-            onAuthStateChanged(auth, (user) => { 
-                if (user && (user.emailVerified || user.providerData[0].providerId === 'google.com')) { 
-                    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); 
-                    document.getElementById('home-screen').classList.add('active'); 
-                    switchTab('rides', document.getElementById('nav-rides')); 
-                } else if (!user) { 
-                    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); 
-                    document.getElementById('login-screen').classList.add('active'); 
-                } 
-            }); 
-        }, 4500);
+        
+        onAuthStateChanged(auth, (user) => {
+            if(user) {
+                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                document.getElementById('home-screen').classList.add('active');
+                useGPS();
+            } else {
+                document.getElementById('login-screen').classList.add('active');
+            }
+        });
     </script>
 </body>
 </html>
