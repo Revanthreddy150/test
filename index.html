@@ -1,216 +1,927 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thodu - Real-time Journey</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Poppins:wght@400;500;600&display=swap');
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thodu – Real-time Journey</title>
 
-        :root {
-            --primary: #28a745;
-            --dark: #1a1a1a;
-            --gray: #6c757d;
-            --light-bg: #f8f9fa;
-        }
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-        body, html {
-            margin: 0; padding: 0;
-            width: 100%; height: 100%;
-            font-family: 'Poppins', sans-serif;
-            background-color: #ffffff;
-            overflow: hidden;
-        }
+  <style>
+    /* ── ROOT ──────────────────────────────────────────────────────── */
+    :root {
+      --primary: #28a745;
+      --primary-light: rgba(40,167,69,.12);
+      --danger:  #dc3545;
+      --warn:    #ffc107;
+      --dark:    #1a1a1a;
+      --gray:    #6c757d;
+      --light-bg:#f4f6f9;
+      --white:   #ffffff;
+      --radius:  16px;
+      --shadow:  0 6px 24px rgba(0,0,0,.08);
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body,html{width:100%;height:100%;font-family:'Poppins',sans-serif;background:#fff;overflow:hidden;}
 
-        .screen {
-            display: none;
-            width: 100%; height: 100vh;
-            position: absolute; top: 0; left: 0;
-            flex-direction: column; justify-content: center; align-items: center;
-        }
-        .active { display: flex; }
+    /* ── SCREENS ───────────────────────────────────────────────────── */
+    .screen{display:none;width:100%;height:100vh;position:absolute;top:0;left:0;
+            flex-direction:column;justify-content:center;align-items:center;}
+    .active{display:flex!important;}
 
-        /* --- SPLASH --- */
-        .brand-name { display: flex; font-size: 5rem; font-weight: 900; color: var(--dark); transition: 0.7s; }
-        .letter { display: inline-block; opacity: 0; }
-        .t { animation: fL 0.8s forwards 0.8s; } .h { animation: fB 0.8s forwards 1.0s; } .o { animation: zI 0.8s forwards 1.2s; } .d { animation: flI 0.5s forwards 1.4s; } .u { animation: fR 0.8s forwards 1.6s; }
-        @keyframes fL { from { opacity: 0; transform: translateX(-80px); } to { opacity: 1; transform: translateX(0); } }
-        @keyframes fB { from { opacity: 0; transform: translateY(60px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes zI { from { opacity: 0; transform: scale(0.3); } to { opacity: 1; transform: scale(1); } }
-        @keyframes flI { 0% { opacity: 0; } 100% { opacity: 1; } }
-        @keyframes fR { from { opacity: 0; transform: translateX(80px); } to { opacity: 1; transform: translateX(0); } }
-        .finished-green { color: var(--primary) !important; transform: scale(1.05); }
+    /* ── SPLASH ────────────────────────────────────────────────────── */
+    .brand-name{display:flex;font-size:5rem;font-weight:900;color:var(--dark);}
+    .letter{display:inline-block;opacity:0;}
+    .t{animation:fL .8s forwards .8s}.h{animation:fB .8s forwards 1s}
+    .o{animation:zI .8s forwards 1.2s}.d{animation:flI .5s forwards 1.4s}
+    .u{animation:fR .8s forwards 1.6s}
+    @keyframes fL{from{opacity:0;transform:translateX(-80px)}to{opacity:1;transform:translateX(0)}}
+    @keyframes fB{from{opacity:0;transform:translateY(60px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes zI{from{opacity:0;transform:scale(.3)}to{opacity:1;transform:scale(1)}}
+    @keyframes flI{0%{opacity:0}100%{opacity:1}}
+    @keyframes fR{from{opacity:0;transform:translateX(80px)}to{opacity:1;transform:translateX(0)}}
+    .finished-green{color:var(--primary)!important;transform:scale(1.05);}
 
-        /* --- AUTH CARD --- */
-        .auth-card {
-            width: 88%; max-width: 400px;
-            padding: 35px; background: white;
-            border-radius: 28px; box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-        .input-box { width: 100%; margin-bottom: 15px; text-align: left; }
-        input {
-            width: 100%; padding: 14px; border: 2px solid #f0f0f0; 
-            border-radius: 14px; font-family: 'Poppins'; box-sizing: border-box; outline: none;
-        }
-        input:focus { border-color: var(--primary); }
-        .btn {
-            width: 100%; padding: 15px; border: none; border-radius: 14px;
-            font-weight: 600; cursor: pointer; transition: 0.3s; margin-top: 10px;
-        }
-        .btn-primary { background: var(--primary); color: white; }
+    /* ── AUTH CARD ─────────────────────────────────────────────────── */
+    .auth-card{width:88%;max-width:400px;padding:35px;background:#fff;
+               border-radius:28px;box-shadow:0 15px 35px rgba(0,0,0,.1);text-align:center;}
+    .auth-card h2{margin-bottom:22px;font-family:'Montserrat',sans-serif;}
+    .input-box{width:100%;margin-bottom:14px;text-align:left;}
+    input{width:100%;padding:14px;border:2px solid #f0f0f0;border-radius:14px;
+          font-family:'Poppins',sans-serif;font-size:.95rem;outline:none;}
+    input:focus{border-color:var(--primary);}
+    .btn{width:100%;padding:15px;border:none;border-radius:14px;font-weight:600;
+         font-family:'Poppins',sans-serif;font-size:1rem;cursor:pointer;transition:.25s;margin-top:8px;}
+    .btn-primary{background:var(--primary);color:#fff;box-shadow:0 4px 14px rgba(40,167,69,.35);}
+    .btn-primary:hover{background:#218838;}
+    .btn-secondary{background:#f0f0f0;color:var(--dark);}
 
-        /* --- DASHBOARD --- */
-        #home-screen { justify-content: flex-start; background: var(--light-bg); }
-        .content-area { flex: 1; width: 100%; padding: 20px; overflow-y: auto; padding-bottom: 100px; }
-        
-        .location-bar {
-            background: white; padding: 15px 20px; border-radius: 15px;
-            display: flex; align-items: center; gap: 12px;
-            font-size: 0.9rem; color: var(--dark);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px;
-            border: 1px solid #eee;
-        }
+    /* ── HOME ──────────────────────────────────────────────────────── */
+    #home-screen{justify-content:flex-start;background:var(--light-bg);}
+    .content-area{flex:1;width:100%;padding:20px;overflow-y:auto;padding-bottom:90px;}
 
-        .location-icon { font-size: 1.2rem; }
-        #user-loc-text { font-weight: 500; color: var(--dark); }
+    /* location bar */
+    .location-bar{background:#fff;padding:14px 18px;border-radius:14px;
+                  display:flex;align-items:center;gap:10px;
+                  box-shadow:var(--shadow);margin-bottom:20px;border:1px solid #eee;}
+    #user-loc-text{font-weight:500;font-size:.9rem;color:var(--dark);}
 
-        .ride-card {
-            background: white; padding: 20px; border-radius: 16px;
-            margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.04);
-            border-left: 6px solid var(--primary);
-        }
+    /* rides list */
+    .section-title{font-family:'Montserrat',sans-serif;font-size:1.3rem;
+                   margin-bottom:14px;color:var(--dark);}
+    .ride-card{background:#fff;padding:18px;border-radius:var(--radius);
+               margin-bottom:12px;box-shadow:var(--shadow);border-left:5px solid var(--primary);
+               transition:.2s;}
+    .ride-card:hover{transform:translateY(-2px);}
+    .ride-route{font-weight:700;font-size:1rem;color:var(--dark);margin-bottom:6px;}
+    .ride-meta{display:flex;gap:10px;flex-wrap:wrap;font-size:.8rem;color:var(--gray);}
+    .ride-pill{background:var(--light-bg);padding:3px 10px;border-radius:20px;font-weight:500;}
+    .ride-pill.green{background:var(--primary-light);color:var(--primary);}
+    .empty-state{text-align:center;padding:50px 20px;color:var(--gray);}
+    .empty-state .icon{font-size:3rem;margin-bottom:12px;}
 
-        .bottom-nav { 
-            width: 100%; height: 75px; background: white; 
-            border-top: 1px solid #eee; display: flex; 
-            position: fixed; bottom: 0; left: 0; z-index: 100;
-        }
-        .nav-item { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #ccc; cursor: pointer; font-size: 0.8rem; }
-        .nav-active { color: var(--primary); font-weight: 600; }
-    </style>
+    /* FAB */
+    #fab-btn{position:fixed;bottom:88px;right:20px;width:58px;height:58px;
+             border-radius:50%;background:var(--primary);color:#fff;border:none;
+             font-size:2rem;line-height:1;box-shadow:0 6px 20px rgba(40,167,69,.45);
+             cursor:pointer;z-index:200;display:none;align-items:center;justify-content:center;
+             transition:transform .2s,box-shadow .2s;}
+    #fab-btn:active{transform:scale(.92);}
+
+    /* bottom nav */
+    .bottom-nav{width:100%;height:72px;background:#fff;border-top:1px solid #eee;
+                display:flex;position:fixed;bottom:0;left:0;z-index:100;}
+    .nav-item{flex:1;display:flex;flex-direction:column;justify-content:center;
+              align-items:center;color:#ccc;cursor:pointer;font-size:.78rem;
+              transition:color .2s;gap:3px;}
+    .nav-item span:first-child{font-size:1.3rem;}
+    .nav-active{color:var(--primary);font-weight:600;}
+
+    /* ── PROFILE SECTION ───────────────────────────────────────────── */
+    .profile-header{text-align:center;padding:30px 0 20px;}
+    .avatar-circle{width:80px;height:80px;border-radius:50%;background:var(--primary-light);
+                   display:flex;align-items:center;justify-content:center;
+                   font-size:2.2rem;margin:0 auto 12px;}
+    .profile-name{font-size:1.3rem;font-weight:700;color:var(--dark);}
+    .verified-badge{display:inline-flex;align-items:center;gap:5px;
+                    background:var(--primary-light);color:var(--primary);
+                    padding:4px 12px;border-radius:20px;font-size:.8rem;
+                    font-weight:600;margin-top:6px;}
+
+    /* doc upload cards */
+    .doc-section-title{font-weight:600;font-size:.9rem;color:var(--gray);
+                       margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;}
+    .doc-card{background:#fff;border-radius:var(--radius);padding:18px;
+              margin-bottom:14px;box-shadow:var(--shadow);display:flex;
+              align-items:center;gap:14px;cursor:pointer;transition:all .2s;
+              border:2px dashed #e0e0e0;position:relative;}
+    .doc-card:hover{border-color:var(--primary);transform:translateY(-1px);}
+    .doc-card.st-pending{border:2px solid var(--warn);border-style:solid;}
+    .doc-card.st-verified{border:2px solid var(--primary);border-style:solid;}
+    .doc-card.st-rejected{border:2px solid var(--danger);border-style:solid;}
+    .doc-icon{width:48px;height:48px;border-radius:12px;background:var(--light-bg);
+              display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;}
+    .doc-info{flex:1;min-width:0;}
+    .doc-title{font-weight:600;font-size:.95rem;color:var(--dark);}
+    .doc-sub{font-size:.8rem;color:var(--gray);margin-top:2px;}
+    .doc-status-badge{padding:4px 10px;border-radius:20px;font-size:.72rem;
+                      font-weight:700;text-transform:uppercase;white-space:nowrap;}
+    .badge-none{background:#f0f0f0;color:var(--gray);}
+    .badge-pending{background:#fff3cd;color:#856404;}
+    .badge-verified{background:#d1e7dd;color:#0a3622;}
+    .badge-rejected{background:#f8d7da;color:#842029;}
+    .doc-thumb{width:44px;height:44px;border-radius:10px;object-fit:cover;flex-shrink:0;}
+    .doc-uploading{font-size:.85rem;color:var(--gray);font-style:italic;}
+    .progress-bar-wrap{width:100%;background:#eee;border-radius:10px;height:6px;margin-top:8px;}
+    .progress-bar{height:6px;background:var(--primary);border-radius:10px;width:0%;transition:width .3s;}
+
+    /* ── ADD RIDE SCREEN ───────────────────────────────────────────── */
+    #add-ride-screen{justify-content:flex-start;background:var(--light-bg);overflow-y:auto;}
+    .ar-header{width:100%;background:#fff;padding:18px 20px;display:flex;align-items:center;
+               gap:14px;box-shadow:0 2px 10px rgba(0,0,0,.06);flex-shrink:0;position:sticky;top:0;z-index:10;}
+    .back-btn{width:38px;height:38px;border-radius:50%;background:var(--light-bg);border:none;
+              font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+    .ar-title{font-family:'Montserrat',sans-serif;font-size:1.2rem;font-weight:900;}
+    .ar-body{width:100%;padding:20px;padding-bottom:40px;}
+
+    /* form cards */
+    .form-card{background:#fff;border-radius:var(--radius);padding:18px;
+               margin-bottom:16px;box-shadow:var(--shadow);}
+    .form-label{font-size:.8rem;font-weight:600;color:var(--gray);
+                text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;display:block;}
+    .loc-input-wrap{position:relative;}
+    .loc-input-wrap input{padding-left:38px;border:2px solid #eee;border-radius:12px;}
+    .loc-input-wrap input:focus{border-color:var(--primary);}
+    .loc-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:1rem;}
+
+    /* vehicle selector */
+    .vehicle-grid{display:flex;gap:10px;}
+    .veh-btn{flex:1;padding:14px 8px;border:2px solid #eee;border-radius:14px;
+             background:#fff;cursor:pointer;text-align:center;transition:all .2s;font-family:'Poppins',sans-serif;}
+    .veh-btn .veh-icon{font-size:1.8rem;display:block;margin-bottom:4px;}
+    .veh-btn .veh-label{font-size:.78rem;font-weight:600;color:var(--gray);}
+    .veh-btn.sel{border-color:var(--primary);background:var(--primary-light);}
+    .veh-btn.sel .veh-label{color:var(--primary);}
+
+    /* spaces selector */
+    .spaces-row{display:flex;gap:8px;flex-wrap:wrap;}
+    .sp-btn{width:46px;height:46px;border-radius:50%;border:2px solid #eee;
+            background:#fff;cursor:pointer;font-weight:700;font-size:.95rem;
+            transition:all .2s;font-family:'Poppins',sans-serif;}
+    .sp-btn.sel{border-color:var(--primary);background:var(--primary);color:#fff;}
+
+    /* map */
+    .map-mode-bar{display:flex;gap:8px;margin-bottom:10px;}
+    .mode-btn{flex:1;padding:10px;border-radius:12px;border:2px solid #eee;
+              background:#fff;font-family:'Poppins',sans-serif;font-weight:600;
+              font-size:.85rem;cursor:pointer;transition:all .2s;display:flex;
+              align-items:center;justify-content:center;gap:6px;}
+    .mode-btn.active-mode{border-color:var(--primary);background:var(--primary);color:#fff;}
+    #ride-map{width:100%;height:280px;border-radius:var(--radius);
+              overflow:hidden;z-index:1;}
+    .map-hint{font-size:.78rem;color:var(--gray);text-align:center;margin-top:6px;}
+
+    /* submit */
+    .btn-submit{width:100%;padding:16px;background:var(--primary);color:#fff;
+                border:none;border-radius:14px;font-family:'Poppins',sans-serif;
+                font-size:1rem;font-weight:700;cursor:pointer;margin-top:8px;
+                box-shadow:0 4px 14px rgba(40,167,69,.35);transition:.2s;}
+    .btn-submit:hover{background:#218838;}
+    .btn-submit:disabled{background:#ccc;box-shadow:none;cursor:not-allowed;}
+
+    /* ── MODAL ─────────────────────────────────────────────────────── */
+    .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;
+                   background:rgba(0,0,0,.55);display:flex;align-items:center;
+                   justify-content:center;z-index:9999;padding:20px;}
+    .modal-box{background:#fff;border-radius:24px;padding:32px 26px;
+               max-width:340px;width:100%;text-align:center;
+               box-shadow:0 20px 60px rgba(0,0,0,.2);}
+    .modal-icon{font-size:3rem;margin-bottom:12px;}
+    .modal-box h3{font-family:'Montserrat',sans-serif;margin-bottom:10px;}
+    .modal-box p{color:var(--gray);font-size:.9rem;line-height:1.55;margin-bottom:20px;}
+    .modal-actions{display:flex;gap:10px;}
+    .modal-actions button{flex:1;padding:12px;border-radius:12px;border:none;
+                          font-family:'Poppins',sans-serif;font-weight:600;cursor:pointer;}
+    .modal-actions .m-primary{background:var(--primary);color:#fff;}
+    .modal-actions .m-secondary{background:#f0f0f0;color:var(--dark);}
+
+    /* ── TOAST ─────────────────────────────────────────────────────── */
+    #toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);
+           background:var(--dark);color:#fff;padding:12px 22px;border-radius:30px;
+           font-size:.88rem;font-weight:500;z-index:9998;opacity:0;
+           transition:opacity .3s;pointer-events:none;white-space:nowrap;}
+    #toast.show{opacity:1;}
+
+    /* ── LEAFLET CUSTOM MARKERS ────────────────────────────────────── */
+    .marker-start{width:22px;height:22px;background:#28a745;border:3px solid #fff;
+                  border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,.35);}
+    .marker-end  {width:22px;height:22px;background:#dc3545;border:3px solid #fff;
+                  border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,.35);}
+    .leaflet-container{font-family:'Poppins',sans-serif;}
+  </style>
 </head>
 <body>
 
-    <div id="splash-screen" class="screen active">
-        <div id="main-text" class="brand-name">
-            <span class="letter t">T</span><span class="letter h">H</span><span class="letter o">O</span><span class="letter d">D</span><span class="letter u">U</span>
-        </div>
-        <p id="tagline" style="margin-top:15px; color:#666;"></p>
+<!-- ════════════════ SPLASH ════════════════ -->
+<div id="splash-screen" class="screen active">
+  <div id="main-text" class="brand-name">
+    <span class="letter t">T</span><span class="letter h">H</span>
+    <span class="letter o">O</span><span class="letter d">D</span>
+    <span class="letter u">U</span>
+  </div>
+  <p id="tagline" style="margin-top:15px;color:#888;font-size:.95rem;"></p>
+</div>
+
+<!-- ════════════════ LOGIN ════════════════ -->
+<div id="login-screen" class="screen">
+  <div class="auth-card" id="auth-container"></div>
+</div>
+
+<!-- ════════════════ HOME ════════════════ -->
+<div id="home-screen" class="screen">
+  <div id="content" class="content-area"></div>
+
+  <!-- FAB -->
+  <button id="fab-btn" onclick="handleFABClick()">＋</button>
+
+  <nav class="bottom-nav">
+    <div class="nav-item nav-active" id="nav-rides"   onclick="switchTab('rides',this)">
+      <span>🚗</span><span>Rides</span>
+    </div>
+    <div class="nav-item" id="nav-profile" onclick="switchTab('profile',this)">
+      <span>👤</span><span>Profile</span>
+    </div>
+  </nav>
+</div>
+
+<!-- ════════════════ ADD RIDE ════════════════ -->
+<div id="add-ride-screen" class="screen">
+  <div class="ar-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <span class="ar-title">Add a Ride</span>
+  </div>
+  <div class="ar-body">
+
+    <!-- From / To -->
+    <div class="form-card">
+      <label class="form-label">📍 From</label>
+      <div class="loc-input-wrap" style="margin-bottom:12px;">
+        <span class="loc-icon">🟢</span>
+        <input type="text" id="from-input" placeholder="Starting location" />
+      </div>
+      <label class="form-label">📍 To</label>
+      <div class="loc-input-wrap">
+        <span class="loc-icon">🔴</span>
+        <input type="text" id="to-input" placeholder="Destination" />
+      </div>
     </div>
 
-    <div id="login-screen" class="screen">
-        <div class="auth-card" id="auth-container"></div>
+    <!-- Vehicle -->
+    <div class="form-card">
+      <label class="form-label">🚘 Vehicle Type</label>
+      <div class="vehicle-grid">
+        <button class="veh-btn" id="veh-bike" onclick="selectVehicle('bike',this)">
+          <span class="veh-icon">🏍️</span><span class="veh-label">Bike</span>
+        </button>
+        <button class="veh-btn" id="veh-auto" onclick="selectVehicle('auto',this)">
+          <span class="veh-icon">🛺</span><span class="veh-label">Auto</span>
+        </button>
+        <button class="veh-btn" id="veh-car" onclick="selectVehicle('car',this)">
+          <span class="veh-icon">🚗</span><span class="veh-label">Car</span>
+        </button>
+      </div>
     </div>
 
-    <div id="home-screen" class="screen">
-        <div id="content" class="content-area"></div>
-        <nav class="bottom-nav">
-            <div class="nav-item nav-active" id="nav-rides" onclick="switchTab('rides', this)"><span>🚗</span><span>Rides</span></div>
-            <div class="nav-item" id="nav-profile" onclick="switchTab('profile', this)"><span>👤</span><span>Profile</span></div>
-        </nav>
+    <!-- Spaces -->
+    <div class="form-card">
+      <label class="form-label">🪑 Available Spaces</label>
+      <div class="spaces-row">
+        <button class="sp-btn" onclick="selectSpace(1,this)">1</button>
+        <button class="sp-btn" onclick="selectSpace(2,this)">2</button>
+        <button class="sp-btn" onclick="selectSpace(3,this)">3</button>
+        <button class="sp-btn" onclick="selectSpace(4,this)">4</button>
+        <button class="sp-btn" onclick="selectSpace(5,this)">5</button>
+        <button class="sp-btn" onclick="selectSpace(6,this)">6</button>
+      </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { 
-            getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, 
-            sendEmailVerification, updateProfile, onAuthStateChanged, signOut, reload 
-        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    <!-- Map -->
+    <div class="form-card">
+      <label class="form-label">🗺️ Select Route on Map</label>
+      <div class="map-mode-bar">
+        <button class="mode-btn active-mode" id="mode-start" onclick="setMapMode('start')">
+          🟢 Set Start
+        </button>
+        <button class="mode-btn" id="mode-end" onclick="setMapMode('end')">
+          🔴 Set End
+        </button>
+      </div>
+      <div id="ride-map"></div>
+      <p class="map-hint">Tap on the map to drop a marker</p>
+    </div>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyA1QeDf1E_Kb1ZC15ahw1dY8hk3J0gXopY",
-            authDomain: "thodu-65cb9.firebaseapp.com",
-            projectId: "thodu-65cb9",
-            storageBucket: "thodu-65cb9.firebasestorage.app",
-            messagingSenderId: "1070229943496",
-            appId: "1:1070229943496:web:038e2e74c463e7acefa1fd"
-        };
+    <button class="btn-submit" id="submit-ride-btn" onclick="submitRide()">
+      🚀 Post Ride
+    </button>
+  </div>
+</div>
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        let checkInterval = null;
+<!-- TOAST -->
+<div id="toast"></div>
 
-        // --- NEW REVERSE GEOCODING LOGIC ---
-        async function getAreaName(lat, lon) {
-            try {
-                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
-                const data = await response.json();
-                // Pick the best name from the address object
-                const address = data.address;
-                const area = address.suburb || address.town || address.village || address.city || "Unknown Location";
-                const road = address.road ? address.road + ", " : "";
-                return `${road}${area}`;
-            } catch (e) {
-                return `Lat: ${lat}, Lon: ${lon}`;
-            }
+<!-- ═══════════════════════════════════════════════
+     SCRIPT  (Firebase v10 modular + Leaflet)
+══════════════════════════════════════════════════ -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script type="module">
+/* ── FIREBASE IMPORTS ───────────────────────────────────────────── */
+import { initializeApp }                              from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword,
+         signInWithEmailAndPassword, sendEmailVerification,
+         updateProfile, onAuthStateChanged, signOut, reload }
+                                                      from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc,
+         updateDoc, collection, onSnapshot, addDoc,
+         serverTimestamp, query, where, orderBy }      from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getStorage, ref as sRef,
+         uploadBytesResumable, getDownloadURL }        from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
+/* ── CONFIG ─────────────────────────────────────────────────────── */
+const firebaseConfig = {
+  apiKey:            "AIzaSyA1QeDf1E_Kb1ZC15ahw1dY8hk3J0gXopY",
+  authDomain:        "thodu-65cb9.firebaseapp.com",
+  projectId:         "thodu-65cb9",
+  storageBucket:     "thodu-65cb9.firebasestorage.app",
+  messagingSenderId: "1070229943496",
+  appId:             "1:1070229943496:web:038e2e74c463e7acefa1fd"
+};
+const app     = initializeApp(firebaseConfig);
+const auth    = getAuth(app);
+const db      = getFirestore(app);
+const storage = getStorage(app);
+
+/* ── STATE ──────────────────────────────────────────────────────── */
+let currentUser       = null;
+let userData          = null;
+let activeTab         = 'rides';
+let userUnsub         = null;
+let ridesUnsub        = null;
+let verifyInterval    = null;
+let mapInstance       = null;
+let startMarker       = null;
+let endMarker         = null;
+let routeLine         = null;
+let mapMode           = 'start';
+let selectedVehicle   = null;
+let selectedSpaces    = null;
+let startPoint        = null;
+let endPoint          = null;
+
+/* ══════════════════════════════════════════════════════════════════
+   UTILITY
+══════════════════════════════════════════════════════════════════ */
+function showToast(msg, dur = 2800) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), dur);
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+async function reverseGeocode(lat, lon) {
+  try {
+    const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+    const d = await r.json();
+    const a = d.address || {};
+    const area = a.suburb || a.town || a.village || a.city_district || a.city || '';
+    const road = a.road ? a.road + ', ' : '';
+    return (road + area).trim() || `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+  } catch { return `${lat.toFixed(4)}, ${lon.toFixed(4)}`; }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   AUTH
+══════════════════════════════════════════════════════════════════ */
+window.setAuthState = (state) => {
+  clearInterval(verifyInterval);
+  const c = document.getElementById('auth-container');
+  if (state === 'login') {
+    c.innerHTML = `
+      <h2>Welcome Back 👋</h2>
+      <div class="input-box"><input type="email"    id="email"    placeholder="Email" /></div>
+      <div class="input-box"><input type="password" id="password" placeholder="Password" /></div>
+      <button class="btn btn-primary" id="btn-login">Login</button>
+      <p style="margin-top:18px;color:#999;font-size:.88rem;">
+        New here? <span style="color:var(--primary);cursor:pointer;font-weight:600;"
+          onclick="setAuthState('signup')">Sign Up</span>
+      </p>`;
+    document.getElementById('btn-login').onclick = doLogin;
+  } else if (state === 'signup') {
+    c.innerHTML = `
+      <h2>Create Account</h2>
+      <div class="input-box"><input type="text"     id="name"     placeholder="Full Name" /></div>
+      <div class="input-box"><input type="email"    id="email"    placeholder="Email" /></div>
+      <div class="input-box"><input type="password" id="password" placeholder="Password (min 6 chars)" /></div>
+      <button class="btn btn-primary" id="btn-signup">Create Account</button>
+      <p style="margin-top:18px;color:#999;font-size:.88rem;">
+        <span style="color:var(--primary);cursor:pointer;font-weight:600;"
+          onclick="setAuthState('login')">← Back to Login</span>
+      </p>`;
+    document.getElementById('btn-signup').onclick = doSignup;
+  } else if (state === 'verify-waiting') {
+    c.innerHTML = `
+      <div style="font-size:3rem;margin-bottom:14px;">📧</div>
+      <h2>Verify Your Email</h2>
+      <p style="color:#999;font-size:.88rem;margin:12px 0 22px;">
+        A verification link was sent to your inbox.<br>Please check and click it.
+      </p>
+      <button class="btn btn-secondary" onclick="handleLogout()">Cancel / Logout</button>`;
+    verifyInterval = setInterval(async () => {
+      if (auth.currentUser) {
+        await reload(auth.currentUser);
+        if (auth.currentUser.emailVerified) {
+          clearInterval(verifyInterval);
+          location.reload();
         }
+      }
+    }, 3000);
+  }
+};
 
-        window.getMyLocation = () => {
-            const locText = document.getElementById('user-loc-text');
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(async (pos) => {
-                    const lat = pos.coords.latitude;
-                    const lon = pos.coords.longitude;
-                    locText.innerText = "Finding area name...";
-                    const areaName = await getAreaName(lat, lon);
-                    locText.innerText = areaName;
-                }, (err) => {
-                    locText.innerText = "Location permission denied";
-                });
-            }
-        };
+async function doSignup() {
+  const name  = document.getElementById('name').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const pass  = document.getElementById('password').value;
+  if (!name || !email || !pass) return showToast('⚠️ Fill all fields');
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    await updateProfile(cred.user, { displayName: name });
+    await sendEmailVerification(cred.user);
+    // Create user doc
+    await setDoc(doc(db, 'users', cred.user.uid), {
+      name, email,
+      licenseStatus: 'none', aadhaarStatus: 'none',
+      licenseUrl: '', aadhaarUrl: '',
+      createdAt: serverTimestamp()
+    });
+    setAuthState('verify-waiting');
+  } catch (e) { showToast('❌ ' + e.message); }
+}
 
-        // --- AUTH & NAVIGATION (Previous Logic Kept Perfect) ---
-        window.setAuthState = (state) => {
-            clearInterval(checkInterval);
-            const container = document.getElementById('auth-container');
-            if (state === 'login') {
-                container.innerHTML = `<h2>Login</h2><div class="input-box"><input type="email" id="email" placeholder="Email"></div><div class="input-box"><input type="password" id="password" placeholder="Password"></div><button class="btn btn-primary" id="btn-login">Login</button><p style="margin-top:20px;">New? <span style="color:var(--primary); cursor:pointer;" onclick="setAuthState('signup')">Sign Up</span></p>`;
-            } else if (state === 'signup') {
-                container.innerHTML = `<h2>Sign Up</h2><div class="input-box"><input type="text" id="name" placeholder="Name"></div><div class="input-box"><input type="email" id="email" placeholder="Email"></div><div class="input-box"><input type="password" id="password" placeholder="Password"></div><button class="btn btn-primary" id="btn-signup">Create Account</button><p style="margin-top:20px;"><span style="color:var(--primary); cursor:pointer;" onclick="setAuthState('login')">Back to Login</span></p>`;
-            } else if (state === 'verify-waiting') {
-                container.innerHTML = `<div class="status-badge status-pending">WAITING FOR VERIFICATION</div><h3>Verify Email</h3><p>Check your inbox to enter Thodu.</p><button class="btn" onclick="window.handleLogout()" style="background:#eee;">Cancel</button>`;
-                checkInterval = setInterval(async () => { if(auth.currentUser){ await reload(auth.currentUser); if(auth.currentUser.emailVerified){ clearInterval(checkInterval); location.reload(); } } }, 3000);
-            }
-            if(document.getElementById('btn-login')) document.getElementById('btn-login').onclick = login;
-            if(document.getElementById('btn-signup')) document.getElementById('btn-signup').onclick = signup;
-        };
+async function doLogin() {
+  try {
+    const cred = await signInWithEmailAndPassword(
+      auth,
+      document.getElementById('email').value.trim(),
+      document.getElementById('password').value
+    );
+    if (!cred.user.emailVerified) setAuthState('verify-waiting');
+  } catch (e) { showToast('❌ ' + e.message); }
+}
 
-        async function signup() {
-            try {
-                const cred = await createUserWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value);
-                await updateProfile(cred.user, { displayName: document.getElementById('name').value });
-                await sendEmailVerification(cred.user);
-                setAuthState('verify-waiting');
-            } catch (e) { alert(e.message); }
-        }
+window.handleLogout = async () => {
+  if (userUnsub)  userUnsub();
+  if (ridesUnsub) ridesUnsub();
+  await signOut(auth);
+  location.reload();
+};
 
-        async function login() {
-            try {
-                const cred = await signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value);
-                if (!cred.user.emailVerified) setAuthState('verify-waiting');
-            } catch (e) { alert(e.message); }
-        }
+/* ══════════════════════════════════════════════════════════════════
+   LOCATION
+══════════════════════════════════════════════════════════════════ */
+window.getMyLocation = () => {
+  const el = document.getElementById('user-loc-text');
+  if (!el) return;
+  if (!navigator.geolocation) { el.textContent = 'Geolocation not supported'; return; }
+  navigator.geolocation.getCurrentPosition(
+    async pos => {
+      el.textContent = 'Finding area…';
+      el.textContent = await reverseGeocode(pos.coords.latitude, pos.coords.longitude);
+    },
+    () => { el.textContent = 'Location permission denied'; }
+  );
+};
 
-        window.handleLogout = async () => { await signOut(auth); location.reload(); };
+/* ══════════════════════════════════════════════════════════════════
+   USER DATA LISTENER
+══════════════════════════════════════════════════════════════════ */
+function startUserListener(uid) {
+  if (userUnsub) userUnsub();
+  userUnsub = onSnapshot(doc(db, 'users', uid), snap => {
+    if (snap.exists()) {
+      userData = { id: snap.id, ...snap.data() };
+    } else {
+      userData = { licenseStatus:'none', aadhaarStatus:'none' };
+    }
+    if (activeTab === 'profile') renderProfileTab();
+  });
+}
 
-        window.switchTab = (tab, el) => {
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('nav-active'));
-            el.classList.add('nav-active');
-            const cont = document.getElementById('content');
-            if(tab === 'rides') {
-                cont.innerHTML = `<div class="location-bar"><span class="location-icon">📍</span><span id="user-loc-text">Fetching your area...</span></div><h2 style="font-family:'Montserrat';">Nearby Rides</h2><div class="ride-card"><b>Express Cab</b><br><small>4.9 ★ • Available Now</small></div>`;
-                window.getMyLocation();
-            } else {
-                cont.innerHTML = `<div style="text-align:center; padding-top:40px;"><img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" style="width:80px; border-radius:50%;"><h3>${auth.currentUser?.displayName}</h3><p>Verified Thodu Member</p><br><button onclick="window.handleLogout()" style="color:red; background:none; border:none; cursor:pointer; font-weight:600;">Logout</button></div>`;
-            }
-        };
+/* ══════════════════════════════════════════════════════════════════
+   TAB SWITCHING
+══════════════════════════════════════════════════════════════════ */
+window.switchTab = (tab, el) => {
+  activeTab = tab;
+  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('nav-active'));
+  el.classList.add('nav-active');
+  const fab = document.getElementById('fab-btn');
 
-        setAuthState('login');
-        setTimeout(() => document.getElementById('main-text').classList.add('finished-green'), 2500);
-        setTimeout(() => document.getElementById('tagline').innerText = "mee prayanam maa bhadyatha", 3000);
-        setTimeout(() => { onAuthStateChanged(auth, (user) => { if (user && user.emailVerified) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById('home-screen').classList.add('active'); switchTab('rides', document.getElementById('nav-rides')); } else if (!user) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById('login-screen').classList.add('active'); } }); }, 6000);
-    </script>
+  if (tab === 'rides') {
+    fab.style.display = 'flex';
+    renderRidesTab();
+    startRidesListener();
+  } else {
+    fab.style.display = 'none';
+    if (ridesUnsub) { ridesUnsub(); ridesUnsub = null; }
+    renderProfileTab();
+  }
+};
+
+/* ══════════════════════════════════════════════════════════════════
+   RIDES TAB
+══════════════════════════════════════════════════════════════════ */
+function renderRidesTab(rides = []) {
+  const cont = document.getElementById('content');
+  let ridesHTML = '';
+  if (rides.length === 0) {
+    ridesHTML = `<div class="empty-state">
+      <div class="icon">🚦</div>
+      <p>No rides available right now.<br>Be the first to add one!</p>
+    </div>`;
+  } else {
+    rides.forEach(r => {
+      const vehIcon = r.vehicle === 'bike' ? '🏍️' : r.vehicle === 'auto' ? '🛺' : '🚗';
+      const vehName = r.vehicle === 'bike' ? 'Bike' : r.vehicle === 'auto' ? 'Auto' : 'Car';
+      ridesHTML += `
+        <div class="ride-card">
+          <div class="ride-route">🟢 ${r.from || 'Unknown'} → 🔴 ${r.to || 'Unknown'}</div>
+          <div class="ride-meta">
+            <span class="ride-pill">${vehIcon} ${vehName}</span>
+            <span class="ride-pill">🪑 ${r.spaces} space${r.spaces > 1 ? 's' : ''}</span>
+            <span class="ride-pill green">👤 ${r.userName || 'Driver'}</span>
+          </div>
+        </div>`;
+    });
+  }
+  cont.innerHTML = `
+    <div class="location-bar">
+      <span style="font-size:1.2rem">📍</span>
+      <span id="user-loc-text">Fetching your area…</span>
+    </div>
+    <p class="section-title">Available Rides</p>
+    ${ridesHTML}`;
+  window.getMyLocation();
+}
+
+function startRidesListener() {
+  if (ridesUnsub) ridesUnsub();
+  const q = query(collection(db, 'rides'), where('status', '==', 'active'));
+  ridesUnsub = onSnapshot(q, snap => {
+    const rides = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (activeTab === 'rides') renderRidesTab(rides);
+  }, err => console.warn('rides listener:', err));
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   PROFILE TAB
+══════════════════════════════════════════════════════════════════ */
+function renderProfileTab() {
+  const cont = document.getElementById('content');
+  const ud   = userData || {};
+  const licSt  = ud.licenseStatus  || 'none';
+  const aadSt  = ud.aadhaarStatus  || 'none';
+  const bothVerified = licSt === 'verified' && aadSt === 'verified';
+
+  const badgeHTML = bothVerified
+    ? `<div><span class="verified-badge">✅ Fully Verified</span></div>`
+    : '';
+
+  cont.innerHTML = `
+    <div class="profile-header">
+      <div class="avatar-circle">👤</div>
+      <div class="profile-name">${auth.currentUser?.displayName || 'User'}</div>
+      <div style="color:var(--gray);font-size:.85rem;margin-top:4px;">${auth.currentUser?.email || ''}</div>
+      ${badgeHTML}
+    </div>
+
+    <p class="doc-section-title">📄 Document Verification</p>
+
+    <!-- LICENCE CARD -->
+    <div class="doc-card st-${licSt}" id="lic-card" onclick="triggerUpload('license')">
+      <div class="doc-icon">🪪</div>
+      <div class="doc-info">
+        <div class="doc-title">Driving Licence</div>
+        <div class="doc-sub">${licSt === 'none' ? 'Tap to upload your licence' :
+          licSt === 'pending' ? 'Waiting for admin review…' :
+          licSt === 'verified' ? 'Your licence is verified ✔' :
+          'Rejected – tap to re-upload'}</div>
+        ${ud.licenseUrl ? `<div id="lic-progress" class="progress-bar-wrap" style="display:none"><div class="progress-bar" id="lic-bar"></div></div>` : ''}
+      </div>
+      ${ud.licenseUrl ? `<img class="doc-thumb" src="${ud.licenseUrl}" alt="Licence" />` : ''}
+      <span class="doc-status-badge badge-${licSt}">
+        ${licSt === 'none' ? 'Upload' : licSt.charAt(0).toUpperCase()+licSt.slice(1)}
+      </span>
+    </div>
+
+    <!-- AADHAAR CARD -->
+    <div class="doc-card st-${aadSt}" id="aad-card" onclick="triggerUpload('aadhaar')">
+      <div class="doc-icon">🪪</div>
+      <div class="doc-info">
+        <div class="doc-title">Aadhaar Card</div>
+        <div class="doc-sub">${aadSt === 'none' ? 'Tap to upload your Aadhaar' :
+          aadSt === 'pending' ? 'Waiting for admin review…' :
+          aadSt === 'verified' ? 'Your Aadhaar is verified ✔' :
+          'Rejected – tap to re-upload'}</div>
+        ${ud.aadhaarUrl ? `<div id="aad-progress" class="progress-bar-wrap" style="display:none"><div class="progress-bar" id="aad-bar"></div></div>` : ''}
+      </div>
+      ${ud.aadhaarUrl ? `<img class="doc-thumb" src="${ud.aadhaarUrl}" alt="Aadhaar" />` : ''}
+      <span class="doc-status-badge badge-${aadSt}">
+        ${aadSt === 'none' ? 'Upload' : aadSt.charAt(0).toUpperCase()+aadSt.slice(1)}
+      </span>
+    </div>
+
+    <div style="margin-top:20px;">
+      <button onclick="handleLogout()"
+        style="width:100%;padding:14px;background:#fff5f5;color:var(--danger);
+               border:2px solid var(--danger);border-radius:14px;
+               font-family:'Poppins',sans-serif;font-weight:600;cursor:pointer;">
+        🚪 Logout
+      </button>
+    </div>`;
+}
+
+/* ── DOCUMENT UPLOAD ─────────────────────────────────────────────── */
+window.triggerUpload = (type) => {
+  const ud = userData || {};
+  // Allow re-upload only if not verified
+  if (ud[type + 'Status'] === 'verified') {
+    showToast('✅ Already verified – no action needed');
+    return;
+  }
+  const input = document.createElement('input');
+  input.type   = 'file';
+  input.accept = 'image/*';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (file) uploadDoc(type, file);
+  };
+  input.click();
+};
+
+async function uploadDoc(type, file) {
+  const uid        = auth.currentUser.uid;
+  const cardId     = type === 'license' ? 'lic-card' : 'aad-card';
+  const barId      = type === 'license' ? 'lic-bar'  : 'aad-bar';
+  const progWrapId = type === 'license' ? 'lic-progress' : 'aad-progress';
+
+  // Show spinner in card
+  const card = document.getElementById(cardId);
+  if (card) {
+    const subEl = card.querySelector('.doc-sub');
+    if (subEl) subEl.textContent = 'Uploading…';
+  }
+
+  try {
+    const storageRef  = sRef(storage, `documents/${uid}/${type}`);
+    const uploadTask  = uploadBytesResumable(storageRef, file);
+
+    uploadTask.on('state_changed',
+      snap => {
+        const pct = Math.round(snap.bytesTransferred / snap.totalBytes * 100);
+        const pw  = document.getElementById(progWrapId);
+        const bar = document.getElementById(barId);
+        if (pw)  pw.style.display  = 'block';
+        if (bar) bar.style.width   = pct + '%';
+      },
+      err => { showToast('❌ Upload failed: ' + err.message); },
+      async () => {
+        const url = await getDownloadURL(uploadTask.snapshot.ref);
+        await updateDoc(doc(db, 'users', uid), {
+          [`${type}Url`]:    url,
+          [`${type}Status`]: 'pending'
+        });
+        showToast('📤 Uploaded! Waiting for admin review.');
+      }
+    );
+  } catch (err) { showToast('❌ ' + err.message); }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   FAB & VERIFICATION CHECK
+══════════════════════════════════════════════════════════════════ */
+window.handleFABClick = () => {
+  const ud  = userData || {};
+  const licOk = ud.licenseStatus === 'verified';
+  const aadOk = ud.aadhaarStatus === 'verified';
+
+  if (!licOk || !aadOk) {
+    showVerifyModal(licOk, aadOk);
+    return;
+  }
+  openAddRide();
+};
+
+function showVerifyModal(licOk, aadOk) {
+  const missing = [];
+  if (!licOk) missing.push('Driving Licence');
+  if (!aadOk) missing.push('Aadhaar Card');
+
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.id = 'verify-modal';
+  overlay.innerHTML = `
+    <div class="modal-box">
+      <div class="modal-icon">🔒</div>
+      <h3>Verification Required</h3>
+      <p>To add a ride you must first get your documents verified:<br>
+         <strong>${missing.join(' &amp; ')}</strong><br><br>
+         Go to <b>Profile</b> tab → upload your documents → wait for admin approval.
+      </p>
+      <div class="modal-actions">
+        <button class="m-primary" onclick="
+          document.getElementById('verify-modal').remove();
+          switchTab('profile', document.getElementById('nav-profile'));">
+          Go to Profile
+        </button>
+        <button class="m-secondary" onclick="document.getElementById('verify-modal').remove();">
+          Cancel
+        </button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   ADD RIDE SCREEN
+══════════════════════════════════════════════════════════════════ */
+function openAddRide() {
+  // Reset state
+  selectedVehicle = null;
+  selectedSpaces  = null;
+  startPoint      = null;
+  endPoint        = null;
+
+  document.querySelectorAll('.veh-btn').forEach(b => b.classList.remove('sel'));
+  document.querySelectorAll('.sp-btn').forEach(b  => b.classList.remove('sel'));
+  const fi = document.getElementById('from-input');
+  const ti = document.getElementById('to-input');
+  if (fi) fi.value = '';
+  if (ti) ti.value = '';
+
+  showScreen('add-ride-screen');
+
+  // Init or refresh map
+  setTimeout(() => {
+    if (!mapInstance) initMap();
+    else              mapInstance.invalidateSize();
+  }, 120);
+}
+
+window.goHome = () => {
+  showScreen('home-screen');
+  document.getElementById('fab-btn').style.display = 'flex';
+};
+
+/* ── MAP ─────────────────────────────────────────────────────────── */
+function initMap() {
+  mapInstance = L.map('ride-map', { zoomControl: true }).setView([17.385, 78.4867], 12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors', maxZoom: 19
+  }).addTo(mapInstance);
+
+  // Try center on user
+  navigator.geolocation?.getCurrentPosition(pos => {
+    mapInstance.setView([pos.coords.latitude, pos.coords.longitude], 14);
+  });
+
+  mapInstance.on('click', async e => {
+    const { lat, lng } = e.latlng;
+    if (mapMode === 'start') {
+      if (startMarker) mapInstance.removeLayer(startMarker);
+      startMarker = L.marker([lat, lng], {
+        icon: L.divIcon({ className:'', html:`<div class="marker-start"></div>`, iconSize:[22,22], iconAnchor:[11,11] })
+      }).addTo(mapInstance).bindPopup('🟢 Start').openPopup();
+      startPoint = { lat, lng };
+      const name = await reverseGeocode(lat, lng);
+      const fi = document.getElementById('from-input');
+      if (fi) fi.value = name;
+      setMapMode('end');
+    } else {
+      if (endMarker) mapInstance.removeLayer(endMarker);
+      endMarker = L.marker([lat, lng], {
+        icon: L.divIcon({ className:'', html:`<div class="marker-end"></div>`, iconSize:[22,22], iconAnchor:[11,11] })
+      }).addTo(mapInstance).bindPopup('🔴 End').openPopup();
+      endPoint = { lat, lng };
+      const name = await reverseGeocode(lat, lng);
+      const ti = document.getElementById('to-input');
+      if (ti) ti.value = name;
+    }
+    drawRoute();
+  });
+}
+
+function drawRoute() {
+  if (routeLine) mapInstance.removeLayer(routeLine);
+  if (startPoint && endPoint) {
+    routeLine = L.polyline(
+      [[startPoint.lat, startPoint.lng], [endPoint.lat, endPoint.lng]],
+      { color: '#28a745', weight: 4, opacity: .7, dashArray: '8,6' }
+    ).addTo(mapInstance);
+    mapInstance.fitBounds(routeLine.getBounds(), { padding: [40, 40] });
+  }
+}
+
+window.setMapMode = (mode) => {
+  mapMode = mode;
+  document.getElementById('mode-start').classList.toggle('active-mode', mode === 'start');
+  document.getElementById('mode-end').classList.toggle('active-mode',   mode === 'end');
+};
+
+/* ── VEHICLE / SPACES ────────────────────────────────────────────── */
+window.selectVehicle = (v, el) => {
+  selectedVehicle = v;
+  document.querySelectorAll('.veh-btn').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+};
+
+window.selectSpace = (n, el) => {
+  selectedSpaces = n;
+  document.querySelectorAll('.sp-btn').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+};
+
+/* ── SUBMIT RIDE ─────────────────────────────────────────────────── */
+window.submitRide = async () => {
+  const fromVal = document.getElementById('from-input').value.trim();
+  const toVal   = document.getElementById('to-input').value.trim();
+
+  if (!fromVal || !toVal)       return showToast('⚠️ Enter From & To locations');
+  if (!selectedVehicle)         return showToast('⚠️ Select a vehicle type');
+  if (!selectedSpaces)          return showToast('⚠️ Select available spaces');
+  if (!startPoint || !endPoint) return showToast('⚠️ Drop Start & End pins on the map');
+
+  const btn = document.getElementById('submit-ride-btn');
+  btn.disabled    = true;
+  btn.textContent = 'Posting…';
+
+  try {
+    await addDoc(collection(db, 'rides'), {
+      userId:    auth.currentUser.uid,
+      userName:  auth.currentUser.displayName || 'Driver',
+      from:      fromVal,
+      to:        toVal,
+      vehicle:   selectedVehicle,
+      spaces:    selectedSpaces,
+      fromLat:   startPoint.lat,
+      fromLon:   startPoint.lng,
+      toLat:     endPoint.lat,
+      toLon:     endPoint.lng,
+      status:    'active',
+      createdAt: serverTimestamp()
+    });
+    showToast('🎉 Ride posted successfully!');
+    showScreen('home-screen');
+    document.getElementById('fab-btn').style.display = 'flex';
+    switchTab('rides', document.getElementById('nav-rides'));
+  } catch (err) {
+    showToast('❌ Failed: ' + err.message);
+  } finally {
+    btn.disabled    = false;
+    btn.textContent = '🚀 Post Ride';
+  }
+};
+
+/* ══════════════════════════════════════════════════════════════════
+   AUTH STATE OBSERVER  (boot logic)
+══════════════════════════════════════════════════════════════════ */
+setAuthState('login');
+
+// Splash animations
+setTimeout(() => document.getElementById('main-text').classList.add('finished-green'), 2500);
+setTimeout(() => { document.getElementById('tagline').textContent = 'mee prayanam maa bhadyatha'; }, 3000);
+
+// After splash, watch auth
+setTimeout(() => {
+  onAuthStateChanged(auth, user => {
+    currentUser = user;
+    if (user && user.emailVerified) {
+      showScreen('home-screen');
+      document.getElementById('fab-btn').style.display = 'flex';
+      startUserListener(user.uid);
+      switchTab('rides', document.getElementById('nav-rides'));
+    } else if (!user) {
+      showScreen('login-screen');
+    }
+    // if user exists but not verified – auth card already showing verify-waiting
+  });
+}, 5000);
+</script>
 </body>
 </html>
