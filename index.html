@@ -1,980 +1,389 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Thodu – Real-time Journey</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USEAS | Professional Academic Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        :root { --neon: #00f2ff; --glass: rgba(255, 255, 255, 0.08); --border: rgba(255, 255, 255, 0.1); }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
+        body { background: #090a0f; color: white; min-height: 100vh; overflow-x: hidden; }
+        
+        #bg-canvas { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at top right, #1b2735, #090a0f); }
+        .stars { position: absolute; inset: 0; background: url('https://www.transparenttextures.com/patterns/stardust.png'); opacity: 0.3; animation: move 150s linear infinite; }
+        @keyframes move { from { background-position: 0 0; } to { background-position: 10000px 5000px; } }
 
-  <style>
-    /* ── ROOT ──────────────────────────────────────────────────────── */
-    :root {
-      --primary: #28a745;
-      --primary-light: rgba(40,167,69,.12);
-      --danger:  #dc3545;
-      --warn:    #ffc107;
-      --dark:    #1a1a1a;
-      --gray:    #6c757d;
-      --light-bg:#f4f6f9;
-      --white:   #ffffff;
-      --radius:  16px;
-      --shadow:  0 6px 24px rgba(0,0,0,.08);
-    }
-    *{box-sizing:border-box;margin:0;padding:0;}
-    body,html{width:100%;height:100%;font-family:'Poppins',sans-serif;background:#fff;overflow:hidden;}
+        #admin-bar { display: none; background: #2ecc71; padding: 12px; position: sticky; top: 0; z-index: 9999; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
+        .btn-admin { background: white; color: #000; border: none; padding: 6px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; margin: 0 5px; font-size: 0.8rem; }
 
-    /* ── SCREENS ───────────────────────────────────────────────────── */
-    .screen{display:none;width:100%;height:100vh;position:absolute;top:0;left:0;
-            flex-direction:column;justify-content:center;align-items:center;}
-    .active{display:flex!important;}
+        header { text-align: center; padding: 60px 20px 20px; }
+        .logo { font-size: 42px; font-weight: 800; letter-spacing: 4px; text-shadow: 0 0 25px var(--neon); color: white; }
+        .search-wrap { max-width: 600px; margin: 30px auto; }
+        .search-wrap input { width: 100%; padding: 15px 30px; border-radius: 50px; border: 1px solid var(--border); background: rgba(0,0,0,0.6); color: white; outline: none; backdrop-filter: blur(10px); }
 
-    /* ── SPLASH ────────────────────────────────────────────────────── */
-    .brand-name{display:flex;font-size:5rem;font-weight:900;color:var(--dark);}
-    .letter{display:inline-block;opacity:0;}
-    .t{animation:fL .8s forwards .8s}.h{animation:fB .8s forwards 1s}
-    .o{animation:zI .8s forwards 1.2s}.d{animation:flI .5s forwards 1.4s}
-    .u{animation:fR .8s forwards 1.6s}
-    @keyframes fL{from{opacity:0;transform:translateX(-80px)}to{opacity:1;transform:translateX(0)}}
-    @keyframes fB{from{opacity:0;transform:translateY(60px)}to{opacity:1;transform:translateY(0)}}
-    @keyframes zI{from{opacity:0;transform:scale(.3)}to{opacity:1;transform:scale(1)}}
-    @keyframes flI{0%{opacity:0}100%{opacity:1}}
-    @keyframes fR{from{opacity:0;transform:translateX(80px)}to{opacity:1;transform:translateX(0)}}
-    .finished-green{color:var(--primary)!important;transform:scale(1.05);}
+        .nav-header { max-width: 1200px; margin: 0 auto 25px; padding: 0 30px; display: flex; align-items: center; gap: 15px; }
+        .breadcrumb { font-size: 0.85rem; color: var(--neon); text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.7; }
+        .btn-back { display: none; background: var(--glass); border: 1px solid var(--neon); color: white; padding: 6px 18px; border-radius: 50px; cursor: pointer; font-size: 0.8rem; }
 
-    /* ── AUTH CARD ─────────────────────────────────────────────────── */
-    .auth-card{width:88%;max-width:400px;padding:35px;background:#fff;
-               border-radius:28px;box-shadow:0 15px 35px rgba(0,0,0,.1);text-align:center;}
-    .auth-card h2{margin-bottom:22px;font-family:'Montserrat',sans-serif;}
-    .input-box{width:100%;margin-bottom:14px;text-align:left;}
-    input{width:100%;padding:14px;border:2px solid #f0f0f0;border-radius:14px;
-          font-family:'Poppins',sans-serif;font-size:.95rem;outline:none;}
-    input:focus{border-color:var(--primary);}
-    .btn{width:100%;padding:15px;border:none;border-radius:14px;font-weight:600;
-         font-family:'Poppins',sans-serif;font-size:1rem;cursor:pointer;transition:.25s;margin-top:8px;}
-    .btn-primary{background:var(--primary);color:#fff;box-shadow:0 4px 14px rgba(40,167,69,.35);}
-    .btn-primary:hover{background:#218838;}
-    .btn-secondary{background:#f0f0f0;color:var(--dark);}
-    
-    /* Google Button Styling */
-    .btn-google {
-      background: #fff;
-      color: #444;
-      border: 2px solid #eee;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 15px;
-    }
-    .btn-google img { width: 20px; }
-    .btn-google:hover { background: #f9f9f9; border-color: #ddd; }
-    
-    .divider {
-      margin: 20px 0;
-      display: flex;
-      align-items: center;
-      text-align: center;
-      color: #ccc;
-      font-size: 0.8rem;
-    }
-    .divider::before, .divider::after {
-      content: '';
-      flex: 1;
-      border-bottom: 1px solid #eee;
-    }
-    .divider:not(:empty)::before { margin-right: .5em; }
-    .divider:not(:empty)::after { margin-left: .5em; }
+        .main-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; padding: 20px; max-width: 1250px; margin: 0 auto; }
+        .card { background: var(--glass); border: 1px solid var(--border); padding: 50px 25px; border-radius: 28px; text-align: center; cursor: pointer; transition: 0.4s; backdrop-filter: blur(20px); position: relative; }
+        .card:hover { transform: translateY(-10px); border-color: var(--neon); background: rgba(255,255,255,0.12); }
+        .card i.main-icon { font-size: 3.5rem; color: var(--neon); margin-bottom: 25px; filter: drop-shadow(0 0 10px var(--neon)); }
 
-    /* ── HOME ──────────────────────────────────────────────────────── */
-    #home-screen{justify-content:flex-start;background:var(--light-bg);}
-    .content-area{flex:1;width:100%;padding:20px;overflow-y:auto;padding-bottom:90px;}
+        .admin-controls { position: absolute; top: 15px; right: 15px; display: flex; gap: 10px; z-index: 10; }
+        .admin-controls i { cursor: pointer; font-size: 1.1rem; transition: 0.2s; }
 
-    /* location bar */
-    .location-bar{background:#fff;padding:14px 18px;border-radius:14px;
-                  display:flex;align-items:center;gap:10px;
-                  box-shadow:var(--shadow);margin-bottom:20px;border:1px solid #eee;}
-    #user-loc-text{font-weight:500;font-size:.9rem;color:var(--dark);}
+        .units-panel { display: none; max-width: 900px; margin: 0 auto; padding: 20px; background: rgba(0,0,0,0.4); border-radius: 30px; border: 1px solid var(--border); }
+        .unit-row { background: rgba(255,255,255,0.05); margin-bottom: 12px; padding: 18px 25px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.3s; }
+        .unit-row:hover { background: rgba(255,255,255,0.1); border-color: var(--neon); }
 
-    /* rides list */
-    .section-title{font-family:'Montserrat',sans-serif;font-size:1.3rem;
-                    margin-bottom:14px;color:var(--dark);}
-    .ride-card{background:#fff;padding:18px;border-radius:var(--radius);
-                margin-bottom:12px;box-shadow:var(--shadow);border-left:5px solid var(--primary);
-                transition:.2s;}
-    .ride-card:hover{transform:translateY(-2px);}
-    .ride-route{font-weight:700;font-size:1rem;color:var(--dark);margin-bottom:6px;}
-    .ride-meta{display:flex;gap:10px;flex-wrap:wrap;font-size:.8rem;color:var(--gray);}
-    .ride-pill{background:var(--light-bg);padding:3px 10px;border-radius:20px;font-weight:500;}
-    .ride-pill.green{background:var(--primary-light);color:var(--primary);}
-    .empty-state{text-align:center;padding:50px 20px;color:var(--gray);}
-    .empty-state .icon{font-size:3rem;margin-bottom:12px;}
+        /* V2 LOADER STYLE */
+        #v2-loader { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(15px); }
+        .v2-logo-spin { font-size: 3.5rem; color: var(--neon); margin-bottom: 25px; animation: pulse 1.5s infinite ease-in-out; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.1); opacity: 1; text-shadow: 0 0 20px var(--neon); } }
+        .progress-bar-container { width: 250px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-top: 25px; overflow: hidden; }
+        #v2-progress { width: 0%; height: 100%; background: var(--neon); transition: 0.4s linear; box-shadow: 0 0 15px var(--neon); }
 
-    /* FAB */
-    #fab-btn{position:fixed;bottom:88px;right:20px;width:58px;height:58px;
-             border-radius:50%;background:var(--primary);color:#fff;border:none;
-             font-size:2rem;line-height:1;box-shadow:0 6px 20px rgba(40,167,69,.45);
-             cursor:pointer;z-index:200;display:none;align-items:center;justify-content:center;
-             transition:transform .2s,box-shadow .2s;}
-    #fab-btn:active{transform:scale(.92);}
+        #admin-editor { display: none; margin-top: 20px; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 20px; border: 1px solid var(--neon); }
+        .edit-input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid var(--border); background: #000; color: #fff; outline: none; }
+        .btn-update { width: 100%; padding: 12px; background: var(--neon); color: #000; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; }
 
-    /* bottom nav */
-    .bottom-nav{width:100%;height:72px;background:#fff;border-top:1px solid #eee;
-                display:flex;position:fixed;bottom:0;left:0;z-index:100;}
-    .nav-item{flex:1;display:flex;flex-direction:column;justify-content:center;
-              align-items:center;color:#ccc;cursor:pointer;font-size:.78rem;
-              transition:color .2s;gap:3px;}
-    .nav-item span:first-child{font-size:1.3rem;}
-    .nav-active{color:var(--primary);font-weight:600;}
+        .viewer { display: none; position: fixed; inset: 0; background: #000; z-index: 9000; flex-direction: column; }
+        .v-bar { background: #111; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+        iframe { width: 100%; flex-grow: 1; border: none; }
 
-    /* ── PROFILE SECTION ───────────────────────────────────────────── */
-    .profile-header{text-align:center;padding:30px 0 20px;}
-    .avatar-circle{width:80px;height:80px;border-radius:50%;background:var(--primary-light);
-                   display:flex;align-items:center;justify-content:center;
-                   font-size:2.2rem;margin:0 auto 12px;}
-    .profile-name{font-size:1.3rem;font-weight:700;color:var(--dark);}
-    .verified-badge{display:inline-flex;align-items:center;gap:5px;
-                    background:var(--primary-light);color:var(--primary);
-                    padding:4px 12px;border-radius:20px;font-size:.8rem;
-                    font-weight:600;margin-top:6px;}
-
-    /* doc upload cards */
-    .doc-section-title{font-weight:600;font-size:.9rem;color:var(--gray);
-                        margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;}
-    .doc-card{background:#fff;border-radius:var(--radius);padding:18px;
-              margin-bottom:14px;box-shadow:var(--shadow);display:flex;
-              align-items:center;gap:14px;cursor:pointer;transition:all .2s;
-              border:2px dashed #e0e0e0;position:relative;}
-    .doc-card:hover{border-color:var(--primary);transform:translateY(-1px);}
-    .doc-card.st-pending{border:2px solid var(--warn);border-style:solid;}
-    .doc-card.st-verified{border:2px solid var(--primary);border-style:solid;}
-    .doc-card.st-rejected{border:2px solid var(--danger);border-style:solid;}
-    .doc-icon{width:48px;height:48px;border-radius:12px;background:var(--light-bg);
-              display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;}
-    .doc-info{flex:1;min-width:0;}
-    .doc-title{font-weight:600;font-size:.95rem;color:var(--dark);}
-    .doc-sub{font-size:.8rem;color:var(--gray);margin-top:2px;}
-    .doc-status-badge{padding:4px 10px;border-radius:20px;font-size:.72rem;
-                      font-weight:700;text-transform:uppercase;white-space:nowrap;}
-    .badge-none{background:#f0f0f0;color:var(--gray);}
-    .badge-pending{background:#fff3cd;color:#856404;}
-    .badge-verified{background:#d1e7dd;color:#0a3622;}
-    .badge-rejected{background:#f8d7da;color:#842029;}
-    .doc-thumb{width:44px;height:44px;border-radius:10px;object-fit:cover;flex-shrink:0;}
-    .doc-uploading{font-size:.85rem;color:var(--gray);font-style:italic;}
-    .progress-bar-wrap{width:100%;background:#eee;border-radius:10px;height:6px;margin-top:8px;}
-    .progress-bar{height:6px;background:var(--primary);border-radius:10px;width:0%;transition:width .3s;}
-
-    /* ── ADD RIDE SCREEN ───────────────────────────────────────────── */
-    #add-ride-screen{justify-content:flex-start;background:var(--light-bg);overflow-y:auto;}
-    .ar-header{width:100%;background:#fff;padding:18px 20px;display:flex;align-items:center;
-               gap:14px;box-shadow:0 2px 10px rgba(0,0,0,.06);flex-shrink:0;position:sticky;top:0;z-index:10;}
-    .back-btn{width:38px;height:38px;border-radius:50%;background:var(--light-bg);border:none;
-              font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
-    .ar-title{font-family:'Montserrat',sans-serif;font-size:1.2rem;font-weight:900;}
-    .ar-body{width:100%;padding:20px;padding-bottom:40px;}
-
-    /* form cards */
-    .form-card{background:#fff;border-radius:var(--radius);padding:18px;
-               margin-bottom:16px;box-shadow:var(--shadow);}
-    .form-label{font-size:.8rem;font-weight:600;color:var(--gray);
-                text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;display:block;}
-    .loc-input-wrap{position:relative;}
-    .loc-input-wrap input{padding-left:38px;border:2px solid #eee;border-radius:12px;}
-    .loc-input-wrap input:focus{border-color:var(--primary);}
-    .loc-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:1rem;}
-
-    /* vehicle selector */
-    .vehicle-grid{display:flex;gap:10px;}
-    .veh-btn{flex:1;padding:14px 8px;border:2px solid #eee;border-radius:14px;
-             background:#fff;cursor:pointer;text-align:center;transition:all .2s;font-family:'Poppins',sans-serif;}
-    .veh-btn .veh-icon{font-size:1.8rem;display:block;margin-bottom:4px;}
-    .veh-btn .veh-label{font-size:.78rem;font-weight:600;color:var(--gray);}
-    .veh-btn.sel{border-color:var(--primary);background:var(--primary-light);}
-    .veh-btn.sel .veh-label{color:var(--primary);}
-
-    /* spaces selector */
-    .spaces-row{display:flex;gap:8px;flex-wrap:wrap;}
-    .sp-btn{width:46px;height:46px;border-radius:50%;border:2px solid #eee;
-            background:#fff;cursor:pointer;font-weight:700;font-size:.95rem;
-            transition:all .2s;font-family:'Poppins',sans-serif;}
-    .sp-btn.sel{border-color:var(--primary);background:var(--primary);color:#fff;}
-
-    /* map */
-    .map-mode-bar{display:flex;gap:8px;margin-bottom:10px;}
-    .mode-btn{flex:1;padding:10px;border-radius:12px;border:2px solid #eee;
-              background:#fff;font-family:'Poppins',sans-serif;font-weight:600;
-              font-size:.85rem;cursor:pointer;transition:all .2s;display:flex;
-              align-items:center;justify-content:center;gap:6px;}
-    .mode-btn.active-mode{border-color:var(--primary);background:var(--primary);color:#fff;}
-    #ride-map{width:100%;height:280px;border-radius:var(--radius);
-              overflow:hidden;z-index:1;}
-    .map-hint{font-size:.78rem;color:var(--gray);text-align:center;margin-top:6px;}
-
-    /* submit */
-    .btn-submit{width:100%;padding:16px;background:var(--primary);color:#fff;
-                border:none;border-radius:14px;font-family:'Poppins',sans-serif;
-                font-size:1rem;font-weight:700;cursor:pointer;margin-top:8px;
-                box-shadow:0 4px 14px rgba(40,167,69,.35);transition:.2s;}
-    .btn-submit:hover{background:#218838;}
-    .btn-submit:disabled{background:#ccc;box-shadow:none;cursor:not-allowed;}
-
-    /* ── MODAL ─────────────────────────────────────────────────────── */
-    .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;
-                   background:rgba(0,0,0,.55);display:flex;align-items:center;
-                   justify-content:center;z-index:9999;padding:20px;}
-    .modal-box{background:#fff;border-radius:24px;padding:32px 26px;
-               max-width:340px;width:100%;text-align:center;
-               box-shadow:0 20px 60px rgba(0,0,0,.2);}
-    .modal-icon{font-size:3rem;margin-bottom:12px;}
-    .modal-box h3{font-family:'Montserrat',sans-serif;margin-bottom:10px;}
-    .modal-box p{color:var(--gray);font-size:.9rem;line-height:1.55;margin-bottom:20px;}
-    .modal-actions{display:flex;gap:10px;}
-    .modal-actions button{flex:1;padding:12px;border-radius:12px;border:none;
-                          font-family:'Poppins',sans-serif;font-weight:600;cursor:pointer;}
-    .modal-actions .m-primary{background:var(--primary);color:#fff;}
-    .modal-actions .m-secondary{background:#f0f0f0;color:var(--dark);}
-
-    /* ── TOAST ─────────────────────────────────────────────────────── */
-    #toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);
-           background:var(--dark);color:#fff;padding:12px 22px;border-radius:30px;
-           font-size:.88rem;font-weight:500;z-index:9998;opacity:0;
-           transition:opacity .3s;pointer-events:none;white-space:nowrap;}
-    #toast.show{opacity:1;}
-
-    /* ── LEAFLET CUSTOM MARKERS ────────────────────────────────────── */
-    .marker-start{width:22px;height:22px;background:#28a745;border:3px solid #fff;
-                  border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,.35);}
-    .marker-end  {width:22px;height:22px;background:#dc3545;border:3px solid #fff;
-                  border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,.35);}
-    .leaflet-container{font-family:'Poppins',sans-serif;}
-  </style>
+        footer { padding: 60px; text-align: center; opacity: 0.4; font-size: 0.8rem; cursor: pointer; }
+    </style>
 </head>
 <body>
 
-<div id="splash-screen" class="screen active">
-  <div id="main-text" class="brand-name">
-    <span class="letter t">T</span><span class="letter h">H</span>
-    <span class="letter o">O</span><span class="letter d">D</span>
-    <span class="letter u">U</span>
-  </div>
-  <p id="tagline" style="margin-top:15px;color:#888;font-size:.95rem;"></p>
+<div id="bg-canvas"><div class="stars"></div></div>
+
+<div id="v2-loader">
+    <div class="v2-logo-spin"><i class="fa-solid fa-shield-halved"></i></div>
+    <div style="font-size: 1.4rem; font-weight: 600; color: var(--neon); letter-spacing: 4px;">USEAS NETWORK</div>
+    <div id="v2-status" style="margin-top: 10px; font-size: 0.9rem; color: rgba(255,255,255,0.6);">Initializing Tunnel...</div>
+    <div class="progress-bar-container">
+        <div id="v2-progress"></div>
+    </div>
 </div>
 
-<div id="login-screen" class="screen">
-  <div class="auth-card" id="auth-container"></div>
+<div id="admin-bar">
+    🛡️ ADMIN ACTIVE | 
+    <button class="btn-admin" onclick="triggerAdd()">+ ADD NEW</button>
+    <button id="v2-toggle-btn" class="btn-admin" style="background:#f39c12;" onclick="toggleV2Loader()">V2 Loader: OFF</button>
+    <button class="btn-admin" style="background:#ff5252; color:#fff;" onclick="location.reload()">EXIT</button>
 </div>
 
-<div id="home-screen" class="screen">
-  <div id="content" class="content-area"></div>
+<header>
+    <div class="logo">🚀 USEAS</div>
+    <div class="search-wrap"><input type="text" id="findBox" placeholder="Search portal..." onkeyup="runSearch()"></div>
+</header>
 
-  <button id="fab-btn" onclick="handleFABClick()">＋</button>
-
-  <nav class="bottom-nav">
-    <div class="nav-item nav-active" id="nav-rides"   onclick="switchTab('rides',this)">
-      <span>🚗</span><span>Rides</span>
-    </div>
-    <div class="nav-item" id="nav-profile" onclick="switchTab('profile',this)">
-      <span>👤</span><span>Profile</span>
-    </div>
-  </nav>
+<div class="nav-header">
+    <button id="back-trigger" class="btn-back" onclick="navBack()">BACK</button>
+    <div id="path-txt" class="breadcrumb">PORTAL / SEMESTERS</div>
 </div>
 
-<div id="add-ride-screen" class="screen">
-  <div class="ar-header">
-    <button class="back-btn" onclick="goHome()">←</button>
-    <span class="ar-title">Add a Ride</span>
-  </div>
-  <div class="ar-body">
+<div id="card-grid" class="main-grid"></div>
 
-    <div class="form-card">
-      <label class="form-label">📍 From</label>
-      <div class="loc-input-wrap" style="margin-bottom:12px;">
-        <span class="loc-icon">🟢</span>
-        <input type="text" id="from-input" placeholder="Starting location" />
-      </div>
-      <label class="form-label">📍 To</label>
-      <div class="loc-input-wrap">
-        <span class="loc-icon">🔴</span>
-        <input type="text" id="to-input" placeholder="Destination" />
-      </div>
+<div id="units-page" class="units-panel">
+    <h2 id="sub-heading" style="color:var(--neon); margin-bottom:20px; text-align:center;"></h2>
+    <div id="units-stack"></div>
+
+    <div id="admin-editor">
+        <p style="color:var(--neon); font-weight:bold;">Editing: <span id="editing-unit-name"></span></p>
+        <input type="text" id="edit-link" class="edit-input" placeholder="Paste URL here...">
+        <div style="display:flex; gap:10px; margin-bottom:10px;">
+            <button id="tabPdf" class="btn-admin" style="background:var(--neon)" onclick="switchLinkType('pdf')">PDF Link</button>
+            <button id="tabVid" class="btn-admin" style="background:white" onclick="switchLinkType('vid')">Video Link</button>
+        </div>
+        <button class="btn-update" onclick="saveEdit()">Update Link</button>
     </div>
-
-    <div class="form-card">
-      <label class="form-label">🚘 Vehicle Type</label>
-      <div class="vehicle-grid">
-        <button class="veh-btn" id="veh-bike" onclick="selectVehicle('bike',this)">
-          <span class="veh-icon">🏍️</span><span class="veh-label">Bike</span>
-        </button>
-        <button class="veh-btn" id="veh-auto" onclick="selectVehicle('auto',this)">
-          <span class="veh-icon">🛺</span><span class="veh-label">Auto</span>
-        </button>
-        <button class="veh-btn" id="veh-car" onclick="selectVehicle('car',this)">
-          <span class="veh-icon">🚗</span><span class="veh-label">Car</span>
-        </button>
-      </div>
-    </div>
-
-    <div class="form-card">
-      <label class="form-label">🪑 Available Spaces</label>
-      <div class="spaces-row">
-        <button class="sp-btn" onclick="selectSpace(1,this)">1</button>
-        <button class="sp-btn" onclick="selectSpace(2,this)">2</button>
-        <button class="sp-btn" onclick="selectSpace(3,this)">3</button>
-        <button class="sp-btn" onclick="selectSpace(4,this)">4</button>
-        <button class="sp-btn" onclick="selectSpace(5,this)">5</button>
-        <button class="sp-btn" onclick="selectSpace(6,this)">6</button>
-      </div>
-    </div>
-
-    <div class="form-card">
-      <label class="form-label">🗺️ Select Route on Map</label>
-      <div class="map-mode-bar">
-        <button class="mode-btn active-mode" id="mode-start" onclick="setMapMode('start')">
-          🟢 Set Start
-        </button>
-        <button class="mode-btn" id="mode-end" onclick="setMapMode('end')">
-          🔴 Set End
-        </button>
-      </div>
-      <div id="ride-map"></div>
-      <p class="map-hint">Tap on the map to drop a marker</p>
-    </div>
-
-    <button class="btn-submit" id="submit-ride-btn" onclick="submitRide()">
-      🚀 Post Ride
-    </button>
-  </div>
 </div>
 
-<div id="toast"></div>
+<div id="pdf-screen" class="viewer">
+    <div class="v-bar">
+        <span id="pdf-label" style="color:var(--neon); font-weight:600;"></span>
+        <div style="display:flex; gap:12px;">
+            <button id="fs-btn" style="display:none; background:#3498db; color:white; border:none; padding:8px 15px; border-radius:8px; cursor:pointer;" onclick="goFull()"><i class="fa-solid fa-expand"></i></button>
+            <button onclick="hideViewer()" style="background:#ff5252; color:white; border:none; padding:8px 22px; border-radius:8px; cursor:pointer;">Close</button>
+        </div>
+    </div>
+    <iframe id="pdf-frame" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<footer id="pass-trigger">© 2026 USEAS Portal | mee prayanam maa bhadyatha</footer>
+
 <script type="module">
-/* ── FIREBASE IMPORTS ───────────────────────────────────────────── */
-import { initializeApp }                               from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword,
-         signInWithEmailAndPassword, sendEmailVerification,
-         updateProfile, onAuthStateChanged, signOut, reload,
-         GoogleAuthProvider, signInWithPopup }
-                                                       from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc,
-         updateDoc, collection, onSnapshot, addDoc,
-         serverTimestamp, query, where, orderBy }      from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getStorage, ref as sRef,
-         uploadBytesResumable, getDownloadURL }        from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* ── CONFIG ─────────────────────────────────────────────────────── */
-const firebaseConfig = {
-  apiKey:            "AIzaSyA1QeDf1E_Kb1ZC15ahw1dY8hk3J0gXopY",
-  authDomain:        "thodu-65cb9.firebaseapp.com",
-  projectId:         "thodu-65cb9",
-  storageBucket:     "thodu-65cb9.firebasestorage.app",
-  messagingSenderId: "1070229943496",
-  appId:             "1:1070229943496:web:038e2e74c463e7acefa1fd"
-};
-const app     = initializeApp(firebaseConfig);
-const auth    = getAuth(app);
-const db      = getFirestore(app);
-const storage = getStorage(app);
-const googleProvider = new GoogleAuthProvider();
+    const firebaseConfig = {
+      apiKey: "AIzaSyDt8SROwFORTZFqVe5xLc3nlDukbOAgdzs",
+      authDomain: "useasnotes.firebaseapp.com",
+      databaseURL: "https://useasnotes-default-rtdb.firebaseio.com",
+      projectId: "useasnotes",
+      storageBucket: "useasnotes.firebasestorage.app",
+      messagingSenderId: "1066601715098",
+      appId: "1:1066601715098:web:3b424d6e097d9112d09623",
+      measurementId: "G-5NMMTRGSR6"
+    };
 
-/* ── STATE ──────────────────────────────────────────────────────── */
-let currentUser       = null;
-let userData          = null;
-let activeTab          = 'rides';
-let userUnsub          = null;
-let ridesUnsub        = null;
-let verifyInterval    = null;
-let mapInstance       = null;
-let startMarker       = null;
-let endMarker         = null;
-let routeLine         = null;
-let mapMode           = 'start';
-let selectedVehicle   = null;
-let selectedSpaces    = null;
-let startPoint        = null;
-let endPoint          = null;
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const docRef = doc(db, "portal", "academic_data_final");
 
-/* ══════════════════════════════════════════════════════════════════
-   UTILITY
-══════════════════════════════════════════════════════════════════ */
-function showToast(msg, dur = 2800) {
-  const t = document.getElementById('toast');
-  if(!t) return;
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), dur);
-}
+    let dbData = {};
+    let isAdmin = false;
+    let mode = 'semesters'; 
+    let path = { sem: null, group: null, subId: null };
+    let activeEditIdx = null;
+    let activeLinkType = 'pdf';
+    let v2On = false;
 
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
-async function reverseGeocode(lat, lon) {
-  try {
-    const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
-    const d = await r.json();
-    const a = d.address || {};
-    const area = a.suburb || a.town || a.village || a.city_district || a.city || '';
-    const road = a.road ? a.road + ', ' : '';
-    return (road + area).trim() || `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
-  } catch { return `${lat.toFixed(4)}, ${lon.toFixed(4)}`; }
-}
-
-/* ══════════════════════════════════════════════════════════════════
-   AUTH
-══════════════════════════════════════════════════════════════════ */
-window.setAuthState = (state) => {
-  clearInterval(verifyInterval);
-  const c = document.getElementById('auth-container');
-  if (state === 'login') {
-    c.innerHTML = `
-      <h2>Welcome Back 👋</h2>
-      <div class="input-box"><input type="email"    id="email"    placeholder="Email" /></div>
-      <div class="input-box"><input type="password" id="password" placeholder="Password" /></div>
-      <button class="btn btn-primary" id="btn-login">Login</button>
-      
-      <div class="divider">OR</div>
-      
-      <button class="btn btn-google" id="btn-google-login">
-        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/layout/google.svg" alt="G">
-        Continue with Google
-      </button>
-
-      <p style="margin-top:18px;color:#999;font-size:.88rem;">
-        New here? <span style="color:var(--primary);cursor:pointer;font-weight:600;"
-          onclick="setAuthState('signup')">Sign Up</span>
-      </p>`;
-    document.getElementById('btn-login').onclick = doLogin;
-    document.getElementById('btn-google-login').onclick = doGoogleLogin;
-  } else if (state === 'signup') {
-    c.innerHTML = `
-      <h2>Create Account</h2>
-      <div class="input-box"><input type="text"     id="name"     placeholder="Full Name" /></div>
-      <div class="input-box"><input type="email"    id="email"    placeholder="Email" /></div>
-      <div class="input-box"><input type="password" id="password" placeholder="Password (min 6 chars)" /></div>
-      <button class="btn btn-primary" id="btn-signup">Create Account</button>
-      <p style="margin-top:18px;color:#999;font-size:.88rem;">
-        <span style="color:var(--primary);cursor:pointer;font-weight:600;"
-          onclick="setAuthState('login')">← Back to Login</span>
-      </p>`;
-    document.getElementById('btn-signup').onclick = doSignup;
-  } else if (state === 'verify-waiting') {
-    c.innerHTML = `
-      <div style="font-size:3rem;margin-bottom:14px;">📧</div>
-      <h2>Verify Your Email</h2>
-      <p style="color:#999;font-size:.88rem;margin:12px 0 22px;">
-        A verification link was sent to your inbox.<br>Please check and click it.
-      </p>
-      <button class="btn btn-secondary" onclick="handleLogout()">Cancel / Logout</button>`;
-    verifyInterval = setInterval(async () => {
-      if (auth.currentUser) {
-        await reload(auth.currentUser);
-        if (auth.currentUser.emailVerified) {
-          clearInterval(verifyInterval);
-          location.reload();
+    onSnapshot(docRef, (s) => {
+        if(s.exists()) {
+            dbData = s.data();
+            v2On = dbData.settings?.v2Enabled || false;
+            updateV2UI();
         }
-      }
-    }, 3000);
-  }
-};
-
-async function doGoogleLogin() {
-  try {
-    const result = await signInWithPopup(auth, googleProvider);
-    const user = result.user;
-    
-    // Check if user document exists, if not, create it
-    const userDoc = await getDoc(doc(db, 'users', user.uid));
-    if (!userDoc.exists()) {
-      await setDoc(doc(db, 'users', user.uid), {
-        name: user.displayName,
-        email: user.email,
-        licenseStatus: 'none', 
-        aadhaarStatus: 'none',
-        licenseUrl: '', 
-        aadhaarUrl: '',
-        createdAt: serverTimestamp()
-      });
-    }
-    showToast('Welcome ' + (user.displayName || ''));
-  } catch (e) {
-    showToast('❌ Google Login failed: ' + e.message);
-  }
-}
-
-async function doSignup() {
-  const name  = document.getElementById('name').value.trim();
-  const email = document.getElementById('email').value.trim();
-  const pass  = document.getElementById('password').value;
-  if (!name || !email || !pass) return showToast('⚠️ Fill all fields');
-  try {
-    const cred = await createUserWithEmailAndPassword(auth, email, pass);
-    await updateProfile(cred.user, { displayName: name });
-    await sendEmailVerification(cred.user);
-    // Create user doc
-    await setDoc(doc(db, 'users', cred.user.uid), {
-      name, email,
-      licenseStatus: 'none', aadhaarStatus: 'none',
-      licenseUrl: '', aadhaarUrl: '',
-      createdAt: serverTimestamp()
+        draw();
     });
-    setAuthState('verify-waiting');
-  } catch (e) { showToast('❌ ' + e.message); }
-}
 
-async function doLogin() {
-  try {
-    const cred = await signInWithEmailAndPassword(
-      auth,
-      document.getElementById('email').value.trim(),
-      document.getElementById('password').value
-    );
-    if (!cred.user.emailVerified) setAuthState('verify-waiting');
-  } catch (e) { showToast('❌ ' + e.message); }
-}
+    function draw() {
+        const grid = document.getElementById('card-grid');
+        const unitsPage = document.getElementById('units-page');
+        const backBtn = document.getElementById('back-trigger');
+        const pathLabel = document.getElementById('path-txt');
 
-window.handleLogout = async () => {
-  if (userUnsub)  userUnsub();
-  if (ridesUnsub) ridesUnsub();
-  await signOut(auth);
-  location.reload();
-};
+        grid.innerHTML = ''; grid.style.display = 'grid';
+        unitsPage.style.display = 'none';
+        backBtn.style.display = mode === 'semesters' ? 'none' : 'block';
 
-/* ══════════════════════════════════════════════════════════════════
-   LOCATION
-══════════════════════════════════════════════════════════════════ */
-window.getMyLocation = () => {
-  const el = document.getElementById('user-loc-text');
-  if (!el) return;
-  if (!navigator.geolocation) { el.textContent = 'Geolocation not supported'; return; }
-  navigator.geolocation.getCurrentPosition(
-    async pos => {
-      el.textContent = 'Finding area…';
-      el.textContent = await reverseGeocode(pos.coords.latitude, pos.coords.longitude);
-    },
-    () => { el.textContent = 'Location permission denied'; }
-  );
-};
-
-/* ══════════════════════════════════════════════════════════════════
-   USER DATA LISTENER
-══════════════════════════════════════════════════════════════════ */
-function startUserListener(uid) {
-  if (userUnsub) userUnsub();
-  userUnsub = onSnapshot(doc(db, 'users', uid), snap => {
-    if (snap.exists()) {
-      userData = { id: snap.id, ...snap.data() };
-    } else {
-      userData = { licenseStatus:'none', aadhaarStatus:'none' };
+        if(mode === 'semesters') {
+            pathLabel.innerText = "SELECT SEMESTER";
+            Object.keys(dbData).filter(k => k !== 'settings').sort().forEach(s => buildCard(s, "fa-graduation-cap", "Semester", () => { path.sem = s; mode = 'groups'; draw(); }, s));
+        }
+        else if(mode === 'groups') {
+            pathLabel.innerText = `${path.sem} / GROUPS`;
+            const groups = dbData[path.sem] || {};
+            Object.keys(groups).forEach(g => buildCard(g, "fa-users-gear", "Group", () => { path.group = g; mode = 'subjects'; draw(); }, g));
+        }
+        else if(mode === 'subjects') {
+            pathLabel.innerText = `${path.group} / SUBJECTS`;
+            const subs = dbData[path.sem][path.group] || {};
+            Object.keys(subs).forEach(id => buildCard(subs[id].title, "fa-book", "Subject", () => { path.subId = id; mode = 'units'; draw(); }, id));
+        }
+        else if(mode === 'units') {
+            grid.style.display = 'none'; unitsPage.style.display = 'block';
+            drawUnits();
+        }
     }
-    if (activeTab === 'profile') renderProfileTab();
-  });
-}
 
-/* ══════════════════════════════════════════════════════════════════
-   TAB SWITCHING
-══════════════════════════════════════════════════════════════════ */
-window.switchTab = (tab, el) => {
-  activeTab = tab;
-  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('nav-active'));
-  if(el) el.classList.add('nav-active');
-  const fab = document.getElementById('fab-btn');
+    function buildCard(title, icon, type, clickFn, key) {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.onclick = clickFn;
+        card.innerHTML = `
+            ${isAdmin ? `
+            <div class="admin-controls">
+                <i class="fa-solid fa-pen-to-square" style="color:var(--neon);" onclick="event.stopPropagation(); editName('${key}', '${title}')"></i>
+                <i class="fa-solid fa-trash" style="color:#ff5252;" onclick="event.stopPropagation(); removeData('${key}')"></i>
+            </div>` : ''}
+            <i class="fa-solid ${icon} main-icon"></i>
+            <h3>${title}</h3>
+            <p style="opacity:0.5; font-size:0.7rem;">${type}</p>
+        `;
+        document.getElementById('card-grid').appendChild(card);
+    }
 
-  if (tab === 'rides') {
-    if(fab) fab.style.display = 'flex';
-    renderRidesTab();
-    startRidesListener();
-  } else {
-    if(fab) fab.style.display = 'none';
-    if (ridesUnsub) { ridesUnsub(); ridesUnsub = null; }
-    renderProfileTab();
-  }
-};
-
-/* ══════════════════════════════════════════════════════════════════
-   RIDES TAB
-══════════════════════════════════════════════════════════════════ */
-function renderRidesTab(rides = []) {
-  const cont = document.getElementById('content');
-  let ridesHTML = '';
-  if (rides.length === 0) {
-    ridesHTML = `<div class="empty-state">
-      <div class="icon">🚦</div>
-      <p>No rides available right now.<br>Be the first to add one!</p>
-    </div>`;
-  } else {
-    rides.forEach(r => {
-      const vehIcon = r.vehicle === 'bike' ? '🏍️' : r.vehicle === 'auto' ? '🛺' : '🚗';
-      const vehName = r.vehicle === 'bike' ? 'Bike' : r.vehicle === 'auto' ? 'Auto' : 'Car';
-      ridesHTML += `
-        <div class="ride-card">
-          <div class="ride-route">🟢 ${r.from || 'Unknown'} → 🔴 ${r.to || 'Unknown'}</div>
-          <div class="ride-meta">
-            <span class="ride-pill">${vehIcon} ${vehName}</span>
-            <span class="ride-pill">🪑 ${r.spaces} space${r.spaces > 1 ? 's' : ''}</span>
-            <span class="ride-pill green">👤 ${r.userName || 'Driver'}</span>
-          </div>
-        </div>`;
-    });
-  }
-  cont.innerHTML = `
-    <div class="location-bar">
-      <span style="font-size:1.2rem">📍</span>
-      <span id="user-loc-text">Fetching your area…</span>
-    </div>
-    <p class="section-title">Available Rides</p>
-    ${ridesHTML}`;
-  window.getMyLocation();
-}
-
-function startRidesListener() {
-  if (ridesUnsub) ridesUnsub();
-  const q = query(collection(db, 'rides'), where('status', '==', 'active'));
-  ridesUnsub = onSnapshot(q, snap => {
-    const rides = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    if (activeTab === 'rides') renderRidesTab(rides);
-  }, err => console.warn('rides listener:', err));
-}
-
-/* ══════════════════════════════════════════════════════════════════
-   PROFILE TAB
-══════════════════════════════════════════════════════════════════ */
-function renderProfileTab() {
-  const cont = document.getElementById('content');
-  const ud   = userData || {};
-  const licSt  = ud.licenseStatus  || 'none';
-  const aadSt  = ud.aadhaarStatus  || 'none';
-  const bothVerified = licSt === 'verified' && aadSt === 'verified';
-
-  const badgeHTML = bothVerified
-    ? `<div><span class="verified-badge">✅ Fully Verified</span></div>`
-    : '';
-
-  cont.innerHTML = `
-    <div class="profile-header">
-      <div class="avatar-circle">👤</div>
-      <div class="profile-name">${auth.currentUser?.displayName || 'User'}</div>
-      <div style="color:var(--gray);font-size:.85rem;margin-top:4px;">${auth.currentUser?.email || ''}</div>
-      ${badgeHTML}
-    </div>
-
-    <p class="doc-section-title">📄 Document Verification</p>
-
-    <div class="doc-card st-${licSt}" id="lic-card" onclick="triggerUpload('license')">
-      <div class="doc-icon">🪪</div>
-      <div class="doc-info">
-        <div class="doc-title">Driving Licence</div>
-        <div class="doc-sub">${licSt === 'none' ? 'Tap to upload your licence' :
-          licSt === 'pending' ? 'Waiting for admin review…' :
-          licSt === 'verified' ? 'Your licence is verified ✔' :
-          'Rejected – tap to re-upload'}</div>
-        ${ud.licenseUrl ? `<div id="lic-progress" class="progress-bar-wrap" style="display:none"><div class="progress-bar" id="lic-bar"></div></div>` : ''}
-      </div>
-      ${ud.licenseUrl ? `<img class="doc-thumb" src="${ud.licenseUrl}" alt="Licence" />` : ''}
-      <span class="doc-status-badge badge-${licSt}">
-        ${licSt === 'none' ? 'Upload' : licSt.charAt(0).toUpperCase()+licSt.slice(1)}
-      </span>
-    </div>
-
-    <div class="doc-card st-${aadSt}" id="aad-card" onclick="triggerUpload('aadhaar')">
-      <div class="doc-icon">🪪</div>
-      <div class="doc-info">
-        <div class="doc-title">Aadhaar Card</div>
-        <div class="doc-sub">${aadSt === 'none' ? 'Tap to upload your Aadhaar' :
-          aadSt === 'pending' ? 'Waiting for admin review…' :
-          aadSt === 'verified' ? 'Your Aadhaar is verified ✔' :
-          'Rejected – tap to re-upload'}</div>
-        ${ud.aadhaarUrl ? `<div id="aad-progress" class="progress-bar-wrap" style="display:none"><div class="progress-bar" id="aad-bar"></div></div>` : ''}
-      </div>
-      ${ud.aadhaarUrl ? `<img class="doc-thumb" src="${ud.aadhaarUrl}" alt="Aadhaar" />` : ''}
-      <span class="doc-status-badge badge-${aadSt}">
-        ${aadSt === 'none' ? 'Upload' : aadSt.charAt(0).toUpperCase()+aadSt.slice(1)}
-      </span>
-    </div>
-
-    <div style="margin-top:20px;">
-      <button onclick="handleLogout()"
-        style="width:100%;padding:14px;background:#fff5f5;color:var(--danger);
-               border:2px solid var(--danger);border-radius:14px;
-               font-family:'Poppins',sans-serif;font-weight:600;cursor:pointer;">
-        🚪 Logout
-      </button>
-    </div>`;
-}
-
-/* ── DOCUMENT UPLOAD ─────────────────────────────────────────────── */
-window.triggerUpload = (type) => {
-  const ud = userData || {};
-  if (ud[type + 'Status'] === 'verified') {
-    showToast('✅ Already verified – no action needed');
-    return;
-  }
-  const input = document.createElement('input');
-  input.type   = 'file';
-  input.accept = 'image/*';
-  input.onchange = (e) => {
-    const file = e.target.files[0];
-    if (file) uploadDoc(type, file);
-  };
-  input.click();
-};
-
-async function uploadDoc(type, file) {
-  const uid         = auth.currentUser.uid;
-  const cardId      = type === 'license' ? 'lic-card' : 'aad-card';
-  const barId       = type === 'license' ? 'lic-bar'  : 'aad-bar';
-  const progWrapId = type === 'license' ? 'lic-progress' : 'aad-progress';
-
-  const card = document.getElementById(cardId);
-  if (card) {
-    const subEl = card.querySelector('.doc-sub');
-    if (subEl) subEl.textContent = 'Uploading…';
-  }
-
-  try {
-    const storageRef  = sRef(storage, `documents/${uid}/${type}`);
-    const uploadTask  = uploadBytesResumable(storageRef, file);
-
-    uploadTask.on('state_changed',
-      snap => {
-        const pct = Math.round(snap.bytesTransferred / snap.totalBytes * 100);
-        const pw  = document.getElementById(progWrapId);
-        const bar = document.getElementById(barId);
-        if (pw)  pw.style.display  = 'block';
-        if (bar) bar.style.width   = pct + '%';
-      },
-      err => { showToast('❌ Upload failed: ' + err.message); },
-      async () => {
-        const url = await getDownloadURL(uploadTask.snapshot.ref);
-        await updateDoc(doc(db, 'users', uid), {
-          [`${type}Url`]:    url,
-          [`${type}Status`]: 'pending'
+    function drawUnits() {
+        const sub = dbData[path.sem][path.group][path.subId];
+        document.getElementById('sub-heading').innerText = sub.title;
+        const list = document.getElementById('units-stack');
+        list.innerHTML = '';
+        (sub.units || []).forEach((u, i) => {
+            const row = document.createElement('div');
+            row.className = 'unit-row';
+            row.onclick = () => isAdmin ? openAdminEditor(i) : handleLinkClick(i);
+            row.innerHTML = `
+                <span>${u}</span>
+                <div style="display:flex; gap:15px; align-items:center;">
+                    ${(sub.vids && sub.vids[i] && sub.vids[i] !== "#") ? `<i class="fa-brands fa-youtube" style="color:red; font-size:1.3rem;" onclick="event.stopPropagation(); openVideo(${i})"></i>` : ''}
+                    <i class="fa-solid fa-file-pdf" style="color:var(--neon)"></i>
+                    ${isAdmin ? `<i class="fa-solid fa-circle-xmark" style="color:red;" onclick="event.stopPropagation(); deleteUnit(${i})"></i>` : ''}
+                </div>`;
+            list.appendChild(row);
         });
-        showToast('📤 Uploaded! Waiting for admin review.');
-      }
-    );
-  } catch (err) { showToast('❌ ' + err.message); }
-}
-
-/* ══════════════════════════════════════════════════════════════════
-   FAB & VERIFICATION CHECK
-══════════════════════════════════════════════════════════════════ */
-window.handleFABClick = () => {
-  const ud  = userData || {};
-  const licOk = ud.licenseStatus === 'verified';
-  const aadOk = ud.aadhaarStatus === 'verified';
-
-  if (!licOk || !aadOk) {
-    showVerifyModal(licOk, aadOk);
-    return;
-  }
-  openAddRide();
-};
-
-function showVerifyModal(licOk, aadOk) {
-  const missing = [];
-  if (!licOk) missing.push('Driving Licence');
-  if (!aadOk) missing.push('Aadhaar Card');
-
-  const overlay = document.createElement('div');
-  overlay.className = 'modal-overlay';
-  overlay.id = 'verify-modal';
-  overlay.innerHTML = `
-    <div class="modal-box">
-      <div class="modal-icon">🔒</div>
-      <h3>Verification Required</h3>
-      <p>To add a ride you must first get your documents verified:<br>
-          <strong>${missing.join(' &amp; ')}</strong><br><br>
-          Go to <b>Profile</b> tab → upload your documents → wait for admin approval.
-      </p>
-      <div class="modal-actions">
-        <button class="m-primary" onclick="
-          document.getElementById('verify-modal').remove();
-          switchTab('profile', document.getElementById('nav-profile'));">
-          Go to Profile
-        </button>
-        <button class="m-secondary" onclick="document.getElementById('verify-modal').remove();">
-          Cancel
-        </button>
-      </div>
-    </div>`;
-  document.body.appendChild(overlay);
-}
-
-/* ══════════════════════════════════════════════════════════════════
-   ADD RIDE SCREEN
-══════════════════════════════════════════════════════════════════ */
-function openAddRide() {
-  selectedVehicle = null;
-  selectedSpaces  = null;
-  startPoint      = null;
-  endPoint        = null;
-
-  document.querySelectorAll('.veh-btn').forEach(b => b.classList.remove('sel'));
-  document.querySelectorAll('.sp-btn').forEach(b  => b.classList.remove('sel'));
-  const fi = document.getElementById('from-input');
-  const ti = document.getElementById('to-input');
-  if (fi) fi.value = '';
-  if (ti) ti.value = '';
-
-  showScreen('add-ride-screen');
-
-  setTimeout(() => {
-    if (!mapInstance) initMap();
-    else              mapInstance.invalidateSize();
-  }, 120);
-}
-
-window.goHome = () => {
-  showScreen('home-screen');
-  const fab = document.getElementById('fab-btn');
-  if(fab) fab.style.display = 'flex';
-};
-
-/* ── MAP ─────────────────────────────────────────────────────────── */
-function initMap() {
-  mapInstance = L.map('ride-map', { zoomControl: true }).setView([17.385, 78.4867], 12);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors', maxZoom: 19
-  }).addTo(mapInstance);
-
-  navigator.geolocation?.getCurrentPosition(pos => {
-    mapInstance.setView([pos.coords.latitude, pos.coords.longitude], 14);
-  });
-
-  mapInstance.on('click', async e => {
-    const { lat, lng } = e.latlng;
-    if (mapMode === 'start') {
-      if (startMarker) mapInstance.removeLayer(startMarker);
-      startMarker = L.marker([lat, lng], {
-        icon: L.divIcon({ className:'', html:`<div class="marker-start"></div>`, iconSize:[22,22], iconAnchor:[11,11] })
-      }).addTo(mapInstance).bindPopup('🟢 Start').openPopup();
-      startPoint = { lat, lng };
-      const name = await reverseGeocode(lat, lng);
-      const fi = document.getElementById('from-input');
-      if (fi) fi.value = name;
-      setMapMode('end');
-    } else {
-      if (endMarker) mapInstance.removeLayer(endMarker);
-      endMarker = L.marker([lat, lng], {
-        icon: L.divIcon({ className:'', html:`<div class="marker-end"></div>`, iconSize:[22,22], iconAnchor:[11,11] })
-      }).addTo(mapInstance).bindPopup('🔴 End').openPopup();
-      endPoint = { lat, lng };
-      const name = await reverseGeocode(lat, lng);
-      const ti = document.getElementById('to-input');
-      if (ti) ti.value = name;
     }
-    drawRoute();
-  });
-}
 
-function drawRoute() {
-  if (routeLine) mapInstance.removeLayer(routeLine);
-  if (startPoint && endPoint) {
-    routeLine = L.polyline(
-      [[startPoint.lat, startPoint.lng], [endPoint.lat, endPoint.lng]],
-      { color: '#28a745', weight: 4, opacity: .7, dashArray: '8,6' }
-    ).addTo(mapInstance);
-    mapInstance.fitBounds(routeLine.getBounds(), { padding: [40, 40] });
-  }
-}
+    // --- Media & V2 Logic ---
+    window.handleLinkClick = (i) => {
+        const sub = dbData[path.sem][path.group][path.subId];
+        const url = sub.links[i];
+        if(!url || url === "#") return alert("No link found!");
+        
+        if(v2On) {
+            const loader = document.getElementById('v2-loader');
+            const progress = document.getElementById('v2-progress');
+            const status = document.getElementById('v2-status');
+            const msgs = ["Initializing Secure Tunnel...", "Verifying Signature...", "Bypassing Buffer...", "Ready!"];
+            
+            loader.style.display = 'flex';
+            progress.style.width = '0%';
+            let step = 0;
+            const interval = setInterval(() => {
+                status.innerText = msgs[step];
+                progress.style.width = ((step + 1) * 25) + "%";
+                step++;
+                if(step >= msgs.length) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        loader.style.display = 'none';
+                        window.open(url, '_blank');
+                    }, 500);
+                }
+            }, 800);
+        } else {
+            openFile(url, sub.units[i]);
+        }
+    };
 
-window.setMapMode = (mode) => {
-  mapMode = mode;
-  document.getElementById('mode-start').classList.toggle('active-mode', mode === 'start');
-  document.getElementById('mode-end').classList.toggle('active-mode',   mode === 'end');
-};
+    window.openFile = (url, name) => {
+        let finalUrl = url;
+        if(url.includes('drive.google.com')) {
+            let fileId = url.includes('/d/') ? url.split('/d/')[1].split('/')[0] : new URL(url).searchParams.get('id');
+            finalUrl = `https://drive.google.com/file/d/${fileId}/preview`;
+        }
+        document.getElementById('pdf-label').innerText = name;
+        document.getElementById('pdf-frame').src = finalUrl;
+        document.getElementById('fs-btn').style.display = 'none';
+        document.getElementById('pdf-screen').style.display = 'flex';
+    };
 
-/* ── VEHICLE / SPACES ────────────────────────────────────────────── */
-window.selectVehicle = (v, el) => {
-  selectedVehicle = v;
-  document.querySelectorAll('.veh-btn').forEach(b => b.classList.remove('sel'));
-  el.classList.add('sel');
-};
+    window.openVideo = (i) => {
+        const sub = dbData[path.sem][path.group][path.subId];
+        let url = sub.vids[i];
+        let id = "";
+        if(url.includes('youtu.be/')) id = url.split('youtu.be/')[1].split(/[?#]/)[0];
+        else if(url.includes('watch?v=')) id = new URL(url).searchParams.get('v');
+        else if(url.includes('embed/')) id = url.split('embed/')[1].split(/[?#]/)[0];
 
-window.selectSpace = (n, el) => {
-  selectedSpaces = n;
-  document.querySelectorAll('.sp-btn').forEach(b => b.classList.remove('sel'));
-  el.classList.add('sel');
-};
+        if(!id) return alert("Invalid Video Link!");
+        document.getElementById('pdf-label').innerText = sub.units[i] + " (Video)";
+        document.getElementById('pdf-frame').src = `https://www.youtube.com/embed/${id}?autoplay=1&rel=0`;
+        document.getElementById('fs-btn').style.display = 'block';
+        document.getElementById('pdf-screen').style.display = 'flex';
+    };
 
-/* ── SUBMIT RIDE ─────────────────────────────────────────────────── */
-window.submitRide = async () => {
-  const fromVal = document.getElementById('from-input').value.trim();
-  const toVal   = document.getElementById('to-input').value.trim();
+    window.goFull = () => {
+        const f = document.getElementById('pdf-frame');
+        if(f.requestFullscreen) f.requestFullscreen();
+        else if(f.webkitRequestFullscreen) f.webkitRequestFullscreen();
+    };
 
-  if (!fromVal || !toVal)       return showToast('⚠️ Enter From & To locations');
-  if (!selectedVehicle)          return showToast('⚠️ Select a vehicle type');
-  if (!selectedSpaces)          return showToast('⚠️ Select available spaces');
-  if (!startPoint || !endPoint) return showToast('⚠️ Drop Start & End pins on the map');
+    window.hideViewer = () => { document.getElementById('pdf-screen').style.display = 'none'; document.getElementById('pdf-frame').src = ""; };
 
-  const btn = document.getElementById('submit-ride-btn');
-  btn.disabled    = true;
-  btn.textContent = 'Posting…';
+    // --- Admin Logic ---
+    window.toggleV2Loader = async () => {
+        v2On = !v2On;
+        dbData.settings = { v2Enabled: v2On };
+        await setDoc(docRef, dbData);
+        updateV2UI();
+    };
 
-  try {
-    await addDoc(collection(db, 'rides'), {
-      userId:    auth.currentUser.uid,
-      userName:  auth.currentUser.displayName || 'Driver',
-      from:      fromVal,
-      to:        toVal,
-      vehicle:   selectedVehicle,
-      spaces:    selectedSpaces,
-      fromLat:   startPoint.lat,
-      fromLon:   startPoint.lng,
-      toLat:     endPoint.lat,
-      toLon:     endPoint.lng,
-      status:    'active',
-      createdAt: serverTimestamp()
-    });
-    showToast('🎉 Ride posted successfully!');
-    showScreen('home-screen');
-    const fab = document.getElementById('fab-btn');
-    if(fab) fab.style.display = 'flex';
-    switchTab('rides', document.getElementById('nav-rides'));
-  } catch (err) {
-    showToast('❌ Failed: ' + err.message);
-  } finally {
-    btn.disabled    = false;
-    btn.textContent = '🚀 Post Ride';
-  }
-};
-
-/* ══════════════════════════════════════════════════════════════════
-   BOOT LOGIC
-══════════════════════════════════════════════════════════════════ */
-setAuthState('login');
-
-// Splash animations
-setTimeout(() => {
-  const mt = document.getElementById('main-text');
-  if(mt) mt.classList.add('finished-green');
-}, 2500);
-
-setTimeout(() => { 
-  const tl = document.getElementById('tagline');
-  if(tl) tl.textContent = 'mee prayanam maa bhadyatha'; 
-}, 3000);
-
-// After splash, watch auth
-setTimeout(() => {
-  onAuthStateChanged(auth, user => {
-    currentUser = user;
-    if (user && (user.emailVerified || user.providerData[0].providerId === 'google.com')) {
-      showScreen('home-screen');
-      const fab = document.getElementById('fab-btn');
-      if(fab) fab.style.display = 'flex';
-      startUserListener(user.uid);
-      switchTab('rides', document.getElementById('nav-rides'));
-    } else if (!user) {
-      showScreen('login-screen');
+    function updateV2UI() {
+        const btn = document.getElementById('v2-toggle-btn');
+        if(btn) {
+            btn.innerText = v2On ? "V2 Loader: ON" : "V2 Loader: OFF";
+            btn.style.background = v2On ? "#2ecc71" : "#f39c12";
+        }
     }
-  });
-}, 5000);
+
+    window.editName = async (key, old) => {
+        const n = prompt("Enter new name:", old);
+        if(!n || n === old) return;
+        if(mode === 'semesters') { dbData[n] = dbData[key]; delete dbData[key]; }
+        else if(mode === 'groups') { dbData[path.sem][n] = dbData[path.sem][key]; delete dbData[path.sem][key]; }
+        else if(mode === 'subjects') { dbData[path.sem][path.group][key].title = n; }
+        await setDoc(docRef, dbData);
+    };
+
+    window.removeData = async (key) => {
+        if(!confirm("Delete this?")) return;
+        if(mode === 'semesters') delete dbData[key];
+        else if(mode === 'groups') delete dbData[path.sem][key];
+        else if(mode === 'subjects') delete dbData[path.sem][path.group][key];
+        await setDoc(docRef, dbData);
+    };
+
+    window.deleteUnit = async (idx) => {
+        if(!confirm("Delete unit?")) return;
+        const s = dbData[path.sem][path.group][path.subId];
+        s.units.splice(idx, 1); s.links.splice(idx, 1);
+        if(s.vids) s.vids.splice(idx, 1);
+        await setDoc(docRef, dbData);
+    };
+
+    window.openAdminEditor = (i) => {
+        activeEditIdx = i;
+        document.getElementById('admin-editor').style.display = 'block';
+        document.getElementById('editing-unit-name').innerText = dbData[path.sem][path.group][path.subId].units[i];
+        switchLinkType('pdf');
+    };
+
+    window.switchLinkType = (t) => {
+        activeLinkType = t;
+        const sub = dbData[path.sem][path.group][path.subId];
+        document.getElementById('tabPdf').style.background = t === 'pdf' ? 'var(--neon)' : 'white';
+        document.getElementById('tabVid').style.background = t === 'vid' ? 'var(--neon)' : 'white';
+        document.getElementById('edit-link').value = t === 'pdf' ? sub.links[activeEditIdx] : (sub.vids ? sub.vids[activeEditIdx] : "");
+    };
+
+    window.saveEdit = async () => {
+        const sub = dbData[path.sem][path.group][path.subId];
+        const val = document.getElementById('edit-link').value;
+        if(activeLinkType === 'pdf') sub.links[activeEditIdx] = val;
+        else { if(!sub.vids) sub.vids = new Array(sub.units.length).fill(""); sub.vids[activeEditIdx] = val; }
+        await setDoc(docRef, dbData);
+        alert("Saved!");
+        document.getElementById('admin-editor').style.display = 'none';
+    };
+
+    window.navBack = () => {
+        if(mode === 'units') mode = 'subjects';
+        else if(mode === 'subjects') mode = 'groups';
+        else if(mode === 'groups') mode = 'semesters';
+        draw();
+    };
+
+    let clicks = 0;
+    document.getElementById('pass-trigger').onclick = () => { if(++clicks === 5) { clicks = 0; if(prompt("Pass:") === "study11") { isAdmin = true; document.getElementById('admin-bar').style.display = 'block'; draw(); } } };
+
+    window.triggerAdd = async () => {
+        const val = prompt(`New ${mode.slice(0,-1).toUpperCase()} Name:`);
+        if(!val) return;
+        if(mode === 'semesters') dbData[val] = {};
+        else if(mode === 'groups') dbData[path.sem][val] = {};
+        else if(mode === 'subjects') {
+            const id = "s" + Date.now();
+            dbData[path.sem][path.group][id] = { title: val, units: [], links: [], vids: [] };
+        }
+        else if(mode === 'units') {
+            const s = dbData[path.sem][path.group][path.subId];
+            s.units.push(val); s.links.push("#"); if(!s.vids) s.vids = []; s.vids.push("");
+        }
+        await setDoc(docRef, dbData);
+    };
+
+    window.runSearch = () => {
+        const q = document.getElementById('findBox').value.toLowerCase();
+        document.querySelectorAll('.card, .unit-row').forEach(el => el.style.display = el.innerText.toLowerCase().includes(q) ? '' : 'none');
+    };
 </script>
 </body>
 </html>
