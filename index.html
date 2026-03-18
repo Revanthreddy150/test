@@ -3,386 +3,326 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>USEAS | Professional Academic Portal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Study Hub | Premium Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        :root { --neon: #00f2ff; --glass: rgba(255, 255, 255, 0.08); --border: rgba(255, 255, 255, 0.1); }
+        :root { --neon: #00f2ff; --glass: rgba(255, 255, 255, 0.07); --border: rgba(255, 255, 255, 0.1); }
         * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
-        body { background: #090a0f; color: white; min-height: 100vh; overflow-x: hidden; }
+        body { background: #050608; color: white; min-height: 100vh; overflow-x: hidden; }
         
-        #bg-canvas { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at top right, #1b2735, #090a0f); }
-        .stars { position: absolute; inset: 0; background: url('https://www.transparenttextures.com/patterns/stardust.png'); opacity: 0.3; animation: move 150s linear infinite; }
-        @keyframes move { from { background-position: 0 0; } to { background-position: 10000px 5000px; } }
+        .bg-mesh { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; 
+            background: radial-gradient(circle at 15% 15%, rgba(0, 242, 255, 0.1), transparent 45%),
+                        radial-gradient(circle at 85% 85%, rgba(0, 114, 255, 0.1), transparent 45%);
+        }
 
-        #admin-bar { display: none; background: #2ecc71; padding: 12px; position: sticky; top: 0; z-index: 9999; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
-        .btn-admin { background: white; color: #000; border: none; padding: 6px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; margin: 0 5px; font-size: 0.8rem; }
+        #admin-bar { display: none; background: #1e272e; padding: 12px; position: sticky; top: 0; z-index: 2000; border-bottom: 2px solid #2ecc71; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .admin-btn { background: #2ecc71; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; margin: 0 5px; font-size: 0.8rem; }
+        
+        .edit-panel { background: rgba(46, 204, 113, 0.1); border: 1px dashed #2ecc71; padding: 25px; border-radius: 15px; margin-top: 25px; display: none; backdrop-filter: blur(10px); }
+        .edit-input { width: 100%; padding: 12px; margin: 10px 0; background: rgba(0,0,0,0.6); border: 1px solid #2ecc71; color: #fff; border-radius: 8px; outline: none; }
 
-        header { text-align: center; padding: 60px 20px 20px; }
-        .logo { font-size: 42px; font-weight: 800; letter-spacing: 4px; text-shadow: 0 0 25px var(--neon); color: white; }
-        .search-wrap { max-width: 600px; margin: 30px auto; }
-        .search-wrap input { width: 100%; padding: 15px 30px; border-radius: 50px; border: 1px solid var(--border); background: rgba(0,0,0,0.6); color: white; outline: none; backdrop-filter: blur(10px); }
+        .header { text-align: center; padding: 70px 20px 20px; }
+        .logo { font-family: 'Orbitron', sans-serif; font-size: 2.5rem; letter-spacing: 5px; color: var(--neon); text-shadow: 0 0 20px rgba(0,242,255,0.6); }
 
-        .nav-header { max-width: 1200px; margin: 0 auto 25px; padding: 0 30px; display: flex; align-items: center; gap: 15px; }
-        .breadcrumb { font-size: 0.85rem; color: var(--neon); text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.7; }
-        .btn-back { display: none; background: var(--glass); border: 1px solid var(--neon); color: white; padding: 6px 18px; border-radius: 50px; cursor: pointer; font-size: 0.8rem; }
+        .bc-box { max-width: 1000px; margin: 15px auto; padding: 15px 25px; background: var(--glass); border-radius: 15px; border: 1px solid var(--border); font-size: 0.85rem; display: flex; gap: 10px; align-items: center; }
+        .bc-link { color: var(--neon); cursor: pointer; opacity: 0.8; }
 
-        .main-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; padding: 20px; max-width: 1250px; margin: 0 auto; }
-        .card { background: var(--glass); border: 1px solid var(--border); padding: 50px 25px; border-radius: 28px; text-align: center; cursor: pointer; transition: 0.4s; backdrop-filter: blur(20px); position: relative; }
-        .card:hover { transform: translateY(-10px); border-color: var(--neon); background: rgba(255,255,255,0.12); }
-        .card i.main-icon { font-size: 3.5rem; color: var(--neon); margin-bottom: 25px; filter: drop-shadow(0 0 10px var(--neon)); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; padding: 25px; max-width: 1100px; margin: 0 auto; }
+        .card { background: var(--glass); border: 1px solid var(--border); padding: 45px 20px; border-radius: 20px; text-align: center; cursor: pointer; position: relative; transition: 0.4s; }
+        .card:hover { border-color: var(--neon); transform: translateY(-8px); background: rgba(0, 242, 255, 0.08); }
+        .card i { font-size: 3rem; color: var(--neon); margin-bottom: 20px; filter: drop-shadow(0 0 10px var(--neon)); }
+        
+        /* Edit Buttons on Cards */
+        .admin-controls { position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column; gap: 5px; }
+        .ctrl-btn { font-size: 0.7rem; padding: 4px 8px; border-radius: 4px; border: none; cursor: pointer; font-weight: bold; }
 
-        .admin-controls { position: absolute; top: 15px; right: 15px; display: flex; gap: 10px; z-index: 10; }
-        .admin-controls i { cursor: pointer; font-size: 1.1rem; transition: 0.2s; }
+        .notes-view { display: none; max-width: 850px; margin: 30px auto; padding: 0 20px; }
+        .unit-item { background: var(--glass); border: 1px solid var(--border); margin: 12px 0; padding: 18px 25px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .unit-item:hover { border-color: var(--neon); background: rgba(255,255,255,0.1); }
+        .unit-actions { display: flex; gap: 20px; align-items: center; font-size: 1.3rem; }
 
-        .units-panel { display: none; max-width: 900px; margin: 0 auto; padding: 20px; background: rgba(0,0,0,0.4); border-radius: 30px; border: 1px solid var(--border); }
-        .unit-row { background: rgba(255,255,255,0.05); margin-bottom: 12px; padding: 18px 25px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.3s; }
-        .unit-row:hover { background: rgba(255,255,255,0.1); border-color: var(--neon); }
+        #v2-loader, #viewer, #video-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background: #050608; flex-direction: column; }
+        .v-header { background: #111; padding: 18px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
+        iframe { width: 100%; height: 100%; border: none; }
 
-        /* V2 LOADER STYLE */
-        #v2-loader { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(15px); }
-        .v2-logo-spin { font-size: 3.5rem; color: var(--neon); margin-bottom: 25px; animation: pulse 1.5s infinite ease-in-out; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.1); opacity: 1; text-shadow: 0 0 20px var(--neon); } }
-        .progress-bar-container { width: 250px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-top: 25px; overflow: hidden; }
-        #v2-progress { width: 0%; height: 100%; background: var(--neon); transition: 0.4s linear; box-shadow: 0 0 15px var(--neon); }
+        #toast-container { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 10000; }
+        .toast { background: var(--neon); color: #000; padding: 12px 35px; border-radius: 50px; font-weight: bold; animation: slideUp 0.4s; }
+        @keyframes slideUp { from { transform: translateY(100px); } }
 
-        #admin-editor { display: none; margin-top: 20px; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 20px; border: 1px solid var(--neon); }
-        .edit-input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid var(--border); background: #000; color: #fff; outline: none; }
-        .btn-update { width: 100%; padding: 12px; background: var(--neon); color: #000; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; }
-
-        .viewer { display: none; position: fixed; inset: 0; background: #000; z-index: 9000; flex-direction: column; }
-        .v-bar { background: #111; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
-        iframe { width: 100%; flex-grow: 1; border: none; }
-
-        footer { padding: 60px; text-align: center; opacity: 0.4; font-size: 0.8rem; cursor: pointer; }
+        footer { padding: 80px; text-align: center; opacity: 0.4; font-size: 0.8rem; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div id="bg-canvas"><div class="stars"></div></div>
-
-<div id="v2-loader">
-    <div class="v2-logo-spin"><i class="fa-solid fa-shield-halved"></i></div>
-    <div style="font-size: 1.4rem; font-weight: 600; color: var(--neon); letter-spacing: 4px;">USEAS NETWORK</div>
-    <div id="v2-status" style="margin-top: 10px; font-size: 0.9rem; color: rgba(255,255,255,0.6);">Initializing Tunnel...</div>
-    <div class="progress-bar-container">
-        <div id="v2-progress"></div>
-    </div>
-</div>
+<div class="bg-mesh"></div>
+<div id="toast-container"></div>
 
 <div id="admin-bar">
-    🛡️ ADMIN ACTIVE | 
-    <button class="btn-admin" onclick="triggerAdd()">+ ADD NEW</button>
-    <button id="v2-toggle-btn" class="btn-admin" style="background:#f39c12;" onclick="toggleV2Loader()">V2 Loader: OFF</button>
-    <button class="btn-admin" style="background:#ff5252; color:#fff;" onclick="location.reload()">EXIT</button>
+    <span style="color:#2ecc71; font-weight:bold; margin-right:15px;">🛡️ ADMIN ACTIVE</span>
+    <button class="admin-btn" onclick="addNewNode()">+ Add Category</button>
+    <button id="v2-toggle" class="admin-btn" style="background:#f39c12;" onclick="toggleV2()">V2 LOADER: OFF</button>
+    <button class="admin-btn" style="background:#e74c3c;" onclick="location.reload()">Exit</button>
 </div>
 
-<header>
-    <div class="logo">🚀 USEAS</div>
-    <div class="search-wrap"><input type="text" id="findBox" placeholder="Search portal..." onkeyup="runSearch()"></div>
-</header>
-
-<div class="nav-header">
-    <button id="back-trigger" class="btn-back" onclick="navBack()">BACK</button>
-    <div id="path-txt" class="breadcrumb">PORTAL / SEMESTERS</div>
+<div id="v2-loader" style="justify-content:center; align-items:center;">
+    <div style="width:70px; height:70px; border:4px solid rgba(0,242,255,0.1); border-top-color:var(--neon); border-radius:50%; animation: spin 0.8s linear infinite;"></div>
+    <h2 style="margin-top:25px; font-family:'Orbitron'; color:var(--neon);">SECURE CONNECTION</h2>
 </div>
 
-<div id="card-grid" class="main-grid"></div>
-
-<div id="units-page" class="units-panel">
-    <h2 id="sub-heading" style="color:var(--neon); margin-bottom:20px; text-align:center;"></h2>
-    <div id="units-stack"></div>
-
-    <div id="admin-editor">
-        <p style="color:var(--neon); font-weight:bold;">Editing: <span id="editing-unit-name"></span></p>
-        <input type="text" id="edit-link" class="edit-input" placeholder="Paste URL here...">
-        <div style="display:flex; gap:10px; margin-bottom:10px;">
-            <button id="tabPdf" class="btn-admin" style="background:var(--neon)" onclick="switchLinkType('pdf')">PDF Link</button>
-            <button id="tabVid" class="btn-admin" style="background:white" onclick="switchLinkType('vid')">Video Link</button>
-        </div>
-        <button class="btn-update" onclick="saveEdit()">Update Link</button>
-    </div>
-</div>
-
-<div id="pdf-screen" class="viewer">
-    <div class="v-bar">
-        <span id="pdf-label" style="color:var(--neon); font-weight:600;"></span>
+<div id="viewer">
+    <div class="v-header">
+        <span id="v-name" style="color:var(--neon); font-weight:bold;">Document</span>
         <div style="display:flex; gap:12px;">
-            <button id="fs-btn" style="display:none; background:#3498db; color:white; border:none; padding:8px 15px; border-radius:8px; cursor:pointer;" onclick="goFull()"><i class="fa-solid fa-expand"></i></button>
-            <button onclick="hideViewer()" style="background:#ff5252; color:white; border:none; padding:8px 22px; border-radius:8px; cursor:pointer;">Close</button>
+            <button class="admin-btn" id="v-dl" style="background:#27ae60;">Download</button>
+            <button class="admin-btn" style="background:#e74c3c;" onclick="closeViewer()">Close</button>
         </div>
     </div>
-    <iframe id="pdf-frame" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    <iframe id="v-frame"></iframe>
 </div>
 
-<footer id="pass-trigger">© 2026 USEAS Portal | mee prayanam maa bhadyatha</footer>
+<div id="video-viewer">
+    <div class="v-header">
+        <span id="video-name" style="color:var(--neon); font-weight:bold;">Video Lesson</span>
+        <button class="admin-btn" style="background:#e74c3c;" onclick="closeVideo()">Close</button>
+    </div>
+    <iframe id="video-frame" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+</div>
+
+<div class="header">
+    <h1 class="logo">STUDY HUB</h1>
+    <p style="opacity:0.5; font-size:0.75rem; letter-spacing:4px; margin-top:8px; text-transform:uppercase;">Mee Prayanam Maa Bhadyatha</p>
+</div>
+
+<div class="bc-box" id="bc"><span class="bc-link" onclick="resetPath()">Home</span></div>
+<div class="grid" id="mainGrid"></div>
+
+<div class="notes-view" id="notesArea">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+        <h2 id="viewTitle" style="color:var(--neon); font-family:'Orbitron';">Subject Details</h2>
+        <button class="admin-btn" style="background:rgba(255,255,255,0.1);" onclick="goBack()">← Back</button>
+    </div>
+    <div id="unitList"></div>
+
+    <div class="edit-panel" id="editPanel">
+        <h3 style="color:#2ecc71; margin-bottom:15px;">Edit Unit Data</h3>
+        <input type="text" id="editName" class="edit-input" placeholder="Unit Name">
+        <input type="text" id="editPdf" class="edit-input" placeholder="PDF Link">
+        <input type="text" id="editVid" class="edit-input" placeholder="YouTube Link">
+        <div style="display:flex; gap:10px;">
+            <button class="admin-btn" style="flex:2;" onclick="saveEdit()">Save Changes</button>
+            <button class="admin-btn" style="background:#e74c3c; flex:1;" onclick="deleteUnit()">Delete Unit</button>
+        </div>
+    </div>
+</div>
+
+<footer id="adminTrigger">© 2026 STUDY HUB | Developed by Revanth & Sandeep</footer>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+    // YOUR FIREBASE CONFIG
     const firebaseConfig = {
-      apiKey: "AIzaSyDt8SROwFORTZFqVe5xLc3nlDukbOAgdzs",
-      authDomain: "useasnotes.firebaseapp.com",
-      databaseURL: "https://useasnotes-default-rtdb.firebaseio.com",
-      projectId: "useasnotes",
-      storageBucket: "useasnotes.firebasestorage.app",
-      messagingSenderId: "1066601715098",
-      appId: "1:1066601715098:web:3b424d6e097d9112d09623",
-      measurementId: "G-5NMMTRGSR6"
+        apiKey: "AIzaSyDt8SROwFORTZFqVe5xLc3nlDukbOAgdzs",
+        authDomain: "useasnotes.firebaseapp.com",
+        databaseURL: "https://useasnotes-default-rtdb.firebaseio.com",
+        projectId: "useasnotes",
+        storageBucket: "useasnotes.firebasestorage.app",
+        messagingSenderId: "1066601715098",
+        appId: "1:1066601715098:web:3b424d6e097d9112d09623",
+        measurementId: "G-5NMMTRGSR6"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const docRef = doc(db, "portal", "academic_data_final");
+    // PATH UNIFIED TO final_v4_data TO ENSURE PREVIOUS DATA IS LOADED
+    const docRef = doc(db, "portal", "final_v4_data");
 
-    let dbData = {};
+    let core = {};
+    let path = [];
     let isAdmin = false;
-    let mode = 'semesters'; 
-    let path = { sem: null, group: null, subId: null };
-    let activeEditIdx = null;
-    let activeLinkType = 'pdf';
-    let v2On = false;
+    let v2 = false;
+    let selectedUnitIdx = null;
 
     onSnapshot(docRef, (s) => {
         if(s.exists()) {
-            dbData = s.data();
-            v2On = dbData.settings?.v2Enabled || false;
+            core = s.data();
+            v2 = core._config?.v2 || false;
             updateV2UI();
+            const urlParams = new URLSearchParams(window.location.search);
+            const sharedPath = urlParams.get('path');
+            const sharedUnit = urlParams.get('unit');
+            if(sharedPath && path.length === 0) {
+                path = sharedPath.split(',');
+                render();
+                if(sharedUnit !== null) setTimeout(() => handleUnitClick(parseInt(sharedUnit)), 800);
+            } else { render(); }
         }
-        draw();
     });
 
-    function draw() {
-        const grid = document.getElementById('card-grid');
-        const unitsPage = document.getElementById('units-page');
-        const backBtn = document.getElementById('back-trigger');
-        const pathLabel = document.getElementById('path-txt');
+    function render() {
+        const grid = document.getElementById('mainGrid');
+        const notes = document.getElementById('notesArea');
+        const bc = document.getElementById('bc');
+        grid.innerHTML = ''; notes.style.display = 'none'; grid.style.display = 'grid';
+        bc.innerHTML = `<span class="bc-link" onclick="resetPath()">Home</span>`;
+        path.forEach((p, i) => { bc.innerHTML += ` > <span class="bc-link" onclick="jumpTo(${i})">${p}</span>`; });
 
-        grid.innerHTML = ''; grid.style.display = 'grid';
-        unitsPage.style.display = 'none';
-        backBtn.style.display = mode === 'semesters' ? 'none' : 'block';
+        let target = core;
+        path.forEach(p => target = target[p]);
+        if(target?._type === 'subject') { renderUnits(target); return; }
 
-        if(mode === 'semesters') {
-            pathLabel.innerText = "SELECT SEMESTER";
-            Object.keys(dbData).filter(k => k !== 'settings').sort().forEach(s => buildCard(s, "fa-graduation-cap", "Semester", () => { path.sem = s; mode = 'groups'; draw(); }, s));
-        }
-        else if(mode === 'groups') {
-            pathLabel.innerText = `${path.sem} / GROUPS`;
-            const groups = dbData[path.sem] || {};
-            Object.keys(groups).forEach(g => buildCard(g, "fa-users-gear", "Group", () => { path.group = g; mode = 'subjects'; draw(); }, g));
-        }
-        else if(mode === 'subjects') {
-            pathLabel.innerText = `${path.group} / SUBJECTS`;
-            const subs = dbData[path.sem][path.group] || {};
-            Object.keys(subs).forEach(id => buildCard(subs[id].title, "fa-book", "Subject", () => { path.subId = id; mode = 'units'; draw(); }, id));
-        }
-        else if(mode === 'units') {
-            grid.style.display = 'none'; unitsPage.style.display = 'block';
-            drawUnits();
-        }
-    }
-
-    function buildCard(title, icon, type, clickFn, key) {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.onclick = clickFn;
-        card.innerHTML = `
-            ${isAdmin ? `
-            <div class="admin-controls">
-                <i class="fa-solid fa-pen-to-square" style="color:var(--neon);" onclick="event.stopPropagation(); editName('${key}', '${title}')"></i>
-                <i class="fa-solid fa-trash" style="color:#ff5252;" onclick="event.stopPropagation(); removeData('${key}')"></i>
-            </div>` : ''}
-            <i class="fa-solid ${icon} main-icon"></i>
-            <h3>${title}</h3>
-            <p style="opacity:0.5; font-size:0.7rem;">${type}</p>
-        `;
-        document.getElementById('card-grid').appendChild(card);
-    }
-
-    function drawUnits() {
-        const sub = dbData[path.sem][path.group][path.subId];
-        document.getElementById('sub-heading').innerText = sub.title;
-        const list = document.getElementById('units-stack');
-        list.innerHTML = '';
-        (sub.units || []).forEach((u, i) => {
-            const row = document.createElement('div');
-            row.className = 'unit-row';
-            row.onclick = () => isAdmin ? openAdminEditor(i) : handleLinkClick(i);
-            row.innerHTML = `
-                <span>${u}</span>
-                <div style="display:flex; gap:15px; align-items:center;">
-                    ${(sub.vids && sub.vids[i] && sub.vids[i] !== "#") ? `<i class="fa-brands fa-youtube" style="color:red; font-size:1.3rem;" onclick="event.stopPropagation(); openVideo(${i})"></i>` : ''}
-                    <i class="fa-solid fa-file-pdf" style="color:var(--neon)"></i>
-                    ${isAdmin ? `<i class="fa-solid fa-circle-xmark" style="color:red;" onclick="event.stopPropagation(); deleteUnit(${i})"></i>` : ''}
-                </div>`;
-            list.appendChild(row);
+        Object.keys(target || {}).filter(k => !k.startsWith('_')).sort().forEach(k => {
+            grid.innerHTML += `<div class="card" onclick="moveIn('${k}')">
+                <i class="fa-solid ${path.length===0?'fa-graduation-cap':path.length===1?'fa-users-rectangle':'fa-book-open'}"></i>
+                <h3>${k}</h3>
+                ${isAdmin ? `
+                    <div class="admin-controls">
+                        <button class="ctrl-btn" style="background:#f39c12; color:white;" onclick="event.stopPropagation(); renameNode('${k}')">Edit</button>
+                        <button class="ctrl-btn" style="background:#e74c3c; color:white;" onclick="event.stopPropagation(); deleteNode('${k}')">Del</button>
+                    </div>` : ''}
+            </div>`;
         });
     }
 
-    // --- Media & V2 Logic ---
-    window.handleLinkClick = (i) => {
-        const sub = dbData[path.sem][path.group][path.subId];
-        const url = sub.links[i];
-        if(!url || url === "#") return alert("No link found!");
-        
-        if(v2On) {
-            const loader = document.getElementById('v2-loader');
-            const progress = document.getElementById('v2-progress');
-            const status = document.getElementById('v2-status');
-            const msgs = ["Initializing Secure Tunnel...", "Verifying Signature...", "Bypassing Buffer...", "Ready!"];
-            
-            loader.style.display = 'flex';
-            progress.style.width = '0%';
-            let step = 0;
-            const interval = setInterval(() => {
-                status.innerText = msgs[step];
-                progress.style.width = ((step + 1) * 25) + "%";
-                step++;
-                if(step >= msgs.length) {
-                    clearInterval(interval);
-                    setTimeout(() => {
-                        loader.style.display = 'none';
-                        window.open(url, '_blank');
-                    }, 500);
-                }
-            }, 800);
-        } else {
-            openFile(url, sub.units[i]);
-        }
+    function renderUnits(data) {
+        document.getElementById('mainGrid').style.display = 'none';
+        document.getElementById('notesArea').style.display = 'block';
+        document.getElementById('viewTitle').innerText = path[path.length - 1];
+        const list = document.getElementById('unitList');
+        list.innerHTML = '';
+
+        (data.units || []).forEach((u, i) => {
+            const hasVid = data.vids && data.vids[i] && data.vids[i].trim() !== "";
+            list.innerHTML += `
+                <div class="unit-item" onclick="handleUnitClick(${i})">
+                    <div style="display:flex; align-items:center; gap:15px;">
+                        <i class="fa-solid fa-file-pdf" style="color:#ff5252;"></i>
+                        <span>${u}</span>
+                    </div>
+                    <div class="unit-actions">
+                        <i class="fa-solid fa-share-nodes" style="color:var(--neon);" onclick="event.stopPropagation(); shareUnit(${i})"></i>
+                        ${hasVid ? `<i class="fa-brands fa-youtube" style="color:#ff0000;" onclick="event.stopPropagation(); playVideo(${i})"></i>` : ''}
+                    </div>
+                </div>`;
+        });
+        if(isAdmin) list.innerHTML += `<button class="admin-btn" style="width:100%; margin-top:20px;" onclick="addUnitPrompt()">+ Add Unit</button>`;
+    }
+
+    window.handleUnitClick = (idx) => {
+        let target = core; path.forEach(p => target = target[p]);
+        if(isAdmin) {
+            selectedUnitIdx = idx;
+            document.getElementById('editPanel').style.display = 'block';
+            document.getElementById('editName').value = target.units[idx];
+            document.getElementById('editPdf').value = target.links[idx];
+            document.getElementById('editVid').value = target.vids ? target.vids[idx] : "";
+            document.getElementById('editPanel').scrollIntoView({ behavior: 'smooth' });
+        } else { openFile(target.links[idx], target.units[idx]); }
+    };
+
+    window.shareUnit = (idx) => {
+        const shareUrl = `${window.location.origin}${window.location.pathname}?path=${encodeURIComponent(path.join(','))}&unit=${idx}`;
+        navigator.clipboard.writeText(shareUrl);
+        showToast("Link Copied!");
     };
 
     window.openFile = (url, name) => {
-        let finalUrl = url;
-        if(url.includes('drive.google.com')) {
-            let fileId = url.includes('/d/') ? url.split('/d/')[1].split('/')[0] : new URL(url).searchParams.get('id');
-            finalUrl = `https://drive.google.com/file/d/${fileId}/preview`;
-        }
-        document.getElementById('pdf-label').innerText = name;
-        document.getElementById('pdf-frame').src = finalUrl;
-        document.getElementById('fs-btn').style.display = 'none';
-        document.getElementById('pdf-screen').style.display = 'flex';
+        if(!url || url === "#") return;
+        if(v2) {
+            document.getElementById('v2-loader').style.display='flex';
+            setTimeout(() => { document.getElementById('v2-loader').style.display='none'; launchViewer(url, name); }, 1500);
+        } else launchViewer(url, name);
     };
 
-    window.openVideo = (i) => {
-        const sub = dbData[path.sem][path.group][path.subId];
-        let url = sub.vids[i];
-        let id = "";
-        if(url.includes('youtu.be/')) id = url.split('youtu.be/')[1].split(/[?#]/)[0];
-        else if(url.includes('watch?v=')) id = new URL(url).searchParams.get('v');
-        else if(url.includes('embed/')) id = url.split('embed/')[1].split(/[?#]/)[0];
-
-        if(!id) return alert("Invalid Video Link!");
-        document.getElementById('pdf-label').innerText = sub.units[i] + " (Video)";
-        document.getElementById('pdf-frame').src = `https://www.youtube.com/embed/${id}?autoplay=1&rel=0`;
-        document.getElementById('fs-btn').style.display = 'block';
-        document.getElementById('pdf-screen').style.display = 'flex';
-    };
-
-    window.goFull = () => {
-        const f = document.getElementById('pdf-frame');
-        if(f.requestFullscreen) f.requestFullscreen();
-        else if(f.webkitRequestFullscreen) f.webkitRequestFullscreen();
-    };
-
-    window.hideViewer = () => { document.getElementById('pdf-screen').style.display = 'none'; document.getElementById('pdf-frame').src = ""; };
-
-    // --- Admin Logic ---
-    window.toggleV2Loader = async () => {
-        v2On = !v2On;
-        dbData.settings = { v2Enabled: v2On };
-        await setDoc(docRef, dbData);
-        updateV2UI();
-    };
-
-    function updateV2UI() {
-        const btn = document.getElementById('v2-toggle-btn');
-        if(btn) {
-            btn.innerText = v2On ? "V2 Loader: ON" : "V2 Loader: OFF";
-            btn.style.background = v2On ? "#2ecc71" : "#f39c12";
-        }
+    function launchViewer(url, name) {
+        let embed = url;
+        if(url.includes('drive.google.com')) embed = url.replace('/view', '/preview').split('?')[0];
+        document.getElementById('v-name').innerText = name;
+        document.getElementById('v-frame').src = embed;
+        document.getElementById('v-dl').onclick = () => window.open(url, '_blank');
+        document.getElementById('viewer').style.display = 'flex';
     }
 
-    window.editName = async (key, old) => {
-        const n = prompt("Enter new name:", old);
-        if(!n || n === old) return;
-        if(mode === 'semesters') { dbData[n] = dbData[key]; delete dbData[key]; }
-        else if(mode === 'groups') { dbData[path.sem][n] = dbData[path.sem][key]; delete dbData[path.sem][key]; }
-        else if(mode === 'subjects') { dbData[path.sem][path.group][key].title = n; }
-        await setDoc(docRef, dbData);
-    };
-
-    window.removeData = async (key) => {
-        if(!confirm("Delete this?")) return;
-        if(mode === 'semesters') delete dbData[key];
-        else if(mode === 'groups') delete dbData[path.sem][key];
-        else if(mode === 'subjects') delete dbData[path.sem][path.group][key];
-        await setDoc(docRef, dbData);
-    };
-
-    window.deleteUnit = async (idx) => {
-        if(!confirm("Delete unit?")) return;
-        const s = dbData[path.sem][path.group][path.subId];
-        s.units.splice(idx, 1); s.links.splice(idx, 1);
-        if(s.vids) s.vids.splice(idx, 1);
-        await setDoc(docRef, dbData);
-    };
-
-    window.openAdminEditor = (i) => {
-        activeEditIdx = i;
-        document.getElementById('admin-editor').style.display = 'block';
-        document.getElementById('editing-unit-name').innerText = dbData[path.sem][path.group][path.subId].units[i];
-        switchLinkType('pdf');
-    };
-
-    window.switchLinkType = (t) => {
-        activeLinkType = t;
-        const sub = dbData[path.sem][path.group][path.subId];
-        document.getElementById('tabPdf').style.background = t === 'pdf' ? 'var(--neon)' : 'white';
-        document.getElementById('tabVid').style.background = t === 'vid' ? 'var(--neon)' : 'white';
-        document.getElementById('edit-link').value = t === 'pdf' ? sub.links[activeEditIdx] : (sub.vids ? sub.vids[activeEditIdx] : "");
+    // YOUTUBE PLAYER FIX
+    window.playVideo = (idx) => {
+        let target = core; path.forEach(p => target = target[p]);
+        let url = target.vids[idx];
+        let vidId = "";
+        try {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            vidId = (match && match[2].length == 11) ? match[2] : "";
+        } catch(e) {}
+        if(!vidId) { showToast("Invalid Video Link"); return; }
+        
+        // Finalized embed link with parameters to avoid 153 error
+        document.getElementById('video-frame').src = `https://www.youtube.com/embed/${vidId}?autoplay=1&rel=0&enablejsapi=1`;
+        document.getElementById('video-viewer').style.display = 'flex';
     };
 
     window.saveEdit = async () => {
-        const sub = dbData[path.sem][path.group][path.subId];
-        const val = document.getElementById('edit-link').value;
-        if(activeLinkType === 'pdf') sub.links[activeEditIdx] = val;
-        else { if(!sub.vids) sub.vids = new Array(sub.units.length).fill(""); sub.vids[activeEditIdx] = val; }
-        await setDoc(docRef, dbData);
-        alert("Saved!");
-        document.getElementById('admin-editor').style.display = 'none';
+        let target = core; path.forEach(p => target = target[p]);
+        target.units[selectedUnitIdx] = document.getElementById('editName').value;
+        target.links[selectedUnitIdx] = document.getElementById('editPdf').value;
+        if(!target.vids) target.vids = [];
+        target.vids[selectedUnitIdx] = document.getElementById('editVid').value;
+        await setDoc(docRef, core);
+        document.getElementById('editPanel').style.display='none';
+        showToast("Changes Saved!");
     };
 
-    window.navBack = () => {
-        if(mode === 'units') mode = 'subjects';
-        else if(mode === 'subjects') mode = 'groups';
-        else if(mode === 'groups') mode = 'semesters';
-        draw();
+    window.renameNode = async (oldKey) => {
+        let newKey = prompt("Enter New Name:", oldKey);
+        if(!newKey || newKey === oldKey) return;
+        let ref = core; path.forEach(p => ref = ref[p]);
+        ref[newKey] = ref[oldKey];
+        delete ref[oldKey];
+        await setDoc(docRef, core);
+        showToast("Renamed!");
     };
 
-    let clicks = 0;
-    document.getElementById('pass-trigger').onclick = () => { if(++clicks === 5) { clicks = 0; if(prompt("Pass:") === "study11") { isAdmin = true; document.getElementById('admin-bar').style.display = 'block'; draw(); } } };
+    window.addNewNode = async () => {
+        const n = prompt("Name:"); if(!n) return;
+        let ref = core; path.forEach(p => ref = ref[p]);
+        if(path.length === 2) ref[n] = { _type:'subject', units:[], links:[], vids:[] };
+        else ref[n] = {};
+        await setDoc(docRef, core);
+    };
 
-    window.triggerAdd = async () => {
-        const val = prompt(`New ${mode.slice(0,-1).toUpperCase()} Name:`);
-        if(!val) return;
-        if(mode === 'semesters') dbData[val] = {};
-        else if(mode === 'groups') dbData[path.sem][val] = {};
-        else if(mode === 'subjects') {
-            const id = "s" + Date.now();
-            dbData[path.sem][path.group][id] = { title: val, units: [], links: [], vids: [] };
+    window.addUnitPrompt = async () => {
+        let ref = core; path.forEach(p => ref = ref[p]);
+        ref.units.push("New Unit"); ref.links.push("#"); if(!ref.vids) ref.vids=[]; ref.vids.push("");
+        await setDoc(docRef, core);
+    };
+
+    window.deleteNode = async (k) => { if(confirm("Delete?")) { let ref = core; path.forEach(p => ref = ref[p]); delete ref[k]; await setDoc(docRef, core); }};
+    window.deleteUnit = async () => { if(confirm("Delete?")) { let ref = core; path.forEach(p => ref = ref[p]); ref.units.splice(selectedUnitIdx, 1); ref.links.splice(selectedUnitIdx, 1); ref.vids.splice(selectedUnitIdx,1); await setDoc(docRef, core); document.getElementById('editPanel').style.display='none'; }};
+
+    window.toggleV2 = async () => { v2 = !v2; if(!core._config) core._config={}; core._config.v2 = v2; await setDoc(docRef, core); };
+    function updateV2UI() { const btn = document.getElementById('v2-toggle'); btn.innerText = v2 ? "V2: ON" : "V2: OFF"; btn.style.background = v2 ? "var(--neon)" : "#f39c12"; }
+
+    window.moveIn = (k) => { path.push(k); render(); };
+    window.goBack = () => { path.pop(); render(); };
+    window.resetPath = () => { path = []; render(); };
+    window.jumpTo = (idx) => { path = path.slice(0, idx+1); render(); };
+    window.closeViewer = () => { document.getElementById('viewer').style.display='none'; document.getElementById('v-frame').src=''; };
+    window.closeVideo = () => { document.getElementById('video-viewer').style.display='none'; document.getElementById('video-frame').src=''; };
+
+    let fCount = 0;
+    document.getElementById('adminTrigger').onclick = () => {
+        if(++fCount === 5) {
+            if(prompt("Pass:") === "useas77") { isAdmin = true; document.getElementById('admin-bar').style.display='block'; render(); }
+            fCount = 0;
         }
-        else if(mode === 'units') {
-            const s = dbData[path.sem][path.group][path.subId];
-            s.units.push(val); s.links.push("#"); if(!s.vids) s.vids = []; s.vids.push("");
-        }
-        await setDoc(docRef, dbData);
     };
 
-    window.runSearch = () => {
-        const q = document.getElementById('findBox').value.toLowerCase();
-        document.querySelectorAll('.card, .unit-row').forEach(el => el.style.display = el.innerText.toLowerCase().includes(q) ? '' : 'none');
+    window.showToast = (m) => {
+        const t = document.createElement('div'); t.className='toast'; t.innerText=m;
+        document.getElementById('toast-container').appendChild(t);
+        setTimeout(() => t.remove(), 3000);
     };
 </script>
 </body>
