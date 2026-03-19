@@ -34,7 +34,6 @@
         .card:hover { border-color: var(--neon); transform: translateY(-8px); background: rgba(0, 242, 255, 0.08); }
         .card i { font-size: 3rem; color: var(--neon); margin-bottom: 20px; filter: drop-shadow(0 0 10px var(--neon)); }
         
-        /* Edit Buttons on Cards */
         .admin-controls { position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column; gap: 5px; }
         .ctrl-btn { font-size: 0.7rem; padding: 4px 8px; border-radius: 4px; border: none; cursor: pointer; font-weight: bold; }
 
@@ -49,6 +48,7 @@
 
         #toast-container { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 10000; }
         .toast { background: var(--neon); color: #000; padding: 12px 35px; border-radius: 50px; font-weight: bold; animation: slideUp 0.4s; }
+        @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes slideUp { from { transform: translateY(100px); } }
 
         footer { padding: 80px; text-align: center; opacity: 0.4; font-size: 0.8rem; cursor: pointer; }
@@ -62,13 +62,14 @@
 <div id="admin-bar">
     <span style="color:#2ecc71; font-weight:bold; margin-right:15px;">🛡️ ADMIN ACTIVE</span>
     <button class="admin-btn" onclick="addNewNode()">+ Add Category</button>
-    <button id="v2-toggle" class="admin-btn" style="background:#f39c12;" onclick="toggleV2()">V2 LOADER: OFF</button>
+    <button id="v2-toggle" class="admin-btn" onclick="toggleV2()">V2: OFF</button>
     <button class="admin-btn" style="background:#e74c3c;" onclick="location.reload()">Exit</button>
 </div>
 
 <div id="v2-loader" style="justify-content:center; align-items:center;">
     <div style="width:70px; height:70px; border:4px solid rgba(0,242,255,0.1); border-top-color:var(--neon); border-radius:50%; animation: spin 0.8s linear infinite;"></div>
-    <h2 style="margin-top:25px; font-family:'Orbitron'; color:var(--neon);">SECURE CONNECTION</h2>
+    <h2 style="margin-top:25px; font-family:'Orbitron'; color:var(--neon); letter-spacing: 2px;">EXTERNAL REDIRECT</h2>
+    <p style="margin-top:10px; opacity:0.6;">Opening in secure browser window...</p>
 </div>
 
 <div id="viewer">
@@ -123,7 +124,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // YOUR FIREBASE CONFIG
     const firebaseConfig = {
         apiKey: "AIzaSyDt8SROwFORTZFqVe5xLc3nlDukbOAgdzs",
         authDomain: "useasnotes.firebaseapp.com",
@@ -137,7 +137,6 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    // PATH UNIFIED TO final_v4_data TO ENSURE PREVIOUS DATA IS LOADED
     const docRef = doc(db, "portal", "final_v4_data");
 
     let core = {};
@@ -151,14 +150,7 @@
             core = s.data();
             v2 = core._config?.v2 || false;
             updateV2UI();
-            const urlParams = new URLSearchParams(window.location.search);
-            const sharedPath = urlParams.get('path');
-            const sharedUnit = urlParams.get('unit');
-            if(sharedPath && path.length === 0) {
-                path = sharedPath.split(',');
-                render();
-                if(sharedUnit !== null) setTimeout(() => handleUnitClick(parseInt(sharedUnit)), 800);
-            } else { render(); }
+            render();
         }
     });
 
@@ -178,11 +170,7 @@
             grid.innerHTML += `<div class="card" onclick="moveIn('${k}')">
                 <i class="fa-solid ${path.length===0?'fa-graduation-cap':path.length===1?'fa-users-rectangle':'fa-book-open'}"></i>
                 <h3>${k}</h3>
-                ${isAdmin ? `
-                    <div class="admin-controls">
-                        <button class="ctrl-btn" style="background:#f39c12; color:white;" onclick="event.stopPropagation(); renameNode('${k}')">Edit</button>
-                        <button class="ctrl-btn" style="background:#e74c3c; color:white;" onclick="event.stopPropagation(); deleteNode('${k}')">Del</button>
-                    </div>` : ''}
+                ${isAdmin ? `<div class="admin-controls"><button class="ctrl-btn" style="background:#f39c12; color:white;" onclick="event.stopPropagation(); renameNode('${k}')">Edit</button><button class="ctrl-btn" style="background:#e74c3c; color:white;" onclick="event.stopPropagation(); deleteNode('${k}')">Del</button></div>` : ''}
             </div>`;
         });
     }
@@ -220,8 +208,49 @@
             document.getElementById('editPdf').value = target.links[idx];
             document.getElementById('editVid').value = target.vids ? target.vids[idx] : "";
             document.getElementById('editPanel').scrollIntoView({ behavior: 'smooth' });
-        } else { openFile(target.links[idx], target.units[idx]); }
+        } else {
+            const url = target.links[idx];
+            const name = target.units[idx];
+            
+            if(v2) {
+                // FORCE EXTERNAL OPENING
+                document.getElementById('v2-loader').style.display = 'flex';
+                setTimeout(() => {
+                    document.getElementById('v2-loader').style.display = 'none';
+                    window.open(url, '_blank');
+                }, 1000);
+            } else {
+                // INTERNAL VIEWING
+                launchViewer(url, name);
+            }
+        }
     };
+
+    function launchViewer(url, name) {
+        let embed = url;
+        if(url.includes('drive.google.com')) {
+            embed = url.replace('/view', '/preview').split('?')[0];
+        }
+        document.getElementById('v-name').innerText = name;
+        document.getElementById('v-frame').src = embed;
+        document.getElementById('v-dl').onclick = () => window.open(url, '_blank');
+        document.getElementById('viewer').style.display = 'flex';
+    }
+
+    window.toggleV2 = async () => {
+        v2 = !v2;
+        if(!core._config) core._config = {};
+        core._config.v2 = v2;
+        await setDoc(docRef, core);
+        showToast(v2 ? "V2 ON: Opening in New Tabs" : "V2 OFF: Opening in Hub Viewer");
+    };
+
+    function updateV2UI() {
+        const btn = document.getElementById('v2-toggle');
+        btn.innerText = v2 ? "V2: ON" : "V2: OFF";
+        btn.style.background = v2 ? "var(--neon)" : "#f39c12";
+        btn.style.color = v2 ? "black" : "white";
+    }
 
     window.shareUnit = (idx) => {
         const shareUrl = `${window.location.origin}${window.location.pathname}?path=${encodeURIComponent(path.join(','))}&unit=${idx}`;
@@ -229,24 +258,6 @@
         showToast("Link Copied!");
     };
 
-    window.openFile = (url, name) => {
-        if(!url || url === "#") return;
-        if(v2) {
-            document.getElementById('v2-loader').style.display='flex';
-            setTimeout(() => { document.getElementById('v2-loader').style.display='none'; launchViewer(url, name); }, 1500);
-        } else launchViewer(url, name);
-    };
-
-    function launchViewer(url, name) {
-        let embed = url;
-        if(url.includes('drive.google.com')) embed = url.replace('/view', '/preview').split('?')[0];
-        document.getElementById('v-name').innerText = name;
-        document.getElementById('v-frame').src = embed;
-        document.getElementById('v-dl').onclick = () => window.open(url, '_blank');
-        document.getElementById('viewer').style.display = 'flex';
-    }
-
-    // YOUTUBE PLAYER FIX
     window.playVideo = (idx) => {
         let target = core; path.forEach(p => target = target[p]);
         let url = target.vids[idx];
@@ -257,8 +268,6 @@
             vidId = (match && match[2].length == 11) ? match[2] : "";
         } catch(e) {}
         if(!vidId) { showToast("Invalid Video Link"); return; }
-        
-        // Finalized embed link with parameters to avoid 153 error
         document.getElementById('video-frame').src = `https://www.youtube.com/embed/${vidId}?autoplay=1&rel=0&enablejsapi=1`;
         document.getElementById('video-viewer').style.display = 'flex';
     };
@@ -281,7 +290,6 @@
         ref[newKey] = ref[oldKey];
         delete ref[oldKey];
         await setDoc(docRef, core);
-        showToast("Renamed!");
     };
 
     window.addNewNode = async () => {
@@ -300,9 +308,6 @@
 
     window.deleteNode = async (k) => { if(confirm("Delete?")) { let ref = core; path.forEach(p => ref = ref[p]); delete ref[k]; await setDoc(docRef, core); }};
     window.deleteUnit = async () => { if(confirm("Delete?")) { let ref = core; path.forEach(p => ref = ref[p]); ref.units.splice(selectedUnitIdx, 1); ref.links.splice(selectedUnitIdx, 1); ref.vids.splice(selectedUnitIdx,1); await setDoc(docRef, core); document.getElementById('editPanel').style.display='none'; }};
-
-    window.toggleV2 = async () => { v2 = !v2; if(!core._config) core._config={}; core._config.v2 = v2; await setDoc(docRef, core); };
-    function updateV2UI() { const btn = document.getElementById('v2-toggle'); btn.innerText = v2 ? "V2: ON" : "V2: OFF"; btn.style.background = v2 ? "var(--neon)" : "#f39c12"; }
 
     window.moveIn = (k) => { path.push(k); render(); };
     window.goBack = () => { path.pop(); render(); };
