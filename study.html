@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Hub | Student Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root { 
+            --primary: #6c5ce7; 
+            --blue-accent: #2980b9;
+            --bg: #f4f7f6; 
+            --card-bg: #ffffff;
+            --text-main: #2d3436; 
+            --text-muted: #636e72; 
+            --border: rgba(0, 0, 0, 0.08); 
+            --delete-btn: #e74c3c; 
+            --neon-green: #2ecc71;
+            --yt-red: #FF0000;
+            --glass: rgba(255, 255, 255, 0.8);
+        }
+        
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; transition: 0.3s; }
+        body { background: var(--bg); color: var(--text-main); min-height: 100vh; overflow-x: hidden; }
+
+        #toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: #2d3436; color: var(--neon-green); padding: 12px 25px;
+            border-radius: 50px; font-weight: 600; font-size: 0.9rem;
+            display: none; z-index: 11000; border: 1px solid var(--neon-green);
+        }
+
+        @keyframes sonarWave {
+            0% { box-shadow: 0 0 0 0 rgba(108, 92, 231, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(108, 92, 231, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(108, 92, 231, 0); }
+        }
+
+        #help-btn {
+            position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px;
+            background: var(--primary); color: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; cursor: pointer; z-index: 1000;
+            animation: sonarWave 2s infinite;
+            box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
+        }
+
+        #visitor-counter {
+            position: fixed; background: var(--primary); color: white;
+            padding: 8px 15px; border-radius: 50px; font-size: 0.75rem;
+            font-weight: bold; z-index: 1000; bottom: 20px; left: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 8px;
+        }
+
+        #admin-bar { display: none; background: #2d3436; padding: 12px; position: sticky; top: 0; z-index: 2000; border-bottom: 2px solid #2ecc71; text-align: center; }
+        .admin-btn { background: #2ecc71; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; margin: 0 5px; font-size: 0.8rem; }
+        
+        .header { text-align: center; padding: 40px 20px 10px; }
+        .logo { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; color: var(--primary); letter-spacing: 5px; font-weight: 700; text-transform: uppercase; }
+
+        .search-container { max-width: 600px; margin: 20px auto; padding: 0 20px; position: relative; }
+        .search-bar { width: 100%; padding: 12px 20px 12px 45px; border-radius: 50px; border: 1px solid var(--border); background: var(--card-bg); outline: none; }
+        .search-icon { position: absolute; left: 35px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+        .bc-box { padding: 12px 25px; background: var(--card-bg); border-radius: 12px; font-size: 0.85rem; border: 1px solid var(--border); margin-bottom: 20px; }
+        .bc-link { color: var(--primary); cursor: pointer; font-weight: 600; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 25px; padding-bottom: 40px; }
+        .card { background: var(--card-bg); border: 1px solid var(--border); padding: 50px 20px; border-radius: 24px; text-align: center; cursor: pointer; position: relative;}
+        .card:hover { transform: translateY(-5px); border-color: var(--primary); }
+        
+        .rank-tag { position: absolute; top: 12px; left: 15px; background: #2d3436; color: #2ecc71; padding: 2px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: bold; }
+
+        .unit-item { background: var(--card-bg); border: 1px solid var(--border); margin: 10px 0; padding: 18px 22px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .unit-item:hover { background: #f8f9ff; }
+        
+        #v2-loader { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 10001; flex-direction: column; align-items: center; justify-content: center; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        #viewer, #video-viewer, #help-panel, #message-admin-panel { display: none; position: fixed; inset: 0; z-index: 9999; background: var(--bg); flex-direction: column; }
+        .v-header { background: var(--card-bg); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+        iframe { width: 100%; height: 100%; border: none; }
+
+        #help-panel { background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; }
+        .help-card { width: 90%; max-width: 450px; background: #fff; border-radius: 30px; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.2); animation: slideUp 0.4s ease-out; }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .help-top { background: var(--primary); padding: 30px; text-align: center; color: white; position: relative; }
+        .help-top i { font-size: 3rem; margin-bottom: 10px; }
+        .help-top h2 { font-family: 'Orbitron'; font-size: 1.2rem; letter-spacing: 2px; }
+        .close-help { position: absolute; top: 15px; right: 20px; color: white; cursor: pointer; font-size: 1.2rem; }
+
+        .help-body { padding: 30px; }
+        .msg-input { width: 100%; height: 120px; padding: 15px; border: 2px solid #eee; border-radius: 15px; margin-bottom: 20px; resize: none; outline: none; font-size: 0.9rem; }
+        .msg-input:focus { border-color: var(--primary); background: #fdfdff; }
+        
+        .submit-help-btn { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 15px; font-weight: bold; cursor: pointer; box-shadow: 0 10px 20px rgba(108, 92, 231, 0.3); }
+        .submit-help-btn:hover { background: #5649c0; transform: translateY(-2px); }
+
+        .msg-card { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+
+        footer { padding: 60px; text-align: center; color: var(--text-muted); opacity: 0.5; font-size: 0.8rem; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div id="toast">Copied!</div>
+<div id="v2-loader"><div class="spinner"></div><p style="margin-top:10px;">Accessing Resource...</p></div>
+<div id="visitor-counter"><i class="fa-solid fa-eye"></i> <span id="view-count">...</span></div>
+
+<div id="help-btn" onclick="openHelp()"><i class="fa-solid fa-headset"></i></div>
+
+<div id="admin-bar">
+    <button class="admin-btn" onclick="addNewNode()">+ Add Folder/Subject</button>
+    <button class="admin-btn" id="v2-toggle-btn" onclick="toggleV2Mode()">V2: OFF</button>
+    <button class="admin-btn" id="msg-inbox-btn" style="background:#3498db;" onclick="openMsgInbox()">Messages</button>
+    <button class="admin-btn" style="background:#e74c3c;" onclick="location.reload()">Exit Admin</button>
+</div>
+
+<div class="header"><h1 class="logo">STUDY HUB</h1></div>
+
+<div class="search-container">
+    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+    <input type="text" id="searchInput" class="search-bar" placeholder="Search for subjects or notes..." onkeyup="filterItems()">
+</div>
+
+<div class="container">
+    <div class="bc-box" id="bc">Home</div>
+    
+    <div id="navHeader" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 id="viewTitle" style="font-size: 1.2rem; color: var(--primary); font-family: 'Orbitron';"></h2>
+        <button onclick="goBack()" class="admin-btn" style="background:var(--blue-accent);"><i class="fa-solid fa-chevron-left"></i> Back</button>
+    </div>
+
+    <div class="grid" id="mainGrid"></div>
+
+    <div id="notesArea" style="display:none;">
+        <div id="unitList"></div>
+        <div id="editPanel" style="display:none; margin-top:30px; padding:20px; border: 2px dashed var(--primary); border-radius: 15px; background: #fff;">
+            <h3>Edit Resource</h3>
+            <input type="text" id="editName" class="search-bar" style="margin:10px 0; border: 1px solid #ddd;" placeholder="Title">
+            <input type="text" id="editPdf" class="search-bar" style="margin:10px 0; border: 1px solid #ddd;" placeholder="PDF Link">
+            <input type="text" id="editVid" class="search-bar" style="margin:10px 0; border: 1px solid #ddd;" placeholder="YouTube Link">
+            <div style="display:flex; gap:10px;">
+                <button class="admin-btn" onclick="saveEdit()" style="flex:1">Update</button>
+                <button class="admin-btn" style="background:var(--delete-btn); flex:1" onclick="deleteUnit()">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="help-panel">
+    <div class="help-card">
+        <div class="help-top">
+            <i class="fa-solid fa-circle-question"></i>
+            <h2>SUPPORT CENTER</h2>
+            <div class="close-help" onclick="closeHelp()"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="help-body">
+            <label>HOW CAN WE HELP?</label>
+            <textarea id="helpMsg" class="msg-input" placeholder="Broken link? Missing notes? Mention the subject name and unit here..."></textarea>
+            <button class="submit-help-btn" onclick="sendMessage()">SEND REPORT</button>
+            <p style="text-align:center; font-size: 0.7rem; color: #aaa; margin-top:15px;">Powered by USEAS Support Team</p>
+        </div>
+    </div>
+</div>
+
+<div id="message-admin-panel">
+    <div class="v-header"><span>Message Inbox</span><button onclick="document.getElementById('message-admin-panel').style.display='none'" class="admin-btn" style="background:red">Close</button></div>
+    <div class="container" style="margin-top:20px; overflow-y: auto; height: 75vh;">
+        <div id="inbox-list"></div>
+        <button class="admin-btn" style="background:#e74c3c; width:100%; margin:20px 0;" onclick="clearMessages()">Clear All Messages</button>
+    </div>
+</div>
+
+<div id="viewer">
+    <div class="v-header"><span id="v-name"></span><button onclick="closeViewer()" class="admin-btn" style="background:red">Close</button></div>
+    <iframe id="v-frame"></iframe>
+</div>
+
+<div id="video-viewer">
+    <div class="v-header"><span id="v-video-name"></span><button onclick="closeVideo()" class="admin-btn" style="background:red">Close</button></div>
+    <div style="flex:1; background:#000; display:flex; align-items:center; justify-content:center;">
+        <iframe id="video-frame" allowfullscreen style="max-width:900px; aspect-ratio:16/9; height:auto;"></iframe>
+    </div>
+</div>
+
+<footer id="adminTrigger">Ⓤ 2026 STUDY HUB PORTAL • POWERED BY USEAS</footer>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, setDoc, onSnapshot, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDt8SROwFORTZFqVe5xLc3nlDukbOAgdzs",
+        authDomain: "useasnotes.firebaseapp.com",
+        projectId: "useasnotes",
+        storageBucket: "useasnotes.firebasestorage.app",
+        appId: "1:1066601715098:web:3b424d6e097d9112d09623"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const docRef = doc(db, "portal", "final_v4_data");
+    const countRef = doc(db, "portal", "visitor_stats");
+    const settingsRef = doc(db, "portal", "app_settings");
+    const msgRef = doc(db, "portal", "messages");
+
+    let core = {}; let path = []; let adminRole = null; 
+    let v2Enabled = false; let selectedUnitIdx = null; let footerClicks = 0;
+
+    window.showToast = (m) => { const t=document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none', 2000); };
+
+    // Admin Login
+    document.getElementById('adminTrigger').onclick = () => {
+        if(++footerClicks === 5) {
+            let p = prompt("Password:");
+            if(p === "useas77") { adminRole = 'super'; setupAdminUI(); }
+            else if(p === "studyhub11") { adminRole = 'editor'; setupAdminUI(); }
+            footerClicks = 0;
+        }
+    };
+
+    function setupAdminUI() {
+        document.getElementById('admin-bar').style.display = 'block';
+        updateV2Btn();
+        render();
+    }
+
+    window.toggleV2Mode = async () => {
+        v2Enabled = !v2Enabled;
+        await setDoc(settingsRef, { v2Enabled });
+        updateV2Btn();
+    };
+
+    function updateV2Btn() {
+        const btn = document.getElementById('v2-toggle-btn');
+        if(btn) {
+            btn.innerText = `V2: ${v2Enabled ? 'ON' : 'OFF'}`;
+            btn.style.background = v2Enabled ? '#2ecc71' : '#f39c12';
+        }
+    }
+
+    window.sendMessage = async () => {
+        const text = document.getElementById('helpMsg').value;
+        if(!text.trim()) return;
+        try {
+            const snap = await getDoc(msgRef);
+            const msgData = { text, time: new Date().toLocaleString() };
+            if (!snap.exists()) await setDoc(msgRef, { inbox: [msgData] });
+            else await updateDoc(msgRef, { inbox: arrayUnion(msgData) });
+            document.getElementById('helpMsg').value = ''; showToast("Report Sent!"); closeHelp();
+        } catch(e) { showToast("Error sending"); }
+    };
+
+    window.openMsgInbox = () => {
+        onSnapshot(msgRef, (s) => {
+            const l = document.getElementById('inbox-list'); l.innerHTML = '';
+            if(s.exists() && s.data().inbox) {
+                s.data().inbox.slice().reverse().forEach(m => {
+                    l.innerHTML += `<div class="msg-card"><strong>${m.time}</strong><p>${m.text}</p></div>`;
+                });
+            } else l.innerHTML = "<p style='text-align:center;'>No messages.</p>";
+        });
+        document.getElementById('message-admin-panel').style.display = 'flex';
+    };
+
+    window.clearMessages = async () => { if(confirm("Clear all reports?")) await setDoc(msgRef, { inbox: [] }); };
+
+    window.setRank = async (k) => {
+        let t = core; path.forEach(p => t = t[p]);
+        let r = prompt("Set Position (1, 2, 3...):", t[k]._rank || "");
+        if(r !== null) {
+            t[k]._rank = parseInt(r) || 999;
+            await setDoc(docRef, core);
+            showToast("Position Updated");
+        }
+    };
+
+    onSnapshot(docRef, (s) => { if(s.exists()){ core = s.data(); render(); } });
+    onSnapshot(settingsRef, (s) => { if(s.exists()){ v2Enabled = s.data().v2Enabled; updateV2Btn(); } });
+
+    function render() {
+        const grid = document.getElementById('mainGrid');
+        const notes = document.getElementById('notesArea');
+        grid.innerHTML = ''; notes.style.display = 'none'; grid.style.display = 'grid';
+
+        document.getElementById('bc').innerHTML = `<span class="bc-link" onclick="resetPath()">Home</span>` + path.map((p, i) => ` > <span class="bc-link" onclick="jumpTo(${i})">${p}</span>`).join('');
+        document.getElementById('navHeader').style.display = path.length > 0 ? 'flex' : 'none';
+        
+        let target = core; path.forEach(p => target = target[p]);
+        if(!target) return resetPath();
+
+        if(target._type === 'subject') {
+            renderUnits(target);
+        } else {
+            const keys = Object.keys(target).filter(k => !k.startsWith('_')).sort((a, b) => {
+                let ra = target[a]._rank || 999; let rb = target[b]._rank || 999;
+                return ra !== rb ? ra - rb : a.localeCompare(b);
+            });
+
+            keys.forEach(k => {
+                // FIXED ICON LOGIC: Graduation Cap for Home, Book Bookmark for Subjects
+                let icon = path.length === 0 ? "fa-graduation-cap" : "fa-book-bookmark";
+                let adminLabel = (adminRole && target[k]._rank) ? `<div class="rank-tag">#R${target[k]._rank}</div>` : "";
+                grid.innerHTML += `
+                    <div class="card" onclick="moveIn('${k}')">
+                        ${adminLabel}
+                        <i class="fa-solid ${icon}" style="font-size:2.8rem; color:var(--primary); margin-bottom:15px; display:block;"></i>
+                        <h3 style="font-size:1.1rem;">${k}</h3>
+                        <div style="position:absolute; top:12px; right:12px; display:flex; gap:8px;">
+                            ${adminRole ? `<i class="fa-solid fa-hashtag" style="color:var(--blue-accent);" onclick="event.stopPropagation(); setRank('${k}')"></i>` : ''}
+                            ${adminRole ? `<i class="fa-solid fa-trash" style="color:red;" onclick="event.stopPropagation(); deleteNode('${k}')"></i>` : ''}
+                        </div>
+                    </div>`;
+            });
+        }
+    }
+
+    function renderUnits(data) {
+        document.getElementById('mainGrid').style.display = 'none';
+        document.getElementById('notesArea').style.display = 'block';
+        const list = document.getElementById('unitList'); list.innerHTML = '';
+        (data.units || []).forEach((u, i) => {
+            list.innerHTML += `
+                <div class="unit-item" onclick="handleUnitClick(${i})">
+                    <div style="display:flex; align-items:center;">
+                        <i class="fa-solid fa-file-pdf" style="color:#e74c3c; margin-right:15px; font-size:1.3rem;"></i>
+                        <span style="font-weight:500;">${u}</span>
+                    </div>
+                    <div style="display:flex; gap:18px; align-items:center;">
+                        ${data.vids && data.vids[i] ? `<i class="fa-brands fa-youtube" style="color:var(--yt-red); font-size:1.6rem;" onclick="event.stopPropagation(); playVid('${data.vids[i]}')"></i>` : ''}
+                        <i class="fa-solid fa-up-right-from-square" style="color:var(--primary);"></i>
+                    </div>
+                </div>`;
+        });
+        if(adminRole) list.innerHTML += `<button class="admin-btn" style="width:100%; margin-top:20px;" onclick="addUnit()">+ Add Resource</button>`;
+    }
+
+    window.handleUnitClick = (idx) => {
+        let t = core; path.forEach(p => t = t[p]);
+        let link = t.links[idx];
+        if(adminRole) {
+            selectedUnitIdx = idx;
+            document.getElementById('editPanel').style.display = 'block';
+            document.getElementById('editName').value = t.units[idx];
+            document.getElementById('editPdf').value = link;
+            document.getElementById('editVid').value = t.vids ? t.vids[idx] : '';
+        } else {
+            if(v2Enabled) {
+                document.getElementById('v2-loader').style.display='flex';
+                setTimeout(()=> { document.getElementById('v2-loader').style.display='none'; window.open(link, '_blank'); }, 1200);
+            } else {
+                document.getElementById('v-frame').src = link.includes('drive.google.com') ? link.replace('/view', '/preview') : link;
+                document.getElementById('viewer').style.display='flex';
+            }
+        }
+    };
+
+    window.moveIn = (k) => { path.push(k); render(); };
+    window.goBack = () => { path.pop(); render(); };
+    window.resetPath = () => { path = []; render(); };
+    window.jumpTo = (i) => { path = path.slice(0, i+1); render(); };
+    window.closeViewer = () => { document.getElementById('viewer').style.display='none'; document.getElementById('v-frame').src=''; };
+    window.closeHelp = () => document.getElementById('help-panel').style.display='none';
+    window.openHelp = () => document.getElementById('help-panel').style.display='flex';
+    
+    window.playVid = (url) => { 
+        let id = url.includes('v=') ? url.split('v=')[1].split('&')[0] : url.split('/').pop();
+        document.getElementById('video-frame').src = `https://www.youtube.com/embed/${id}?autoplay=1`;
+        document.getElementById('video-viewer').style.display='flex';
+    };
+    window.closeVideo = () => { document.getElementById('video-viewer').style.display='none'; document.getElementById('video-frame').src=''; };
+
+    window.saveEdit = async () => {
+        let t = core; path.forEach(p => t = t[p]);
+        t.units[selectedUnitIdx] = document.getElementById('editName').value;
+        t.links[selectedUnitIdx] = document.getElementById('editPdf').value;
+        if(!t.vids) t.vids = [];
+        t.vids[selectedUnitIdx] = document.getElementById('editVid').value;
+        await setDoc(docRef, core); document.getElementById('editPanel').style.display='none'; showToast("Updated");
+    };
+
+    // FIXED: Unit Delete Function
+    window.deleteUnit = async () => {
+        if(confirm("Delete this resource?")) {
+            let t = core; path.forEach(p => t = t[p]);
+            t.units.splice(selectedUnitIdx, 1);
+            t.links.splice(selectedUnitIdx, 1);
+            if(t.vids) t.vids.splice(selectedUnitIdx, 1);
+            await setDoc(docRef, core);
+            document.getElementById('editPanel').style.display='none';
+            showToast("Deleted");
+        }
+    };
+
+    window.deleteNode = async (k) => { if(confirm(`Delete ${k}?`)) { let t=core; path.forEach(p=>t=t[p]); delete t[k]; await setDoc(docRef, core); } };
+    window.addNewNode = async () => { let n=prompt("Name:"); if(!n)return; let t=core; path.forEach(p=>t=t[p]); t[n]=path.length>=1?{_type:'subject',units:[],links:[],vids:[]}:{}; await setDoc(docRef, core); };
+    window.addUnit = async () => { let t=core; path.forEach(p=>t=t[p]); t.units.push("New Note"); t.links.push("#"); if(!t.vids) t.vids=[]; t.vids.push(""); await setDoc(docRef, core); };
+
+    window.filterItems = () => {
+        let q = document.getElementById('searchInput').value.toLowerCase();
+        document.querySelectorAll('.card, .unit-item').forEach(el => el.style.display = el.innerText.toLowerCase().includes(q) ? 'flex' : 'none');
+    };
+
+    async function updateCounter() {
+        const snap = await getDoc(countRef);
+        let count = snap.exists() ? snap.data().count : 0;
+        await setDoc(countRef, { count: ++count });
+        document.getElementById('view-count').innerText = count.toLocaleString();
+    }
+    updateCounter();
+
+</script>
+</body>
+</html>
