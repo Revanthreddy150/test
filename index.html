@@ -1,334 +1,509 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Study Hub | Premium Portal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thodu – Verified Journey</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <style>
+    :root{
+      --primary:#28a745;--primary-light:rgba(40,167,69,.12);
+      --danger:#dc3545;--warn:#ffc107;--dark:#1a1a1a;
+      --gray:#6c757d;--light-bg:#f4f6f9;--white:#fff;
+      --radius:16px;--shadow:0 6px 24px rgba(0,0,0,.08);
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body,html{width:100%;height:100%;font-family:'Poppins',sans-serif;background:#fff;overflow:hidden;}
+    .screen{display:none;width:100%;height:100vh;position:absolute;top:0;left:0;
+            flex-direction:column;align-items:center;justify-content:center;}
+    .active{display:flex!important;}
 
-    <style>
-        :root { --neon: #00f2ff; --glass: rgba(255, 255, 255, 0.07); --border: rgba(255, 255, 255, 0.1); }
-        * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
-        body { background: #050608; color: white; min-height: 100vh; overflow-x: hidden; }
-        
-        .bg-mesh { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; 
-            background: radial-gradient(circle at 15% 15%, rgba(0, 242, 255, 0.1), transparent 45%),
-                        radial-gradient(circle at 85% 85%, rgba(0, 114, 255, 0.1), transparent 45%);
-        }
+    /* ── SPLASH ── */
+    #splash-screen{background:linear-gradient(135deg,#fff 0%,#e8f5e9 100%);}
+    .brand-wrap{text-align:center;}
+    .brand-name{display:flex;justify-content:center;font-size:5rem;font-weight:900;
+                font-family:'Montserrat',sans-serif;color:var(--dark);}
+    .letter{display:inline-block;opacity:0;}
+    .l-T{animation:fromLeft .7s forwards .6s}
+    .l-H{animation:fromBot .7s forwards .8s}
+    .l-O{animation:zoomIn  .7s forwards 1s}
+    .l-D{animation:fadeIn  .7s forwards 1.2s}
+    .l-U{animation:fromRight .7s forwards 1.4s}
+    @keyframes fromLeft {from{opacity:0;transform:translateX(-70px)}to{opacity:1;transform:translateX(0)}}
+    @keyframes fromBot  {from{opacity:0;transform:translateY(60px)} to{opacity:1;transform:translateY(0)}}
+    @keyframes zoomIn   {from{opacity:0;transform:scale(.2)}        to{opacity:1;transform:scale(1)}}
+    @keyframes fadeIn   {from{opacity:0}                            to{opacity:1}}
+    @keyframes fromRight{from{opacity:0;transform:translateX(70px)} to{opacity:1;transform:translateX(0)}}
+    .brand-green{color:var(--primary)!important;}
+    .tagline{margin-top:14px;font-size:.95rem;color:#888;letter-spacing:.5px;opacity:0;
+              animation:fadeIn .8s forwards 2.4s;}
+    .splash-dot{width:8px;height:8px;border-radius:50%;background:var(--primary);
+                display:inline-block;margin:0 3px;opacity:0;}
+    .dot1{animation:fadeIn .4s forwards 2s}
+    .dot2{animation:fadeIn .4s forwards 2.2s}
+    .dot3{animation:fadeIn .4s forwards 2.4s}
 
-        #admin-bar { display: none; background: #1e272e; padding: 12px; position: sticky; top: 0; z-index: 2000; border-bottom: 2px solid #2ecc71; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        .admin-btn { background: #2ecc71; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; margin: 0 5px; font-size: 0.8rem; }
-        
-        .edit-panel { background: rgba(46, 204, 113, 0.1); border: 1px dashed #2ecc71; padding: 25px; border-radius: 15px; margin-top: 25px; display: none; backdrop-filter: blur(10px); }
-        .edit-input { width: 100%; padding: 12px; margin: 10px 0; background: rgba(0,0,0,0.6); border: 1px solid #2ecc71; color: #fff; border-radius: 8px; outline: none; }
+    /* ── AUTH & CARDS ── */
+    #login-screen{background:linear-gradient(160deg,#e8f5e9 0%,#f4f6f9 100%);}
+    .auth-card{width:88%;max-width:400px;padding:36px 28px;background:#fff;
+               border-radius:28px;box-shadow:0 20px 60px rgba(0,0,0,.12); overflow-y: auto; max-height: 90vh;}
+    .auth-logo{font-family:'Montserrat',sans-serif;font-size:1.8rem;font-weight:900;
+               color:var(--primary);text-align:center;margin-bottom:6px;}
+    .auth-sub{text-align:center;color:var(--gray);font-size:.85rem;margin-bottom:24px;}
+    h2{font-family:'Montserrat',sans-serif;margin-bottom:20px;font-size:1.4rem;color:var(--dark);}
+    .field-group{margin-bottom:14px; width: 100%; text-align: left;}
+    .field-label{font-size:.78rem;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;display:block;}
+    .field-wrap{position:relative;}
+    .field-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:1rem;}
+    input, select{width:100%;padding:13px 13px 13px 40px;border:2px solid #eee;
+          border-radius:13px;font-family:'Poppins',sans-serif;font-size:.92rem;
+          outline:none;transition:border-color .2s,box-shadow .2s;}
+    input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-light);}
+    input.no-icon{padding-left:13px;}
+    .btn{width:100%;padding:14px;border:none;border-radius:13px;font-weight:600;
+         font-family:'Poppins',sans-serif;font-size:.97rem;cursor:pointer;
+         transition:.25s;margin-top:6px;}
+    .btn-primary{background:var(--primary);color:#fff;box-shadow:0 4px 18px rgba(40,167,69,.35);}
+    .btn-outline{background:#fff;color:var(--danger);border:2px solid var(--danger);}
+    .auth-switch{text-align:center;margin-top:18px;color:var(--gray);font-size:.87rem;}
+    .link{color:var(--primary);cursor:pointer;font-weight:600;}
 
-        .header { text-align: center; padding: 70px 20px 20px; }
-        .logo { font-family: 'Orbitron', sans-serif; font-size: 2.5rem; letter-spacing: 5px; color: var(--neon); text-shadow: 0 0 20px rgba(0,242,255,0.6); }
+    /* ── HOME ── */
+    #home-screen{justify-content:flex-start;background:var(--light-bg);padding:0;}
+    .home-body{flex:1;width:100%;overflow-y:auto;padding:16px 16px 88px;}
+    .top-bar{width:100%;background:#fff;padding:14px 18px;
+             display:flex;align-items:center;justify-content:space-between;
+             box-shadow:0 2px 12px rgba(0,0,0,.07);position:sticky;top:0;z-index:50;}
+    .top-bar-brand{font-family:'Montserrat',sans-serif;font-weight:900;
+                   font-size:1.3rem;color:var(--primary);}
+    .loc-chip{display:flex;align-items:center;gap:6px;background:var(--light-bg);
+              padding:7px 12px;border-radius:20px;font-size:.8rem;color:var(--dark);
+              font-weight:500;cursor:pointer;max-width:200px;overflow:hidden;
+              white-space:nowrap;text-overflow:ellipsis;}
 
-        .bc-box { max-width: 1000px; margin: 15px auto; padding: 15px 25px; background: var(--glass); border-radius: 15px; border: 1px solid var(--border); font-size: 0.85rem; display: flex; gap: 10px; align-items: center; }
-        .bc-link { color: var(--neon); cursor: pointer; opacity: 0.8; }
+    /* ── RIDE CARDS ── */
+    .ride-card{background:#fff;border-radius:var(--radius);padding:16px;
+                margin-bottom:12px;box-shadow:var(--shadow);
+                border-left:4px solid var(--primary);transition:.2s;}
+    .ride-route{font-weight:700;font-size:.98rem;color:var(--dark);margin-bottom:8px;}
+    .pill{background:var(--light-bg);padding:4px 10px;border-radius:20px;
+          font-size:.76rem;font-weight:600;color:var(--gray); display: inline-block; margin-right: 5px; margin-bottom: 5px;}
+    .pill.g{background:var(--primary-light);color:var(--primary);}
 
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; padding: 25px; max-width: 1100px; margin: 0 auto; }
-        .card { background: var(--glass); border: 1px solid var(--border); padding: 45px 20px; border-radius: 20px; text-align: center; cursor: pointer; position: relative; transition: 0.4s; }
-        .card:hover { border-color: var(--neon); transform: translateY(-8px); background: rgba(0, 242, 255, 0.08); }
-        .card i { font-size: 3rem; color: var(--neon); margin-bottom: 20px; filter: drop-shadow(0 0 10px var(--neon)); }
-        
-        .admin-controls { position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column; gap: 5px; }
-        .ctrl-btn { font-size: 0.7rem; padding: 4px 8px; border-radius: 4px; border: none; cursor: pointer; font-weight: bold; }
+    /* ── PROFILE ── */
+    .profile-top{text-align:center;padding:28px 0 20px;}
+    .avatar{width:80px;height:80px;border-radius:50%;background:var(--primary);
+            display:flex;align-items:center;justify-content:center;
+            font-size:2rem;font-weight:700;color:#fff;margin:0 auto 12px;}
+    .doc-card{background:#fff;border-radius:var(--radius);padding:16px;
+              margin-bottom:12px;box-shadow:var(--shadow);display:flex;
+              align-items:center;gap:12px;cursor:pointer;transition:.2s;
+              border:2px dashed #e0e0e0;}
+    .doc-card.st-verified{border:2px solid var(--primary); border-style: solid;}
+    .doc-card.st-pending{border:2px solid var(--warn); border-style: solid;}
+    .doc-card.st-rejected{border:2px solid var(--danger); border-style: solid;}
+    .doc-info{flex:1;}
+    .doc-title{font-weight:600;font-size:.93rem;color:var(--dark);}
+    .doc-sub{font-size:.78rem;color:var(--gray);}
+    .doc-badge{padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:700;text-transform:uppercase;}
+    .db-none{background:#f0f0f0;color:var(--gray);}
+    .db-pending{background:#fff3cd;color:#856404;}
+    .db-verified{background:#d1e7dd;color:#0a3622;}
+    .db-rejected{background:#f8d7da;color:#842029;}
 
-        .notes-view { display: none; max-width: 850px; margin: 30px auto; padding: 0 20px; }
-        .unit-item { background: var(--glass); border: 1px solid var(--border); margin: 12px 0; padding: 18px 25px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        .unit-item:hover { border-color: var(--neon); background: rgba(255,255,255,0.1); }
-        .unit-actions { display: flex; gap: 20px; align-items: center; font-size: 1.3rem; }
+    /* ── MODALS ── */
+    .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;
+                    background:rgba(0,0,0,.6);display:none;align-items:center;
+                    justify-content:center;z-index:9999;padding:20px;}
+    .modal-box{background:#fff;border-radius:24px;padding:24px;
+                max-width:400px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.2);
+                max-height: 90vh; overflow-y: auto;}
+    .active-modal{display:flex;}
 
-        #v2-loader, #viewer, #video-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background: #050608; flex-direction: column; }
-        .v-header { background: #111; padding: 18px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
-        iframe { width: 100%; height: 100%; border: none; }
+    /* ── BOTTOM NAV ── */
+    .bottom-nav{width:100%;height:70px;background:#fff;border-top:1px solid #eee;
+                display:flex;position:fixed;bottom:0;z-index:100;}
+    .nav-item{flex:1;display:flex;flex-direction:column;justify-content:center;
+              align-items:center;color:#ccc;cursor:pointer;font-size:.74rem;transition:color .2s;}
+    .nav-active{color:var(--primary);font-weight:600;}
 
-        #toast-container { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 10000; }
-        .toast { background: var(--neon); color: #000; padding: 12px 35px; border-radius: 50px; font-weight: bold; animation: slideUp 0.4s; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes slideUp { from { transform: translateY(100px); } }
+    /* ── TOAST ── */
+    #toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);
+            background:rgba(26,26,26,.92);color:#fff;padding:11px 22px;
+            border-radius:30px;font-size:.86rem;z-index:9998;
+            opacity:0;transition:opacity .3s;pointer-events:none;}
+    #toast.show{opacity:1;}
 
-        footer { padding: 80px; text-align: center; opacity: 0.4; font-size: 0.8rem; cursor: pointer; }
-    </style>
+    /* ── FAB ── */
+    #fab-btn{position:fixed;bottom:86px;right:18px;width:56px;height:56px;
+              border-radius:50%;background:var(--primary);color:#fff;border:none;
+              font-size:1.8rem;box-shadow:0 6px 22px rgba(40,167,69,.45);
+              cursor:pointer;z-index:200;display:none;align-items:center;justify-content:center;}
+
+    /* Admin Styles */
+    .admin-user-card{background:#fff; padding:15px; border-radius:15px; margin-bottom:15px; box-shadow:var(--shadow);}
+    .admin-detail-row{font-size: 0.85rem; margin-bottom: 5px;}
+    .admin-img-preview{width: 100%; border-radius: 10px; margin: 10px 0; border: 1px solid #ddd;}
+  </style>
 </head>
 <body>
 
-<div class="bg-mesh"></div>
-<div id="toast-container"></div>
-
-<div id="admin-bar">
-    <span style="color:#2ecc71; font-weight:bold; margin-right:15px;">🛡️ ADMIN ACTIVE</span>
-    <button class="admin-btn" onclick="addNewNode()">+ Add Category</button>
-    <button id="v2-toggle" class="admin-btn" onclick="toggleV2()">V2: OFF</button>
-    <button class="admin-btn" style="background:#e74c3c;" onclick="location.reload()">Exit</button>
-</div>
-
-<div id="v2-loader" style="justify-content:center; align-items:center;">
-    <div style="width:70px; height:70px; border:4px solid rgba(0,242,255,0.1); border-top-color:var(--neon); border-radius:50%; animation: spin 0.8s linear infinite;"></div>
-    <h2 style="margin-top:25px; font-family:'Orbitron'; color:var(--neon); letter-spacing: 2px;">EXTERNAL REDIRECT</h2>
-    <p style="margin-top:10px; opacity:0.6;">Opening in secure browser window...</p>
-</div>
-
-<div id="viewer">
-    <div class="v-header">
-        <span id="v-name" style="color:var(--neon); font-weight:bold;">Document</span>
-        <div style="display:flex; gap:12px;">
-            <button class="admin-btn" id="v-dl" style="background:#27ae60;">Download</button>
-            <button class="admin-btn" style="background:#e74c3c;" onclick="closeViewer()">Close</button>
-        </div>
+<div id="splash-screen" class="screen active">
+  <div class="brand-wrap">
+    <div class="brand-name">
+      <span class="letter l-T">T</span>
+      <span class="letter l-H">H</span>
+      <span class="letter l-O">O</span>
+      <span class="letter l-D">D</span>
+      <span class="letter l-U">U</span>
     </div>
-    <iframe id="v-frame"></iframe>
+    <p class="tagline">mee prayanam maa bhadyatha</p>
+  </div>
 </div>
 
-<div id="video-viewer">
-    <div class="v-header">
-        <span id="video-name" style="color:var(--neon); font-weight:bold;">Video Lesson</span>
-        <button class="admin-btn" style="background:#e74c3c;" onclick="closeVideo()">Close</button>
+<div id="login-screen" class="screen">
+  <div class="auth-card" id="auth-container"></div>
+</div>
+
+<div id="home-screen" class="screen">
+  <div class="top-bar">
+    <span class="top-bar-brand">THODU</span>
+    <div class="loc-chip" onclick="getMyLocation()">📍 <span id="loc-text">Locating...</span></div>
+  </div>
+  <div class="home-body" id="home-body"></div>
+  <button id="fab-btn" onclick="openAddRide()">＋</button>
+  <nav class="bottom-nav">
+    <div class="nav-item nav-active" id="nav-rides" onclick="switchTab('rides',this)"><span>🚗</span><span>Rides</span></div>
+    <div class="nav-item" id="nav-my-rides" onclick="switchTab('my-rides',this)"><span>📋</span><span>My Rides</span></div>
+    <div class="nav-item" id="nav-profile" onclick="switchTab('profile',this)"><span>👤</span><span>Profile</span></div>
+    <div class="nav-item" id="nav-admin" style="display:none;" onclick="switchTab('admin',this)"><span>🛡️</span><span>Admin</span></div>
+  </nav>
+</div>
+
+<div class="modal-overlay" id="doc-modal">
+  <div class="modal-box">
+    <h2 id="modal-title">Verification</h2>
+    <div id="modal-form-content"></div>
+    <div class="field-group">
+      <label class="field-label">Upload Image Photo</label>
+      <input type="file" id="doc-file-input" accept="image/*" class="no-icon">
     </div>
-    <iframe id="video-frame" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
-</div>
-
-<div class="header">
-    <h1 class="logo">STUDY HUB</h1>
-    <p style="opacity:0.5; font-size:0.75rem; letter-spacing:4px; margin-top:8px; text-transform:uppercase;">Visualize Live Updated Notes</p>
-</div>
-
-<div class="bc-box" id="bc"><span class="bc-link" onclick="resetPath()">Home</span></div>
-<div class="grid" id="mainGrid"></div>
-
-<div class="notes-view" id="notesArea">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
-        <h2 id="viewTitle" style="color:var(--neon); font-family:'Orbitron';">Subject Details</h2>
-        <button class="admin-btn" style="background:rgba(255,255,255,0.1);" onclick="goBack()">← Back</button>
+    <div style="display:flex; gap:10px; margin-top:15px;">
+      <button class="btn btn-outline" style="margin-top:0" onclick="closeDocModal()">Cancel</button>
+      <button class="btn btn-primary" style="margin-top:0" id="doc-submit-btn">Submit</button>
     </div>
-    <div id="unitList"></div>
-
-    <div class="edit-panel" id="editPanel">
-        <h3 style="color:#2ecc71; margin-bottom:15px;">Edit Unit Data</h3>
-        <input type="text" id="editName" class="edit-input" placeholder="Unit Name">
-        <input type="text" id="editPdf" class="edit-input" placeholder="PDF Link">
-        <input type="text" id="editVid" class="edit-input" placeholder="YouTube Link">
-        <div style="display:flex; gap:10px;">
-            <button class="admin-btn" style="flex:2;" onclick="saveEdit()">Save Changes</button>
-            <button class="admin-btn" style="background:#e74c3c; flex:1;" onclick="deleteUnit()">Delete Unit</button>
-        </div>
-    </div>
+  </div>
 </div>
 
-<footer id="adminTrigger">© 2026 STUDY HUB </footer>
+<div class="modal-overlay" id="view-modal">
+  <div class="modal-box" style="text-align:center;">
+    <h2 id="view-modal-title">Document Details</h2>
+    <div id="view-modal-content" style="text-align:left; margin-bottom:15px; font-size:0.9rem;"></div>
+    <img id="view-modal-img" style="width:100%; border-radius:10px; margin-bottom:15px;">
+    <button class="btn btn-primary" onclick="closeViewModal()">Close</button>
+  </div>
+</div>
+
+<div id="toast"></div>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, sendEmailVerification, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, onSnapshot, addDoc, serverTimestamp, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyDt8SROwFORTZFqVe5xLc3nlDukbOAgdzs",
-        authDomain: "useasnotes.firebaseapp.com",
-        databaseURL: "https://useasnotes-default-rtdb.firebaseio.com",
-        projectId: "useasnotes",
-        storageBucket: "useasnotes.firebasestorage.app",
-        messagingSenderId: "1066601715098",
-        appId: "1:1066601715098:web:3b424d6e097d9112d09623",
-        measurementId: "G-5NMMTRGSR6"
-    };
+const firebaseConfig = {
+  apiKey: "AIzaSyA1QeDf1E_Kb1ZC15ahw1dY8hk3J0gXopY",
+  authDomain: "thodu-65cb9.firebaseapp.com",
+  projectId: "thodu-65cb9",
+  storageBucket: "thodu-65cb9.firebasestorage.app",
+  messagingSenderId: "1070229943496",
+  appId: "1:1070229943496:web:038e2e74c463e7acefa1fd"
+};
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const docRef = doc(db, "portal", "final_v4_data");
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
+const ADMIN_EMAIL = "admin@thodu.com";
 
-    let core = {};
-    let path = [];
-    let isAdmin = false;
-    let v2 = false;
-    let selectedUnitIdx = null;
+let currentUser = null;
+let userData = null;
+let activeTab = 'rides';
 
-    onSnapshot(docRef, (s) => {
-        if(s.exists()) {
-            core = s.data();
-            v2 = core._config?.v2 || false;
-            updateV2UI();
-            render();
-        }
+// --- UTILS ---
+function showToast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000);}
+function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+function closeDocModal(){ document.getElementById('doc-modal').classList.remove('active-modal'); }
+function closeViewModal(){ document.getElementById('view-modal').classList.remove('active-modal'); }
+
+// --- AUTH ---
+window.setAuthState = (state) => {
+  const c = document.getElementById('auth-container');
+  if(state === 'login'){
+    c.innerHTML = `
+      <div class="auth-logo">THODU</div>
+      <h2>Login</h2>
+      <input type="email" id="le" placeholder="Email" style="margin-bottom:10px">
+      <input type="password" id="lp" placeholder="Password" style="margin-bottom:15px">
+      <button class="btn btn-primary" onclick="doLogin()">Login</button>
+      <p class="auth-switch">New? <span class="link" onclick="setAuthState('signup')">Sign Up</span></p>
+    `;
+  } else {
+    c.innerHTML = `
+      <div class="auth-logo">THODU</div>
+      <h2>Sign Up</h2>
+      <input type="text" id="sn" placeholder="Full Name" style="margin-bottom:10px">
+      <input type="email" id="se" placeholder="Email" style="margin-bottom:10px">
+      <input type="password" id="sp" placeholder="Password (min 6)" style="margin-bottom:15px">
+      <button class="btn btn-primary" onclick="doSignup()">Create Account</button>
+      <p class="auth-switch">Member? <span class="link" onclick="setAuthState('login')">Login</span></p>
+    `;
+  }
+};
+
+window.doLogin = async () => {
+  try {
+    const e = document.getElementById('le').value;
+    const p = document.getElementById('lp').value;
+    await signInWithEmailAndPassword(auth, e, p);
+  } catch(e){ showToast(e.message); }
+};
+
+window.doSignup = async () => {
+  try {
+    const n = document.getElementById('sn').value;
+    const e = document.getElementById('se').value;
+    const p = document.getElementById('sp').value;
+    const cred = await createUserWithEmailAndPassword(auth, e, p);
+    await updateProfile(cred.user, { displayName: n });
+    await setDoc(doc(db, 'users', cred.user.uid), { name:n, email:e, licenseStatus:'none', aadhaarStatus:'none' });
+    showToast("Account Created!");
+  } catch(e){ showToast(e.message); }
+};
+
+window.handleLogout = () => signOut(auth);
+
+// --- TAB LOGIC ---
+window.switchTab = (tab, el) => {
+  activeTab = tab;
+  document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('nav-active'));
+  el.classList.add('nav-active');
+  document.getElementById('fab-btn').style.display = (tab === 'rides' ? 'flex' : 'none');
+  renderCurrentTab();
+};
+
+function renderCurrentTab(){
+  if(activeTab === 'rides') renderRides();
+  if(activeTab === 'profile') renderProfile();
+  if(activeTab === 'admin') renderAdmin();
+  if(activeTab === 'my-rides') renderMyRides();
+}
+
+// --- PROFILE & VERIFICATION ---
+function renderProfile(){
+  const body = document.getElementById('home-body');
+  const ud = userData || {};
+  body.innerHTML = `
+    <div class="profile-top">
+      <div class="avatar">${(currentUser.displayName || 'U')[0]}</div>
+      <h2>${currentUser.displayName}</h2>
+      <p>${currentUser.email}</p>
+    </div>
+    <div class="doc-card st-${ud.licenseStatus}" onclick="handleDocClick('license')">
+      <div class="doc-info">
+        <div class="doc-title">Driving License</div>
+        <div class="doc-sub">Status: ${ud.licenseStatus || 'None'}</div>
+      </div>
+      <span class="doc-badge db-${ud.licenseStatus}">${ud.licenseStatus === 'none' ? 'Upload' : ud.licenseStatus}</span>
+    </div>
+    <div class="doc-card st-${ud.aadhaarStatus}" onclick="handleDocClick('aadhaar')">
+      <div class="doc-info">
+        <div class="doc-title">Aadhaar Card</div>
+        <div class="doc-sub">Status: ${ud.aadhaarStatus || 'None'}</div>
+      </div>
+      <span class="doc-badge db-${ud.aadhaarStatus}">${ud.aadhaarStatus === 'none' ? 'Upload' : ud.aadhaarStatus}</span>
+    </div>
+    <button class="btn btn-outline" onclick="handleLogout()">Logout</button>
+  `;
+}
+
+window.handleDocClick = (type) => {
+  const status = type === 'license' ? userData.licenseStatus : userData.aadhaarStatus;
+  if(status === 'verified'){
+    showVerifiedOptions(type);
+  } else {
+    openDocModal(type);
+  }
+};
+
+function showVerifiedOptions(type){
+  const ud = userData;
+  const content = type === 'license' ? 
+    `DL No: ${ud.dlNumber}<br>Type: ${ud.dlType}<br>DOB: ${ud.dlDob}` :
+    `Aadhaar No: ${ud.aadhaarNumber}<br>DOB: ${ud.aadhaarDob}`;
+  
+  const imgUrl = type === 'license' ? ud.licenseUrl : ud.aadhaarUrl;
+
+  const viewModal = document.getElementById('view-modal');
+  document.getElementById('view-modal-content').innerHTML = `
+    <div style="margin-bottom:15px;">${content}</div>
+    <button class="btn btn-outline" onclick="openDocModal('${type}'); closeViewModal();">Edit Details</button>
+  `;
+  document.getElementById('view-modal-img').src = imgUrl;
+  viewModal.classList.add('active-modal');
+}
+
+window.openDocModal = (type) => {
+  const modal = document.getElementById('doc-modal');
+  const content = document.getElementById('modal-form-content');
+  document.getElementById('modal-title').textContent = type === 'license' ? "License Details" : "Aadhaar Details";
+  
+  if(type === 'license'){
+    content.innerHTML = `
+      <input type="text" id="form-name" placeholder="Name as in License" style="margin-bottom:10px">
+      <input type="text" id="form-id" placeholder="DL Number" style="margin-bottom:10px">
+      <input type="date" id="form-dob" style="margin-bottom:10px">
+      <select id="form-extra" style="margin-bottom:10px">
+        <option value="Bike">Bike</option>
+        <option value="Car">Car</option>
+        <option value="Both">Both (Bike & Car)</option>
+      </select>
+    `;
+  } else {
+    content.innerHTML = `
+      <input type="text" id="form-name" placeholder="Name as per Aadhaar" style="margin-bottom:10px">
+      <input type="number" id="form-id" placeholder="12 Digit Aadhaar Number" style="margin-bottom:10px">
+      <input type="date" id="form-dob" style="margin-bottom:10px">
+      <input type="tel" id="form-extra" placeholder="Phone as per Aadhaar" style="margin-bottom:10px">
+    `;
+  }
+  
+  document.getElementById('doc-submit-btn').onclick = () => submitDocDetails(type);
+  modal.classList.add('active-modal');
+};
+
+async function submitDocDetails(type){
+  const name = document.getElementById('form-name').value;
+  const idNum = document.getElementById('form-id').value;
+  const dob = document.getElementById('form-dob').value;
+  const extra = document.getElementById('form-extra').value;
+  const file = document.getElementById('doc-file-input').files[0];
+
+  if(!name || !idNum || !dob || !file) return showToast("Fill all fields and pick a photo");
+
+  const btn = document.getElementById('doc-submit-btn');
+  btn.disabled = true; btn.textContent = "Uploading...";
+
+  try {
+    const storagePath = `docs/${currentUser.uid}/${type}`;
+    const imgRef = sRef(storage, storagePath);
+    await uploadBytes(imgRef, file);
+    const url = await getDownloadURL(imgRef);
+
+    const updateData = {};
+    if(type === 'license'){
+      updateData.licenseStatus = 'pending';
+      updateData.licenseUrl = url;
+      updateData.dlName = name;
+      updateData.dlNumber = idNum;
+      updateData.dlDob = dob;
+      updateData.dlType = extra;
+    } else {
+      updateData.aadhaarStatus = 'pending';
+      updateData.aadhaarUrl = url;
+      updateData.aadhaarName = name;
+      updateData.aadhaarNumber = idNum;
+      updateData.aadhaarDob = dob;
+      updateData.aadhaarPhone = extra;
+    }
+
+    await updateDoc(doc(db, 'users', currentUser.uid), updateData);
+    showToast("Submitted for verification");
+    closeDocModal();
+  } catch(e){ showToast(e.message); }
+  btn.disabled = false; btn.textContent = "Submit";
+}
+
+// --- ADMIN PANEL ---
+async function renderAdmin(){
+  const body = document.getElementById('home-body');
+  body.innerHTML = "<h3>Pending Verifications</h3>";
+  const q = query(collection(db, 'users'));
+  const snap = await getDocs(q);
+  
+  snap.forEach(uDoc => {
+    const u = uDoc.data();
+    if(u.licenseStatus === 'pending' || u.aadhaarStatus === 'pending'){
+      const card = document.createElement('div');
+      card.className = 'admin-user-card';
+      let html = `<strong>User: ${u.name}</strong><br>`;
+      
+      if(u.licenseStatus === 'pending'){
+        html += `
+          <div style="border-top:1px solid #eee; margin-top:10px; padding-top:10px">
+            <p><strong>LICENSE REQUEST</strong></p>
+            <p class="admin-detail-row">Name: ${u.dlName}</p>
+            <p class="admin-detail-row">DL No: ${u.dlNumber}</p>
+            <p class="admin-detail-row">DOB: ${u.dlDob} | Type: ${u.dlType}</p>
+            <img src="${u.licenseUrl}" class="admin-img-preview">
+            <button class="btn btn-primary" onclick="adminAction('${uDoc.id}', 'license', 'verified')">Approve</button>
+            <button class="btn btn-outline" onclick="adminAction('${uDoc.id}', 'license', 'rejected')">Reject</button>
+          </div>
+        `;
+      }
+      if(u.aadhaarStatus === 'pending'){
+        html += `
+          <div style="border-top:1px solid #eee; margin-top:10px; padding-top:10px">
+            <p><strong>AADHAAR REQUEST</strong></p>
+            <p class="admin-detail-row">Name: ${u.aadhaarName}</p>
+            <p class="admin-detail-row">No: ${u.aadhaarNumber}</p>
+            <p class="admin-detail-row">DOB: ${u.aadhaarDob} | Phone: ${u.aadhaarPhone}</p>
+            <img src="${u.aadhaarUrl}" class="admin-img-preview">
+            <button class="btn btn-primary" onclick="adminAction('${uDoc.id}', 'aadhaar', 'verified')">Approve</button>
+            <button class="btn btn-outline" onclick="adminAction('${uDoc.id}', 'aadhaar', 'rejected')">Reject</button>
+          </div>
+        `;
+      }
+      card.innerHTML = html;
+      body.appendChild(card);
+    }
+  });
+}
+
+window.adminAction = async (uid, type, status) => {
+  const field = type === 'license' ? 'licenseStatus' : 'aadhaarStatus';
+  await updateDoc(doc(db, 'users', uid), { [field]: status });
+  showToast(`Document ${status}`);
+  renderAdmin();
+};
+
+// --- RIDES LOGIC (Placeholder for your existing logic) ---
+function renderRides(){ 
+  document.getElementById('home-body').innerHTML = '<div class="empty-state">No rides available.</div>';
+}
+function renderMyRides(){ 
+  document.getElementById('home-body').innerHTML = '<div class="empty-state">No history yet.</div>';
+}
+
+// --- BOOTSTRAP ---
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    currentUser = user;
+    if(user.email === ADMIN_EMAIL) document.getElementById('nav-admin').style.display = 'flex';
+    onSnapshot(doc(db, 'users', user.uid), (d) => {
+      userData = d.data();
+      renderCurrentTab();
     });
+    showScreen('home-screen');
+  } else {
+    setAuthState('login');
+    showScreen('login-screen');
+  }
+  setTimeout(() => document.getElementById('splash-screen').style.display='none', 4500);
+});
 
-    function render() {
-        const grid = document.getElementById('mainGrid');
-        const notes = document.getElementById('notesArea');
-        const bc = document.getElementById('bc');
-        grid.innerHTML = ''; notes.style.display = 'none'; grid.style.display = 'grid';
-        bc.innerHTML = `<span class="bc-link" onclick="resetPath()">Home</span>`;
-        path.forEach((p, i) => { bc.innerHTML += ` > <span class="bc-link" onclick="jumpTo(${i})">${p}</span>`; });
-
-        let target = core;
-        path.forEach(p => target = target[p]);
-        if(target?._type === 'subject') { renderUnits(target); return; }
-
-        Object.keys(target || {}).filter(k => !k.startsWith('_')).sort().forEach(k => {
-            grid.innerHTML += `<div class="card" onclick="moveIn('${k}')">
-                <i class="fa-solid ${path.length===0?'fa-graduation-cap':path.length===1?'fa-users-rectangle':'fa-book-open'}"></i>
-                <h3>${k}</h3>
-                ${isAdmin ? `<div class="admin-controls"><button class="ctrl-btn" style="background:#f39c12; color:white;" onclick="event.stopPropagation(); renameNode('${k}')">Edit</button><button class="ctrl-btn" style="background:#e74c3c; color:white;" onclick="event.stopPropagation(); deleteNode('${k}')">Del</button></div>` : ''}
-            </div>`;
-        });
-    }
-
-    function renderUnits(data) {
-        document.getElementById('mainGrid').style.display = 'none';
-        document.getElementById('notesArea').style.display = 'block';
-        document.getElementById('viewTitle').innerText = path[path.length - 1];
-        const list = document.getElementById('unitList');
-        list.innerHTML = '';
-
-        (data.units || []).forEach((u, i) => {
-            const hasVid = data.vids && data.vids[i] && data.vids[i].trim() !== "";
-            list.innerHTML += `
-                <div class="unit-item" onclick="handleUnitClick(${i})">
-                    <div style="display:flex; align-items:center; gap:15px;">
-                        <i class="fa-solid fa-file-pdf" style="color:#ff5252;"></i>
-                        <span>${u}</span>
-                    </div>
-                    <div class="unit-actions">
-                        <i class="fa-solid fa-share-nodes" style="color:var(--neon);" onclick="event.stopPropagation(); shareUnit(${i})"></i>
-                        ${hasVid ? `<i class="fa-brands fa-youtube" style="color:#ff0000;" onclick="event.stopPropagation(); playVideo(${i})"></i>` : ''}
-                    </div>
-                </div>`;
-        });
-        if(isAdmin) list.innerHTML += `<button class="admin-btn" style="width:100%; margin-top:20px;" onclick="addUnitPrompt()">+ Add Unit</button>`;
-    }
-
-    window.handleUnitClick = (idx) => {
-        let target = core; path.forEach(p => target = target[p]);
-        if(isAdmin) {
-            selectedUnitIdx = idx;
-            document.getElementById('editPanel').style.display = 'block';
-            document.getElementById('editName').value = target.units[idx];
-            document.getElementById('editPdf').value = target.links[idx];
-            document.getElementById('editVid').value = target.vids ? target.vids[idx] : "";
-            document.getElementById('editPanel').scrollIntoView({ behavior: 'smooth' });
-        } else {
-            const url = target.links[idx];
-            const name = target.units[idx];
-            
-            if(v2) {
-                // FORCE EXTERNAL OPENING
-                document.getElementById('v2-loader').style.display = 'flex';
-                setTimeout(() => {
-                    document.getElementById('v2-loader').style.display = 'none';
-                    window.open(url, '_blank');
-                }, 1000);
-            } else {
-                // INTERNAL VIEWING
-                launchViewer(url, name);
-            }
-        }
-    };
-
-    function launchViewer(url, name) {
-        let embed = url;
-        if(url.includes('drive.google.com')) {
-            embed = url.replace('/view', '/preview').split('?')[0];
-        }
-        document.getElementById('v-name').innerText = name;
-        document.getElementById('v-frame').src = embed;
-        document.getElementById('v-dl').onclick = () => window.open(url, '_blank');
-        document.getElementById('viewer').style.display = 'flex';
-    }
-
-    window.toggleV2 = async () => {
-        v2 = !v2;
-        if(!core._config) core._config = {};
-        core._config.v2 = v2;
-        await setDoc(docRef, core);
-        showToast(v2 ? "V2 ON: Opening in New Tabs" : "V2 OFF: Opening in Hub Viewer");
-    };
-
-    function updateV2UI() {
-        const btn = document.getElementById('v2-toggle');
-        btn.innerText = v2 ? "V2: ON" : "V2: OFF";
-        btn.style.background = v2 ? "var(--neon)" : "#f39c12";
-        btn.style.color = v2 ? "black" : "white";
-    }
-
-    window.shareUnit = (idx) => {
-        const shareUrl = `${window.location.origin}${window.location.pathname}?path=${encodeURIComponent(path.join(','))}&unit=${idx}`;
-        navigator.clipboard.writeText(shareUrl);
-        showToast("Link Copied!");
-    };
-
-    window.playVideo = (idx) => {
-        let target = core; path.forEach(p => target = target[p]);
-        let url = target.vids[idx];
-        let vidId = "";
-        try {
-            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-            const match = url.match(regExp);
-            vidId = (match && match[2].length == 11) ? match[2] : "";
-        } catch(e) {}
-        if(!vidId) { showToast("Invalid Video Link"); return; }
-        document.getElementById('video-frame').src = `https://www.youtube.com/embed/${vidId}?autoplay=1&rel=0&enablejsapi=1`;
-        document.getElementById('video-viewer').style.display = 'flex';
-    };
-
-    window.saveEdit = async () => {
-        let target = core; path.forEach(p => target = target[p]);
-        target.units[selectedUnitIdx] = document.getElementById('editName').value;
-        target.links[selectedUnitIdx] = document.getElementById('editPdf').value;
-        if(!target.vids) target.vids = [];
-        target.vids[selectedUnitIdx] = document.getElementById('editVid').value;
-        await setDoc(docRef, core);
-        document.getElementById('editPanel').style.display='none';
-        showToast("Changes Saved!");
-    };
-
-    window.renameNode = async (oldKey) => {
-        let newKey = prompt("Enter New Name:", oldKey);
-        if(!newKey || newKey === oldKey) return;
-        let ref = core; path.forEach(p => ref = ref[p]);
-        ref[newKey] = ref[oldKey];
-        delete ref[oldKey];
-        await setDoc(docRef, core);
-    };
-
-    window.addNewNode = async () => {
-        const n = prompt("Name:"); if(!n) return;
-        let ref = core; path.forEach(p => ref = ref[p]);
-        if(path.length === 2) ref[n] = { _type:'subject', units:[], links:[], vids:[] };
-        else ref[n] = {};
-        await setDoc(docRef, core);
-    };
-
-    window.addUnitPrompt = async () => {
-        let ref = core; path.forEach(p => ref = ref[p]);
-        ref.units.push("New Unit"); ref.links.push("#"); if(!ref.vids) ref.vids=[]; ref.vids.push("");
-        await setDoc(docRef, core);
-    };
-
-    window.deleteNode = async (k) => { if(confirm("Delete?")) { let ref = core; path.forEach(p => ref = ref[p]); delete ref[k]; await setDoc(docRef, core); }};
-    window.deleteUnit = async () => { if(confirm("Delete?")) { let ref = core; path.forEach(p => ref = ref[p]); ref.units.splice(selectedUnitIdx, 1); ref.links.splice(selectedUnitIdx, 1); ref.vids.splice(selectedUnitIdx,1); await setDoc(docRef, core); document.getElementById('editPanel').style.display='none'; }};
-
-    window.moveIn = (k) => { path.push(k); render(); };
-    window.goBack = () => { path.pop(); render(); };
-    window.resetPath = () => { path = []; render(); };
-    window.jumpTo = (idx) => { path = path.slice(0, idx+1); render(); };
-    window.closeViewer = () => { document.getElementById('viewer').style.display='none'; document.getElementById('v-frame').src=''; };
-    window.closeVideo = () => { document.getElementById('video-viewer').style.display='none'; document.getElementById('video-frame').src=''; };
-
-    let fCount = 0;
-    document.getElementById('adminTrigger').onclick = () => {
-        if(++fCount === 5) {
-            if(prompt("Pass:") === "useas77") { isAdmin = true; document.getElementById('admin-bar').style.display='block'; render(); }
-            fCount = 0;
-        }
-    };
-
-    window.showToast = (m) => {
-        const t = document.createElement('div'); t.className='toast'; t.innerText=m;
-        document.getElementById('toast-container').appendChild(t);
-        setTimeout(() => t.remove(), 3000);
-    };
 </script>
 </body>
 </html>
