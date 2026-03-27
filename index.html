@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Thodu – Verified Journey</title>
+  <title>Thodu – Real-time Journey</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <style>
@@ -35,28 +35,30 @@
     @keyframes zoomIn   {from{opacity:0;transform:scale(.2)}        to{opacity:1;transform:scale(1)}}
     @keyframes fadeIn   {from{opacity:0}                            to{opacity:1}}
     @keyframes fromRight{from{opacity:0;transform:translateX(70px)} to{opacity:1;transform:translateX(0)}}
-    .brand-green{color:var(--primary)!important;}
+    .brand-green{color:var(--primary)!important;transition:color .5s;}
     .tagline{margin-top:14px;font-size:.95rem;color:#888;letter-spacing:.5px;opacity:0;
-              animation:fadeIn .8s forwards 2.4s;}
+             animation:fadeIn .8s forwards 2.4s;}
     .splash-dot{width:8px;height:8px;border-radius:50%;background:var(--primary);
                 display:inline-block;margin:0 3px;opacity:0;}
     .dot1{animation:fadeIn .4s forwards 2s}
     .dot2{animation:fadeIn .4s forwards 2.2s}
     .dot3{animation:fadeIn .4s forwards 2.4s}
 
-    /* ── AUTH & CARDS ── */
+    /* ── AUTH ── */
     #login-screen{background:linear-gradient(160deg,#e8f5e9 0%,#f4f6f9 100%);}
     .auth-card{width:88%;max-width:400px;padding:36px 28px;background:#fff;
-               border-radius:28px;box-shadow:0 20px 60px rgba(0,0,0,.12); overflow-y: auto; max-height: 90vh;}
+               border-radius:28px;box-shadow:0 20px 60px rgba(0,0,0,.12);}
     .auth-logo{font-family:'Montserrat',sans-serif;font-size:1.8rem;font-weight:900;
                color:var(--primary);text-align:center;margin-bottom:6px;}
     .auth-sub{text-align:center;color:var(--gray);font-size:.85rem;margin-bottom:24px;}
-    h2{font-family:'Montserrat',sans-serif;margin-bottom:20px;font-size:1.4rem;color:var(--dark);}
-    .field-group{margin-bottom:14px; width: 100%; text-align: left;}
-    .field-label{font-size:.78rem;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;display:block;}
+    .auth-card h2{font-family:'Montserrat',sans-serif;margin-bottom:20px;
+                  font-size:1.4rem;color:var(--dark);}
+    .field-group{margin-bottom:14px;}
+    .field-label{font-size:.78rem;font-weight:600;color:var(--gray);
+                  text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;display:block;}
     .field-wrap{position:relative;}
     .field-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:1rem;}
-    input, select{width:100%;padding:13px 13px 13px 40px;border:2px solid #eee;
+    input{width:100%;padding:13px 13px 13px 40px;border:2px solid #eee;
           border-radius:13px;font-family:'Poppins',sans-serif;font-size:.92rem;
           outline:none;transition:border-color .2s,box-shadow .2s;}
     input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-light);}
@@ -65,9 +67,12 @@
          font-family:'Poppins',sans-serif;font-size:.97rem;cursor:pointer;
          transition:.25s;margin-top:6px;}
     .btn-primary{background:var(--primary);color:#fff;box-shadow:0 4px 18px rgba(40,167,69,.35);}
+    .btn-primary:hover{background:#218838;transform:translateY(-1px);}
+    .btn-primary:disabled{background:#aaa;box-shadow:none;cursor:not-allowed;transform:none;}
     .btn-outline{background:#fff;color:var(--danger);border:2px solid var(--danger);}
     .auth-switch{text-align:center;margin-top:18px;color:var(--gray);font-size:.87rem;}
     .link{color:var(--primary);cursor:pointer;font-weight:600;}
+    .link:hover{text-decoration:underline;}
 
     /* ── HOME ── */
     #home-screen{justify-content:flex-start;background:var(--light-bg);padding:0;}
@@ -76,75 +81,154 @@
              display:flex;align-items:center;justify-content:space-between;
              box-shadow:0 2px 12px rgba(0,0,0,.07);position:sticky;top:0;z-index:50;}
     .top-bar-brand{font-family:'Montserrat',sans-serif;font-weight:900;
-                   font-size:1.3rem;color:var(--primary);}
+                    font-size:1.3rem;color:var(--primary);}
     .loc-chip{display:flex;align-items:center;gap:6px;background:var(--light-bg);
               padding:7px 12px;border-radius:20px;font-size:.8rem;color:var(--dark);
               font-weight:500;cursor:pointer;max-width:200px;overflow:hidden;
               white-space:nowrap;text-overflow:ellipsis;}
 
-    /* ── RIDE CARDS ── */
+    /* search */
+    .search-bar{background:#fff;border-radius:14px;padding:10px 14px;
+                display:flex;align-items:center;gap:8px;box-shadow:var(--shadow);
+                margin-bottom:16px;border:2px solid #eee;}
+    .search-bar input{border:none;box-shadow:none;padding:0;font-size:.9rem;
+                      background:transparent;flex:1;}
+    .search-bar input:focus{border:none;box-shadow:none;}
+
+    /* section */
+    .sec-header{display:flex;align-items:center;justify-content:space-between;
+                margin-bottom:12px;}
+    .sec-title{font-family:'Montserrat',sans-serif;font-size:1.15rem;
+                font-weight:700;color:var(--dark);}
+    .sec-count{background:var(--primary-light);color:var(--primary);
+                padding:3px 10px;border-radius:20px;font-size:.78rem;font-weight:700;}
+
+    /* ride card */
     .ride-card{background:#fff;border-radius:var(--radius);padding:16px;
                 margin-bottom:12px;box-shadow:var(--shadow);
-                border-left:4px solid var(--primary);transition:.2s;}
-    .ride-route{font-weight:700;font-size:.98rem;color:var(--dark);margin-bottom:8px;}
+                border-left:4px solid var(--primary);transition:.2s;cursor:pointer;}
+    .ride-card:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,0,0,.1);}
+    .ride-route{font-weight:700;font-size:.98rem;color:var(--dark);margin-bottom:8px;
+                display:flex;align-items:center;gap:6px;}
+    .ride-arrow{color:var(--primary);font-weight:900;}
+    .ride-meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
     .pill{background:var(--light-bg);padding:4px 10px;border-radius:20px;
-          font-size:.76rem;font-weight:600;color:var(--gray); display: inline-block; margin-right: 5px; margin-bottom: 5px;}
+          font-size:.76rem;font-weight:600;color:var(--gray);}
     .pill.g{background:var(--primary-light);color:var(--primary);}
+    .pill.b{background:#e8f4fd;color:#0d6efd;}
+    .pill.y{background:#fff3cd;color:#856404;}
+    .ride-footer{display:flex;align-items:center;justify-content:space-between;}
+    .price-tag{font-size:1.1rem;font-weight:700;color:var(--primary);}
+    .book-btn{padding:8px 18px;background:var(--primary);color:#fff;border:none;
+              border-radius:10px;font-family:'Poppins',sans-serif;font-weight:600;
+              font-size:.82rem;cursor:pointer;transition:.2s;}
+    .book-btn:hover{background:#218838;}
+    .book-btn:disabled{background:#ccc;cursor:not-allowed;}
 
-    /* ── PROFILE ── */
+    /* profile */
     .profile-top{text-align:center;padding:28px 0 20px;}
     .avatar{width:80px;height:80px;border-radius:50%;background:var(--primary);
             display:flex;align-items:center;justify-content:center;
-            font-size:2rem;font-weight:700;color:#fff;margin:0 auto 12px;}
+            font-size:2rem;font-weight:700;color:#fff;margin:0 auto 12px;
+            box-shadow:0 4px 16px rgba(40,167,69,.35);}
+    .p-name{font-size:1.25rem;font-weight:700;color:var(--dark);}
+    .p-email{color:var(--gray);font-size:.83rem;margin-top:3px;}
+    .verified-badge{display:inline-flex;align-items:center;gap:5px;
+                    background:var(--primary-light);color:var(--primary);
+                    padding:5px 14px;border-radius:20px;font-size:.8rem;
+                    font-weight:700;margin-top:10px;}
+    .doc-section-label{font-size:.78rem;font-weight:700;color:var(--gray);
+                       text-transform:uppercase;letter-spacing:.5px;
+                       margin-bottom:10px;margin-top:4px;}
     .doc-card{background:#fff;border-radius:var(--radius);padding:16px;
               margin-bottom:12px;box-shadow:var(--shadow);display:flex;
               align-items:center;gap:12px;cursor:pointer;transition:.2s;
               border:2px dashed #e0e0e0;}
-    .doc-card.st-verified{border:2px solid var(--primary); border-style: solid;}
-    .doc-card.st-pending{border:2px solid var(--warn); border-style: solid;}
-    .doc-card.st-rejected{border:2px solid var(--danger); border-style: solid;}
-    .doc-info{flex:1;}
+    .doc-card:hover{border-color:var(--primary);transform:translateY(-1px);}
+    .doc-card.st-pending{border:2px solid var(--warn);}
+    .doc-card.st-verified{border:2px solid var(--primary);border-style:solid;}
+    .doc-card.st-rejected{border:2px solid var(--danger);}
+    .doc-icon-box{width:46px;height:46px;border-radius:12px;background:var(--light-bg);
+                  display:flex;align-items:center;justify-content:center;
+                  font-size:1.4rem;flex-shrink:0;}
+    .doc-info{flex:1;min-width:0;}
     .doc-title{font-weight:600;font-size:.93rem;color:var(--dark);}
-    .doc-sub{font-size:.78rem;color:var(--gray);}
-    .doc-badge{padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:700;text-transform:uppercase;}
+    .doc-sub{font-size:.78rem;color:var(--gray);margin-top:2px;}
+    .doc-badge{padding:3px 10px;border-radius:20px;font-size:.7rem;
+               font-weight:700;text-transform:uppercase;white-space:nowrap;flex-shrink:0;}
     .db-none{background:#f0f0f0;color:var(--gray);}
     .db-pending{background:#fff3cd;color:#856404;}
     .db-verified{background:#d1e7dd;color:#0a3622;}
     .db-rejected{background:#f8d7da;color:#842029;}
 
-    /* ── MODALS ── */
+    /* ── ADD RIDE ── */
+    #add-ride-screen{justify-content:flex-start;background:var(--light-bg);overflow-y:auto;}
+    .ar-header{width:100%;background:#fff;padding:16px 18px;display:flex;
+               align-items:center;gap:14px;box-shadow:0 2px 10px rgba(0,0,0,.07);
+               position:sticky;top:0;z-index:10;flex-shrink:0;}
+    .back-btn{width:38px;height:38px;border-radius:50%;background:var(--light-bg);
+              border:none;font-size:1.1rem;cursor:pointer;display:flex;
+              align-items:center;justify-content:center;transition:.2s;}
+    .back-btn:hover{background:#e0e0e0;}
+    .ar-title{font-family:'Montserrat',sans-serif;font-size:1.2rem;font-weight:900;}
+    .ar-body{width:100%;padding:18px;padding-bottom:40px;}
+    .form-card{background:#fff;border-radius:var(--radius);padding:18px;
+               margin-bottom:16px;box-shadow:var(--shadow);}
+    .form-label{font-size:.78rem;font-weight:700;color:var(--gray);
+                text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;display:block;}
+    .veh-grid{display:flex;gap:10px;}
+    .veh-btn{flex:1;padding:14px 6px;border:2px solid #eee;border-radius:14px;
+             background:#fff;cursor:pointer;text-align:center;transition:.2s;
+             font-family:'Poppins',sans-serif;}
+    .veh-btn.sel{border-color:var(--primary);background:var(--primary-light);}
+    .veh-btn.sel .veh-label{color:var(--primary);}
+    #ride-map{width:100%;height:260px;border-radius:var(--radius);overflow:hidden;z-index:1;}
+    .submit-btn{width:100%;padding:16px;background:var(--primary);color:#fff;
+                border:none;border-radius:14px;font-family:'Poppins',sans-serif;
+                font-size:1rem;font-weight:700;cursor:pointer;margin-top:8px;
+                box-shadow:0 4px 16px rgba(40,167,69,.35);transition:.2s;}
+
+    /* ── MODAL ── */
     .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;
-                    background:rgba(0,0,0,.6);display:none;align-items:center;
-                    justify-content:center;z-index:9999;padding:20px;}
-    .modal-box{background:#fff;border-radius:24px;padding:24px;
+                   background:rgba(0,0,0,.6);display:none;align-items:center;
+                   justify-content:center;z-index:9999;padding:20px;}
+    .modal-box{background:#fff;border-radius:24px;padding:28px;
                 max-width:400px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.2);
-                max-height: 90vh; overflow-y: auto;}
-    .active-modal{display:flex;}
+                animation:zoomIn .25s ease;}
+    .modal-box h3{font-family:'Montserrat',sans-serif;margin-bottom:15px;font-size:1.2rem;}
+    .modal-actions{display:flex;gap:10px;margin-top:20px;}
+    .modal-actions button{flex:1;padding:12px;border-radius:12px;border:none;
+                          font-family:'Poppins',sans-serif;font-weight:600;cursor:pointer;}
+    .m-primary{background:var(--primary);color:#fff;}
+    .m-secondary{background:#f0f0f0;color:var(--dark);}
+
+    /* ── ADMIN ── */
+    #admin-screen{justify-content:flex-start;background:var(--light-bg);overflow-y:auto;}
+    .admin-user-card{background:#fff;border-radius:var(--radius);padding:16px;
+                      margin-bottom:14px;box-shadow:var(--shadow);}
+    .admin-doc-details{background:var(--light-bg);padding:12px;border-radius:12px;margin-bottom:10px;font-size:.85rem;}
 
     /* ── BOTTOM NAV ── */
     .bottom-nav{width:100%;height:70px;background:#fff;border-top:1px solid #eee;
-                display:flex;position:fixed;bottom:0;z-index:100;}
+                display:flex;position:fixed;bottom:0;z-index:100;
+                box-shadow:0 -4px 20px rgba(0,0,0,.06);}
     .nav-item{flex:1;display:flex;flex-direction:column;justify-content:center;
-              align-items:center;color:#ccc;cursor:pointer;font-size:.74rem;transition:color .2s;}
+              align-items:center;color:#ccc;cursor:pointer;font-size:.74rem;
+              transition:color .2s;gap:2px;}
     .nav-active{color:var(--primary);font-weight:600;}
-
-    /* ── TOAST ── */
-    #toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);
-            background:rgba(26,26,26,.92);color:#fff;padding:11px 22px;
-            border-radius:30px;font-size:.86rem;z-index:9998;
-            opacity:0;transition:opacity .3s;pointer-events:none;}
-    #toast.show{opacity:1;}
 
     /* ── FAB ── */
     #fab-btn{position:fixed;bottom:86px;right:18px;width:56px;height:56px;
               border-radius:50%;background:var(--primary);color:#fff;border:none;
               font-size:1.8rem;box-shadow:0 6px 22px rgba(40,167,69,.45);
-              cursor:pointer;z-index:200;display:none;align-items:center;justify-content:center;}
+              cursor:pointer;z-index:200;display:none;align-items:center;
+              justify-content:center;}
 
-    /* Admin Styles */
-    .admin-user-card{background:#fff; padding:15px; border-radius:15px; margin-bottom:15px; box-shadow:var(--shadow);}
-    .admin-detail-row{font-size: 0.85rem; margin-bottom: 5px;}
-    .admin-img-preview{width: 100%; border-radius: 10px; margin: 10px 0; border: 1px solid #ddd;}
+    #toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);
+            background:rgba(26,26,26,.92);color:#fff;padding:11px 22px;
+            border-radius:30px;font-size:.86rem;z-index:9998;opacity:0;transition:opacity .3s;pointer-events:none;}
+    #toast.show{opacity:1;}
+    .empty-state{text-align:center;padding:50px 20px;color:var(--gray);}
   </style>
 </head>
 <body>
@@ -158,6 +242,11 @@
       <span class="letter l-D">D</span>
       <span class="letter l-U">U</span>
     </div>
+    <div>
+      <span class="splash-dot dot1">●</span>
+      <span class="splash-dot dot2">●</span>
+      <span class="splash-dot dot3">●</span>
+    </div>
     <p class="tagline">mee prayanam maa bhadyatha</p>
   </div>
 </div>
@@ -169,341 +258,411 @@
 <div id="home-screen" class="screen">
   <div class="top-bar">
     <span class="top-bar-brand">THODU</span>
-    <div class="loc-chip" onclick="getMyLocation()">📍 <span id="loc-text">Locating...</span></div>
+    <div class="loc-chip" onclick="getMyLocation()">
+      📍 <span id="loc-text">Getting location…</span>
+    </div>
   </div>
   <div class="home-body" id="home-body"></div>
-  <button id="fab-btn" onclick="openAddRide()">＋</button>
-  <nav class="bottom-nav">
-    <div class="nav-item nav-active" id="nav-rides" onclick="switchTab('rides',this)"><span>🚗</span><span>Rides</span></div>
-    <div class="nav-item" id="nav-my-rides" onclick="switchTab('my-rides',this)"><span>📋</span><span>My Rides</span></div>
-    <div class="nav-item" id="nav-profile" onclick="switchTab('profile',this)"><span>👤</span><span>Profile</span></div>
-    <div class="nav-item" id="nav-admin" style="display:none;" onclick="switchTab('admin',this)"><span>🛡️</span><span>Admin</span></div>
+  <button id="fab-btn" onclick="handleFABClick()">＋</button>
+  <nav class="bottom-nav" id="bottom-nav">
+    <div class="nav-item nav-active" id="nav-rides" onclick="switchTab('rides',this)">
+      <span>🚗</span><span>Rides</span>
+    </div>
+    <div class="nav-item" id="nav-my-rides" onclick="switchTab('my-rides',this)">
+      <span>📋</span><span>My Rides</span>
+    </div>
+    <div class="nav-item" id="nav-profile" onclick="switchTab('profile',this)">
+      <span>👤</span><span>Profile</span>
+    </div>
+    <div class="nav-item" id="nav-admin" style="display:none;" onclick="switchTab('admin',this)">
+      <span>🛡️</span><span>Admin</span>
+    </div>
   </nav>
 </div>
 
-<div class="modal-overlay" id="doc-modal">
-  <div class="modal-box">
-    <h2 id="modal-title">Verification</h2>
-    <div id="modal-form-content"></div>
-    <div class="field-group">
-      <label class="field-label">Upload Image Photo</label>
-      <input type="file" id="doc-file-input" accept="image/*" class="no-icon">
+<div id="add-ride-screen" class="screen">
+  <div class="ar-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <span class="ar-title">Add a Ride</span>
+  </div>
+  <div class="ar-body">
+    <div class="form-card">
+      <label class="form-label">📍 Route</label>
+      <input type="text" id="from-input" placeholder="From" style="margin-bottom:10px; padding-left:13px;"/>
+      <input type="text" id="to-input" placeholder="To" style="padding-left:13px;"/>
     </div>
-    <div style="display:flex; gap:10px; margin-top:15px;">
-      <button class="btn btn-outline" style="margin-top:0" onclick="closeDocModal()">Cancel</button>
-      <button class="btn btn-primary" style="margin-top:0" id="doc-submit-btn">Submit</button>
+    <div class="form-card">
+       <div style="display:flex; gap:10px;">
+          <input type="date" id="ride-date" class="no-icon" style="flex:1; padding:13px;"/>
+          <input type="time" id="ride-time" class="no-icon" style="flex:1; padding:13px;"/>
+       </div>
+    </div>
+    <div class="form-card">
+      <label class="form-label">🚘 Vehicle</label>
+      <div class="veh-grid">
+        <button class="veh-btn" id="veh-bike" onclick="selectVehicle('bike',this)">🏍️ Bike</button>
+        <button class="veh-btn" id="veh-auto" onclick="selectVehicle('auto',this)">🛺 Auto</button>
+        <button class="veh-btn" id="veh-car" onclick="selectVehicle('car',this)">🚗 Car</button>
+      </div>
+    </div>
+    <div class="form-card">
+      <label class="form-label">💰 Price & 🪑 Seats</label>
+      <div style="display:flex; gap:10px;">
+          <input type="number" id="ride-price" placeholder="Price ₹" style="flex:1; padding-left:13px;"/>
+          <input type="number" id="ride-seats" placeholder="Seats" style="flex:1; padding-left:13px;"/>
+      </div>
+    </div>
+    <div class="form-card">
+      <div id="ride-map"></div>
+    </div>
+    <button class="submit-btn" id="submit-ride-btn" onclick="submitRide()">🚀 Post Ride</button>
+  </div>
+</div>
+
+<div id="admin-screen" class="screen">
+  <div class="ar-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <span class="ar-title">🛡️ Admin Panel</span>
+  </div>
+  <div class="ar-body" id="admin-body"></div>
+</div>
+
+<div id="lic-modal" class="modal-overlay">
+  <div class="modal-box">
+    <h3>🪪 Licence Verification</h3>
+    <div class="field-group">
+      <label class="field-label">DL Number</label>
+      <input type="text" id="m-dl-num" class="no-icon" placeholder="TS 09 XXXX XXXX"/>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Expiry Date</label>
+      <input type="date" id="m-dl-exp" class="no-icon"/>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Name (as on DL)</label>
+      <input type="text" id="m-dl-name" class="no-icon" placeholder="Full Name"/>
+    </div>
+    <div class="modal-actions">
+      <button class="m-secondary" onclick="closeModal('lic-modal')">Cancel</button>
+      <button class="m-primary" onclick="submitVerification('license')">Submit</button>
     </div>
   </div>
 </div>
 
-<div class="modal-overlay" id="view-modal">
-  <div class="modal-box" style="text-align:center;">
-    <h2 id="view-modal-title">Document Details</h2>
-    <div id="view-modal-content" style="text-align:left; margin-bottom:15px; font-size:0.9rem;"></div>
-    <img id="view-modal-img" style="width:100%; border-radius:10px; margin-bottom:15px;">
-    <button class="btn btn-primary" onclick="closeViewModal()">Close</button>
+<div id="aad-modal" class="modal-overlay">
+  <div class="modal-box">
+    <h3>🪪 Aadhaar Verification</h3>
+    <div class="field-group">
+      <label class="field-label">Aadhaar Number</label>
+      <input type="number" id="m-aad-num" class="no-icon" placeholder="12 Digit Number"/>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Linked Phone No</label>
+      <input type="tel" id="m-aad-phone" class="no-icon" placeholder="+91"/>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Name (as on Aadhaar)</label>
+      <input type="text" id="m-aad-name" class="no-icon" placeholder="Full Name"/>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Date of Birth</label>
+      <input type="date" id="m-aad-dob" class="no-icon"/>
+    </div>
+    <div class="modal-actions">
+      <button class="m-secondary" onclick="closeModal('aad-modal')">Cancel</button>
+      <button class="m-primary" onclick="submitVerification('aadhaar')">Submit</button>
+    </div>
   </div>
 </div>
 
 <div id="toast"></div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, sendEmailVerification, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, onSnapshot, addDoc, serverTimestamp, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, updateProfile, onAuthStateChanged, signOut, reload } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, onSnapshot, addDoc, getDocs, serverTimestamp, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const firebaseConfig = {
+const app = initializeApp({
   apiKey: "AIzaSyA1QeDf1E_Kb1ZC15ahw1dY8hk3J0gXopY",
   authDomain: "thodu-65cb9.firebaseapp.com",
   projectId: "thodu-65cb9",
   storageBucket: "thodu-65cb9.firebasestorage.app",
   messagingSenderId: "1070229943496",
   appId: "1:1070229943496:web:038e2e74c463e7acefa1fd"
-};
-
-const app = initializeApp(firebaseConfig);
+});
 const auth = getAuth(app);
 const db = getFirestore(app);
-const storage = getStorage(app);
-const ADMIN_EMAIL = "admin@thodu.com";
 
+const ADMIN_EMAIL = "admin@thodu.com";
 let currentUser = null;
 let userData = null;
 let activeTab = 'rides';
+let userUnsub = null;
+let mapInstance = null;
+let startPoint = null;
+let endPoint = null;
+let selectedVehicle = null;
 
-// --- UTILS ---
-function showToast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000);}
-function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
-function closeDocModal(){ document.getElementById('doc-modal').classList.remove('active-modal'); }
-function closeViewModal(){ document.getElementById('view-modal').classList.remove('active-modal'); }
+/* ════════════════════ UTILS ════════════════════ */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
 
-// --- AUTH ---
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+window.closeModal = (id) => document.getElementById(id).style.display = 'none';
+
+/* ════════════════════ AUTH ════════════════════ */
 window.setAuthState = (state) => {
   const c = document.getElementById('auth-container');
-  if(state === 'login'){
+  if (state === 'login') {
     c.innerHTML = `
       <div class="auth-logo">THODU</div>
       <h2>Login</h2>
-      <input type="email" id="le" placeholder="Email" style="margin-bottom:10px">
-      <input type="password" id="lp" placeholder="Password" style="margin-bottom:15px">
+      <div class="field-group"><input type="email" id="le" placeholder="Email"/></div>
+      <div class="field-group"><input type="password" id="lp" placeholder="Password"/></div>
       <button class="btn btn-primary" onclick="doLogin()">Login</button>
-      <p class="auth-switch">New? <span class="link" onclick="setAuthState('signup')">Sign Up</span></p>
-    `;
-  } else {
+      <p class="auth-switch">New? <span class="link" onclick="setAuthState('signup')">Sign Up</span></p>`;
+  } else if (state === 'signup') {
     c.innerHTML = `
       <div class="auth-logo">THODU</div>
       <h2>Sign Up</h2>
-      <input type="text" id="sn" placeholder="Full Name" style="margin-bottom:10px">
-      <input type="email" id="se" placeholder="Email" style="margin-bottom:10px">
-      <input type="password" id="sp" placeholder="Password (min 6)" style="margin-bottom:15px">
+      <div class="field-group"><input type="text" id="sn" placeholder="Full Name"/></div>
+      <div class="field-group"><input type="email" id="se" placeholder="Email"/></div>
+      <div class="field-group"><input type="password" id="spw" placeholder="Password"/></div>
       <button class="btn btn-primary" onclick="doSignup()">Create Account</button>
-      <p class="auth-switch">Member? <span class="link" onclick="setAuthState('login')">Login</span></p>
-    `;
+      <p class="auth-switch"><span class="link" onclick="setAuthState('login')">Back to Login</span></p>`;
   }
-};
-
-window.doLogin = async () => {
-  try {
-    const e = document.getElementById('le').value;
-    const p = document.getElementById('lp').value;
-    await signInWithEmailAndPassword(auth, e, p);
-  } catch(e){ showToast(e.message); }
 };
 
 window.doSignup = async () => {
+  const name = document.getElementById('sn').value;
+  const email = document.getElementById('se').value;
+  const pass = document.getElementById('spw').value;
   try {
-    const n = document.getElementById('sn').value;
-    const e = document.getElementById('se').value;
-    const p = document.getElementById('sp').value;
-    const cred = await createUserWithEmailAndPassword(auth, e, p);
-    await updateProfile(cred.user, { displayName: n });
-    await setDoc(doc(db, 'users', cred.user.uid), { name:n, email:e, licenseStatus:'none', aadhaarStatus:'none' });
-    showToast("Account Created!");
-  } catch(e){ showToast(e.message); }
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    await updateProfile(cred.user, { displayName: name });
+    await setDoc(doc(db, 'users', cred.user.uid), {
+      name, email, licenseStatus: 'none', aadhaarStatus: 'none'
+    });
+    showToast("Account Created! Please login.");
+    setAuthState('login');
+  } catch (e) { showToast(e.message); }
 };
 
-window.handleLogout = () => signOut(auth);
-
-// --- TAB LOGIC ---
-window.switchTab = (tab, el) => {
-  activeTab = tab;
-  document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('nav-active'));
-  el.classList.add('nav-active');
-  document.getElementById('fab-btn').style.display = (tab === 'rides' ? 'flex' : 'none');
-  renderCurrentTab();
+window.doLogin = async () => {
+  const email = document.getElementById('le').value;
+  const pass = document.getElementById('lp').value;
+  try { await signInWithEmailAndPassword(auth, email, pass); } 
+  catch (e) { showToast(e.message); }
 };
 
-function renderCurrentTab(){
-  if(activeTab === 'rides') renderRides();
-  if(activeTab === 'profile') renderProfile();
-  if(activeTab === 'admin') renderAdmin();
-  if(activeTab === 'my-rides') renderMyRides();
-}
+window.handleLogout = () => { signOut(auth); location.reload(); };
 
-// --- PROFILE & VERIFICATION ---
-function renderProfile(){
-  const body = document.getElementById('home-body');
-  const ud = userData || {};
-  body.innerHTML = `
-    <div class="profile-top">
-      <div class="avatar">${(currentUser.displayName || 'U')[0]}</div>
-      <h2>${currentUser.displayName}</h2>
-      <p>${currentUser.email}</p>
-    </div>
-    <div class="doc-card st-${ud.licenseStatus}" onclick="handleDocClick('license')">
-      <div class="doc-info">
-        <div class="doc-title">Driving License</div>
-        <div class="doc-sub">Status: ${ud.licenseStatus || 'None'}</div>
-      </div>
-      <span class="doc-badge db-${ud.licenseStatus}">${ud.licenseStatus === 'none' ? 'Upload' : ud.licenseStatus}</span>
-    </div>
-    <div class="doc-card st-${ud.aadhaarStatus}" onclick="handleDocClick('aadhaar')">
-      <div class="doc-info">
-        <div class="doc-title">Aadhaar Card</div>
-        <div class="doc-sub">Status: ${ud.aadhaarStatus || 'None'}</div>
-      </div>
-      <span class="doc-badge db-${ud.aadhaarStatus}">${ud.aadhaarStatus === 'none' ? 'Upload' : ud.aadhaarStatus}</span>
-    </div>
-    <button class="btn btn-outline" onclick="handleLogout()">Logout</button>
-  `;
-}
-
-window.handleDocClick = (type) => {
-  const status = type === 'license' ? userData.licenseStatus : userData.aadhaarStatus;
-  if(status === 'verified'){
-    showVerifiedOptions(type);
+/* ════════════════════ CORE LOGIC ════════════════════ */
+onAuthStateChanged(auth, user => {
+  if (user) {
+    currentUser = user;
+    showScreen('home-screen');
+    document.getElementById('fab-btn').style.display = 'flex';
+    if (user.email === ADMIN_EMAIL) document.getElementById('nav-admin').style.display = 'flex';
+    startUserListener(user.uid);
+    switchTab('rides', document.getElementById('nav-rides'));
   } else {
-    openDocModal(type);
+    showScreen('login-screen');
+    setAuthState('login');
   }
-};
+});
 
-function showVerifiedOptions(type){
-  const ud = userData;
-  const content = type === 'license' ? 
-    `DL No: ${ud.dlNumber}<br>Type: ${ud.dlType}<br>DOB: ${ud.dlDob}` :
-    `Aadhaar No: ${ud.aadhaarNumber}<br>DOB: ${ud.aadhaarDob}`;
-  
-  const imgUrl = type === 'license' ? ud.licenseUrl : ud.aadhaarUrl;
-
-  const viewModal = document.getElementById('view-modal');
-  document.getElementById('view-modal-content').innerHTML = `
-    <div style="margin-bottom:15px;">${content}</div>
-    <button class="btn btn-outline" onclick="openDocModal('${type}'); closeViewModal();">Edit Details</button>
-  `;
-  document.getElementById('view-modal-img').src = imgUrl;
-  viewModal.classList.add('active-modal');
-}
-
-window.openDocModal = (type) => {
-  const modal = document.getElementById('doc-modal');
-  const content = document.getElementById('modal-form-content');
-  document.getElementById('modal-title').textContent = type === 'license' ? "License Details" : "Aadhaar Details";
-  
-  if(type === 'license'){
-    content.innerHTML = `
-      <input type="text" id="form-name" placeholder="Name as in License" style="margin-bottom:10px">
-      <input type="text" id="form-id" placeholder="DL Number" style="margin-bottom:10px">
-      <input type="date" id="form-dob" style="margin-bottom:10px">
-      <select id="form-extra" style="margin-bottom:10px">
-        <option value="Bike">Bike</option>
-        <option value="Car">Car</option>
-        <option value="Both">Both (Bike & Car)</option>
-      </select>
-    `;
-  } else {
-    content.innerHTML = `
-      <input type="text" id="form-name" placeholder="Name as per Aadhaar" style="margin-bottom:10px">
-      <input type="number" id="form-id" placeholder="12 Digit Aadhaar Number" style="margin-bottom:10px">
-      <input type="date" id="form-dob" style="margin-bottom:10px">
-      <input type="tel" id="form-extra" placeholder="Phone as per Aadhaar" style="margin-bottom:10px">
-    `;
-  }
-  
-  document.getElementById('doc-submit-btn').onclick = () => submitDocDetails(type);
-  modal.classList.add('active-modal');
-};
-
-async function submitDocDetails(type){
-  const name = document.getElementById('form-name').value;
-  const idNum = document.getElementById('form-id').value;
-  const dob = document.getElementById('form-dob').value;
-  const extra = document.getElementById('form-extra').value;
-  const file = document.getElementById('doc-file-input').files[0];
-
-  if(!name || !idNum || !dob || !file) return showToast("Fill all fields and pick a photo");
-
-  const btn = document.getElementById('doc-submit-btn');
-  btn.disabled = true; btn.textContent = "Uploading...";
-
-  try {
-    const storagePath = `docs/${currentUser.uid}/${type}`;
-    const imgRef = sRef(storage, storagePath);
-    await uploadBytes(imgRef, file);
-    const url = await getDownloadURL(imgRef);
-
-    const updateData = {};
-    if(type === 'license'){
-      updateData.licenseStatus = 'pending';
-      updateData.licenseUrl = url;
-      updateData.dlName = name;
-      updateData.dlNumber = idNum;
-      updateData.dlDob = dob;
-      updateData.dlType = extra;
-    } else {
-      updateData.aadhaarStatus = 'pending';
-      updateData.aadhaarUrl = url;
-      updateData.aadhaarName = name;
-      updateData.aadhaarNumber = idNum;
-      updateData.aadhaarDob = dob;
-      updateData.aadhaarPhone = extra;
-    }
-
-    await updateDoc(doc(db, 'users', currentUser.uid), updateData);
-    showToast("Submitted for verification");
-    closeDocModal();
-  } catch(e){ showToast(e.message); }
-  btn.disabled = false; btn.textContent = "Submit";
-}
-
-// --- ADMIN PANEL ---
-async function renderAdmin(){
-  const body = document.getElementById('home-body');
-  body.innerHTML = "<h3>Pending Verifications</h3>";
-  const q = query(collection(db, 'users'));
-  const snap = await getDocs(q);
-  
-  snap.forEach(uDoc => {
-    const u = uDoc.data();
-    if(u.licenseStatus === 'pending' || u.aadhaarStatus === 'pending'){
-      const card = document.createElement('div');
-      card.className = 'admin-user-card';
-      let html = `<strong>User: ${u.name}</strong><br>`;
-      
-      if(u.licenseStatus === 'pending'){
-        html += `
-          <div style="border-top:1px solid #eee; margin-top:10px; padding-top:10px">
-            <p><strong>LICENSE REQUEST</strong></p>
-            <p class="admin-detail-row">Name: ${u.dlName}</p>
-            <p class="admin-detail-row">DL No: ${u.dlNumber}</p>
-            <p class="admin-detail-row">DOB: ${u.dlDob} | Type: ${u.dlType}</p>
-            <img src="${u.licenseUrl}" class="admin-img-preview">
-            <button class="btn btn-primary" onclick="adminAction('${uDoc.id}', 'license', 'verified')">Approve</button>
-            <button class="btn btn-outline" onclick="adminAction('${uDoc.id}', 'license', 'rejected')">Reject</button>
-          </div>
-        `;
-      }
-      if(u.aadhaarStatus === 'pending'){
-        html += `
-          <div style="border-top:1px solid #eee; margin-top:10px; padding-top:10px">
-            <p><strong>AADHAAR REQUEST</strong></p>
-            <p class="admin-detail-row">Name: ${u.aadhaarName}</p>
-            <p class="admin-detail-row">No: ${u.aadhaarNumber}</p>
-            <p class="admin-detail-row">DOB: ${u.aadhaarDob} | Phone: ${u.aadhaarPhone}</p>
-            <img src="${u.aadhaarUrl}" class="admin-img-preview">
-            <button class="btn btn-primary" onclick="adminAction('${uDoc.id}', 'aadhaar', 'verified')">Approve</button>
-            <button class="btn btn-outline" onclick="adminAction('${uDoc.id}', 'aadhaar', 'rejected')">Reject</button>
-          </div>
-        `;
-      }
-      card.innerHTML = html;
-      body.appendChild(card);
-    }
+function startUserListener(uid) {
+  userUnsub = onSnapshot(doc(db, 'users', uid), snap => {
+    userData = snap.data();
+    if (activeTab === 'profile') renderProfile();
   });
 }
 
-window.adminAction = async (uid, type, status) => {
-  const field = type === 'license' ? 'licenseStatus' : 'aadhaarStatus';
-  await updateDoc(doc(db, 'users', uid), { [field]: status });
-  showToast(`Document ${status}`);
-  renderAdmin();
+window.switchTab = (tab, el) => {
+  activeTab = tab;
+  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('nav-active'));
+  el.classList.add('nav-active');
+  const body = document.getElementById('home-body');
+  document.getElementById('fab-btn').style.display = (tab === 'rides') ? 'flex' : 'none';
+  
+  if (tab === 'rides') renderRides();
+  else if (tab === 'profile') renderProfile();
+  else if (tab === 'admin') { showScreen('admin-screen'); loadAdminData(); }
 };
 
-// --- RIDES LOGIC (Placeholder for your existing logic) ---
-function renderRides(){ 
-  document.getElementById('home-body').innerHTML = '<div class="empty-state">No rides available.</div>';
-}
-function renderMyRides(){ 
-  document.getElementById('home-body').innerHTML = '<div class="empty-state">No history yet.</div>';
+/* ════════════════════ PROFILE & VERIFY ════════════════════ */
+function renderProfile() {
+  const ud = userData || {};
+  const body = document.getElementById('home-body');
+  body.innerHTML = `
+    <div class="profile-top">
+      <div class="avatar">${(currentUser.displayName||'U')[0]}</div>
+      <div class="p-name">${currentUser.displayName}</div>
+      <div class="p-email">${currentUser.email}</div>
+    </div>
+    <p class="doc-section-label">Verification</p>
+    <div class="doc-card st-${ud.licenseStatus}" onclick="openVerify('license')">
+      <div class="doc-icon-box">🪪</div>
+      <div class="doc-info">
+        <div class="doc-title">Driving Licence</div>
+        <div class="doc-sub">${ud.licenseStatus === 'verified' ? 'Verified' : 'Click to update details'}</div>
+      </div>
+      <span class="doc-badge db-${ud.licenseStatus}">${ud.licenseStatus}</span>
+    </div>
+    <div class="doc-card st-${ud.aadhaarStatus}" onclick="openVerify('aadhaar')">
+      <div class="doc-icon-box">🆔</div>
+      <div class="doc-info">
+        <div class="doc-title">Aadhaar Card</div>
+        <div class="doc-sub">${ud.aadhaarStatus === 'verified' ? 'Verified' : 'Click to update details'}</div>
+      </div>
+      <span class="doc-badge db-${ud.aadhaarStatus}">${ud.aadhaarStatus}</span>
+    </div>
+    <button class="btn btn-outline" style="margin-top:20px;" onclick="handleLogout()">Logout</button>
+  `;
 }
 
-// --- BOOTSTRAP ---
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    currentUser = user;
-    if(user.email === ADMIN_EMAIL) document.getElementById('nav-admin').style.display = 'flex';
-    onSnapshot(doc(db, 'users', user.uid), (d) => {
-      userData = d.data();
-      renderCurrentTab();
-    });
-    showScreen('home-screen');
+window.openVerify = (type) => {
+  if (userData[type+'Status'] === 'verified') return showToast("Already Verified!");
+  document.getElementById(type === 'license' ? 'lic-modal' : 'aad-modal').style.display = 'flex';
+};
+
+window.submitVerification = async (type) => {
+  const uid = currentUser.uid;
+  let data = {};
+  if (type === 'license') {
+    data = {
+      licenseNum: document.getElementById('m-dl-num').value,
+      licenseExp: document.getElementById('m-dl-exp').value,
+      licenseName: document.getElementById('m-dl-name').value,
+      licenseStatus: 'pending'
+    };
   } else {
-    setAuthState('login');
-    showScreen('login-screen');
+    data = {
+      aadhaarNum: document.getElementById('m-aad-num').value,
+      aadhaarPhone: document.getElementById('m-aad-phone').value,
+      aadhaarName: document.getElementById('m-aad-name').value,
+      aadhaarDob: document.getElementById('m-aad-dob').value,
+      aadhaarStatus: 'pending'
+    };
   }
-  setTimeout(() => document.getElementById('splash-screen').style.display='none', 4500);
-});
+  await updateDoc(doc(db, 'users', uid), data);
+  closeModal(type === 'license' ? 'lic-modal' : 'aad-modal');
+  showToast("Details Submitted! Pending Admin Approval.");
+};
 
+/* ════════════════════ RIDES ════════════════════ */
+window.handleFABClick = () => {
+  if (userData.licenseStatus === 'verified' && userData.aadhaarStatus === 'verified') {
+    showScreen('add-ride-screen');
+    setTimeout(initMap, 500);
+  } else {
+    showToast("❌ Complete both verifications to post a ride!");
+    switchTab('profile', document.getElementById('nav-profile'));
+  }
+};
+
+function initMap() {
+  if (mapInstance) return;
+  mapInstance = L.map('ride-map').setView([17.385, 78.4867], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapInstance);
+}
+
+window.selectVehicle = (v, el) => {
+    selectedVehicle = v;
+    document.querySelectorAll('.veh-btn').forEach(b => b.classList.remove('sel'));
+    el.classList.add('sel');
+};
+
+window.submitRide = async () => {
+    const ride = {
+        from: document.getElementById('from-input').value,
+        to: document.getElementById('to-input').value,
+        price: document.getElementById('ride-price').value,
+        seats: document.getElementById('ride-seats').value,
+        vehicle: selectedVehicle,
+        userId: currentUser.uid,
+        userName: currentUser.displayName,
+        status: 'active'
+    };
+    await addDoc(collection(db, 'rides'), ride);
+    showToast("Ride Posted!");
+    goHome();
+};
+
+window.goHome = () => showScreen('home-screen');
+
+async function renderRides() {
+    const body = document.getElementById('home-body');
+    body.innerHTML = `<div class="empty-state">Loading Rides...</div>`;
+    const snap = await getDocs(collection(db, 'rides'));
+    let html = '<div class="sec-header"><span class="sec-title">Available Rides</span></div>';
+    snap.forEach(d => {
+        const r = d.data();
+        html += `
+            <div class="ride-card">
+                <div class="ride-route">🟢 ${r.from} → 🔴 ${r.to}</div>
+                <div class="ride-meta">
+                    <span class="pill">${r.vehicle}</span>
+                    <span class="pill">🪑 ${r.seats}</span>
+                    <span class="pill g">👤 ${r.userName}</span>
+                </div>
+                <div class="price-tag">₹${r.price}</div>
+            </div>`;
+    });
+    body.innerHTML = html || `<div class="empty-state">No rides found.</div>`;
+}
+
+/* ════════════════════ ADMIN PANEL ════════════════════ */
+async function loadAdminData() {
+  const body = document.getElementById('admin-body');
+  body.innerHTML = "Loading...";
+  const snap = await getDocs(collection(db, 'users'));
+  let html = "";
+  snap.forEach(d => {
+    const u = d.data();
+    if (u.licenseStatus === 'pending' || u.aadhaarStatus === 'pending') {
+      html += `
+        <div class="admin-user-card">
+          <strong>${u.name}</strong> (${u.email})
+          ${u.licenseStatus === 'pending' ? `
+            <div class="admin-doc-details">
+              <b>Licence:</b> ${u.licenseNum} | Exp: ${u.licenseExp} | Name: ${u.licenseName}
+              <div style="margin-top:5px;">
+                <button class="btn btn-primary" style="width:auto; padding:5px 10px;" onclick="adminAction('${d.id}','license','verified')">Approve</button>
+                <button class="btn btn-outline" style="width:auto; padding:5px 10px; color:red; border-color:red;" onclick="adminAction('${d.id}','license','rejected')">Reject</button>
+              </div>
+            </div>` : ''}
+          ${u.aadhaarStatus === 'pending' ? `
+            <div class="admin-doc-details">
+              <b>Aadhaar:</b> ${u.aadhaarNum} | Phone: ${u.aadhaarPhone} | Name: ${u.aadhaarName}
+              <div style="margin-top:5px;">
+                <button class="btn btn-primary" style="width:auto; padding:5px 10px;" onclick="adminAction('${d.id}','aadhaar','verified')">Approve</button>
+                <button class="btn btn-outline" style="width:auto; padding:5px 10px; color:red; border-color:red;" onclick="adminAction('${d.id}','aadhaar','rejected')">Reject</button>
+              </div>
+            </div>` : ''}
+        </div>`;
+    }
+  });
+  body.innerHTML = html || "No pending requests.";
+}
+
+window.adminAction = async (uid, type, status) => {
+  await updateDoc(doc(db, 'users', uid), { [type+'Status']: status });
+  showToast("Updated!");
+  loadAdminData();
+};
+
+/* Splash logic */
+setTimeout(() => document.querySelectorAll('.letter').forEach(l => l.classList.add('brand-green')), 2000);
 </script>
 </body>
 </html>
