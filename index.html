@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sub User Hub</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body class="bg-white text-slate-800 p-4 font-sans min-h-screen relative">
+
+    <!-- Sub-Navbar Category Tabs -->
+    <div class="flex items-center space-x-2 mb-6 border-b pb-4 border-slate-100">
+        <button id="tab-helps-btn" class="px-5 py-2 rounded-full text-xs font-bold tracking-wide transition cursor-pointer bg-blue-600 text-white shadow-md">Helps Feed</button>
+        <button id="tab-grocery-btn" class="px-5 py-2 rounded-full text-xs font-bold tracking-wide transition cursor-pointer bg-slate-100 text-slate-600 hover:bg-slate-200">Food & Grocery</button>
+    </div>
+
+    <!-- MAIN VIEWS PANEL CONTAINER GRID -->
+    <div id="view-helps" class="space-y-4">
+        <h2 class="text-sm font-black uppercase tracking-wider text-slate-400 mb-2">Active Neighborhood Assistance Requests</h2>
+        <div id="helps-feed-output" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </div>
+
+    <div id="view-grocery" class="hidden space-y-4">
+        <h2 class="text-sm font-black uppercase tracking-wider text-slate-400 mb-2">Local Vendors Within 10 KM Range</h2>
+        <div id="grocery-feed-output" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+    </div>
+
+    <!-- FLOATING SECURITY BUTTON (+) -->
+    <button id="btn-floating-action" class="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-tr from-blue-600 to-indigo-600 text-white rounded-full text-2xl font-black shadow-xl hover:scale-105 transition active:scale-95 flex items-center justify-center cursor-pointer select-none">
+        +
+    </button>
+
+    <!-- ACTION SHEET PANEL MODAL OVERLAY -->
+    <div id="action-modal-overlay" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-lg shadow-2xl relative border border-slate-100 max-h-[90vh] overflow-y-auto">
+            <button id="btn-close-action-modal" class="absolute top-4 right-4 text-slate-400 text-xl font-bold">&times;</button>
+            
+            <div class="flex border-b pb-2 mb-4 space-x-4 text-sm font-bold">
+                <button id="form-help-tab" class="text-blue-600 border-b-2 border-blue-600 pb-1">Request Help</button>
+                <button id="form-shop-tab" class="text-slate-400 pb-1">Add My Shop</button>
+            </div>
+
+            <!-- FORM 1: ASK ASSISTANCE -->
+            <div id="form-help-block" class="space-y-3">
+                <input type="text" id="help-fullname" class="w-full p-2.5 bg-slate-50 border rounded-xl text-xs font-semibold" placeholder="Your Full Name">
+                <div class="h-40 bg-slate-100 rounded-xl overflow-hidden relative" id="map-help-box"></div>
+                <input type="text" id="help-coords" readonly class="w-full p-2 bg-slate-100 border text-[10px] font-mono text-slate-500 rounded-lg" placeholder="Coordinates Selected">
+                <input type="tel" id="help-phone" class="w-full p-2.5 bg-slate-50 border rounded-xl text-xs font-semibold" placeholder="Working Contact Number">
+                <textarea id="help-desc" class="w-full p-2.5 bg-slate-50 border rounded-xl text-xs font-medium h-20" placeholder="Describe what support you require..."></textarea>
+                <button id="btn-submit-help" class="w-full bg-blue-600 text-white text-xs font-bold py-2.5 rounded-xl">Post Assistance Request</button>
+            </div>
+
+            <!-- FORM 2: EXPAND SHOP SPACE -->
+            <div id="form-shop-block" class="hidden space-y-3">
+                <input type="text" id="shop-name" class="w-full p-2.5 bg-slate-50 border rounded-xl text-xs font-semibold" placeholder="Official Shop Name">
+                <div class="h-40 bg-slate-100 rounded-xl overflow-hidden relative" id="map-shop-box"></div>
+                <input type="text" id="shop-coords" readonly class="w-full p-2 bg-slate-100 border text-[10px] font-mono text-slate-500 rounded-lg" placeholder="Shop Coordinates Mapped">
+                
+                <!-- Sub Items Inventory Injection Area Block -->
+                <div class="border p-3 rounded-xl bg-slate-50 space-y-2">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide block">Inventory Sub Items (Limit 50)</span>
+                    <div class="flex gap-2">
+                        <input type="text" id="item-title" class="flex-1 p-2 bg-white border rounded-lg text-xs" placeholder="e.g. Amul Curd">
+                        <input type="text" id="item-price" class="w-20 p-2 bg-white border rounded-lg text-xs text-center" placeholder="₹60">
+                        <button id="btn-add-subitem" class="bg-slate-800 text-white text-xs px-3 rounded-lg font-bold">+</button>
+                    </div>
+                    <ul id="added-items-list" class="text-xs space-y-1 max-h-24 overflow-y-auto font-mono text-slate-600 divide-y divide-slate-200 pt-1"></ul>
+                </div>
+                <button id="btn-submit-shop" class="w-full bg-emerald-600 text-white text-xs font-bold py-2.5 rounded-xl">Submit Shop Request for Admin Review</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, push, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDGI7b17RRfpgctXIVIgPtyECtUBLEcMAU",
+            authDomain: "skill-bc495.firebaseapp.com",
+            databaseURL: "https://skill-bc495-default-rtdb.firebaseio.com",
+            projectId: "skill-bc495",
+            storageBucket: "skill-bc495.firebasestorage.app",
+            messagingSenderId: "53919238872",
+            appId: "1:53919238872:web:711de8f103089c653025ad",
+            measurementId: "G-6H5D0771NE"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Parse Passed Incoming Profile parameters strings out from URL queries loops
+        const params = new URLSearchParams(window.location.search);
+        const userUid = params.get('uid');
+        const userName = params.get('name');
+        const userAadharStatus = params.get('aadharStatus') || "Unverified";
+        const centerLat = parseFloat(params.get('lat')) || 17.3850;
+        const centerLng = parseFloat(params.get('lng')) || 78.4867;
+
+        let mapHelp = null, mapShop = null;
+        let markerHelp = null, markerShop = null;
+        let currentShopItems = [];
+
+        // Tab View Controls Switcher Engine Maps
+        document.getElementById('tab-helps-btn').addEventListener('click', () => toggleView('helps'));
+        document.getElementById('tab-grocery-btn').addEventListener('click', () => toggleView('grocery'));
+
+        function toggleView(t) {
+            const hBtn = document.getElementById('tab-helps-btn'), gBtn = document.getElementById('tab-grocery-btn');
+            const hFeed = document.getElementById('view-helps'), gFeed = document.getElementById('view-grocery');
+            if (t === 'helps') {
+                hBtn.className = "px-5 py-2 rounded-full text-xs font-bold tracking-wide transition bg-blue-600 text-white shadow-md";
+                gBtn.className = "px-5 py-2 rounded-full text-xs font-bold tracking-wide transition bg-slate-100 text-slate-600";
+                hFeed.classList.remove('hidden'); gFeed.classList.add('hidden');
+            } else {
+                gBtn.className = "px-5 py-2 rounded-full text-xs font-bold tracking-wide transition bg-blue-600 text-white shadow-md";
+                hBtn.className = "px-5 py-2 rounded-full text-xs font-bold tracking-wide transition bg-slate-100 text-slate-600";
+                gFeed.classList.remove('hidden'); hFeed.classList.add('hidden');
+            }
+        }
+
+        // --- MANAGE FLOATING SECURITY GUARD LINKS CLICK ---
+        document.getElementById('btn-floating-action').addEventListener('click', () => {
+            if (userAadharStatus !== "Verified") {
+                alert(`Action Restricted! Your current Aadhar status is [${userAadharStatus}]. You can only create help posts or add shops once an Admin fully approves your document request verification upload.`);
+                return;
+            }
+            document.getElementById('action-modal-overlay').classList.remove('hidden');
+            initializeFormMaps();
+        });
+
+        document.getElementById('btn-close-action-modal').addEventListener('click', () => {
+            document.getElementById('action-modal-overlay').classList.add('hidden');
+        });
+
+        // Form tabs bindings toggle panels
+        document.getElementById('form-help-tab').addEventListener('click', () => {
+            document.getElementById('form-help-block').classList.remove('hidden');
+            document.getElementById('form-shop-block').classList.add('hidden');
+            document.getElementById('form-help-tab').className = "text-blue-600 border-b-2 border-blue-600 pb-1";
+            document.getElementById('form-shop-tab').className = "text-slate-400 pb-1";
+        });
+        document.getElementById('form-shop-tab').addEventListener('click', () => {
+            document.getElementById('form-shop-block').classList.remove('hidden');
+            document.getElementById('form-help-block').classList.add('hidden');
+            document.getElementById('form-shop-tab').className = "text-blue-600 border-b-2 border-blue-600 pb-1";
+            document.getElementById('form-help-tab').className = "text-slate-400 pb-1";
+        });
+
+        // Add inventory items rows
+        document.getElementById('btn-add-subitem').addEventListener('click', () => {
+            const title = document.getElementById('item-title').value.trim();
+            const price = document.getElementById('item-price').value.trim();
+            if (!title || !price || currentShopItems.length >= 50) return;
+
+            currentShopItems.push({ title, price });
+            const li = document.createElement('li');
+            li.className = "py-0.5 flex justify-between";
+            li.innerHTML = `<span>${title}</span><span>${price}</span>`;
+            document.getElementById('added-items-list').appendChild(li);
+
+            document.getElementById('item-title').value = "";
+            document.getElementById('item-price').value = "";
+        });
+
+        function initializeFormMaps() {
+            setTimeout(() => {
+                if (!mapHelp) {
+                    mapHelp = L.map('map-help-box').setView([centerLat, centerLng], 15);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapHelp);
+                    markerHelp = L.marker([centerLat, centerLng], { draggable: true }).addTo(mapHelp);
+                    document.getElementById('help-coords').value = `${centerLat}, ${centerLng}`;
+                    mapHelp.on('click', (e) => { markerHelp.setLatLng(e.latlng); document.getElementById('help-coords').value = `${e.latlng.lat}, ${e.latlng.lng}`; });
+                }
+                if (!mapShop) {
+                    mapShop = L.map('map-shop-box').setView([centerLat, centerLng], 15);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapShop);
+                    markerShop = L.marker([centerLat, centerLng], { draggable: true }).addTo(mapShop);
+                    document.getElementById('shop-coords').value = `${centerLat}, ${centerLng}`;
+                    mapShop.on('click', (e) => { markerShop.setLatLng(e.latlng); document.getElementById('shop-coords').value = `${e.latlng.lat}, ${e.latlng.lng}`; });
+                }
+            }, 200);
+        }
+
+        // Submissions Post Logic Blocks map items tracking
+        document.getElementById('btn-submit-help').addEventListener('click', () => {
+            const name = document.getElementById('help-fullname').value.trim() || userName;
+            const coords = document.getElementById('help-coords').value.split(',');
+            const phone = document.getElementById('help-phone').value.trim();
+            const desc = document.getElementById('help-desc').value.trim();
+
+            if (!phone || !desc) return alert("Fill required inputs.");
+
+            const itemPushRef = push(ref(db, 'helps_posts'));
+            set(itemPushRef, {
+                postId: itemPushRef.key, uid: userUid, posterName: name, phone, desc,
+                lat: parseFloat(coords[0]), lng: parseFloat(coords[1]), createdAt: Date.now()
+            }).then(() => {
+                document.getElementById('action-modal-overlay').classList.add('hidden');
+                alert("Help request posted successfully!");
+            });
+        });
+
+        document.getElementById('btn-submit-shop').addEventListener('click', () => {
+            const name = document.getElementById('shop-name').value.trim();
+            const coords = document.getElementById('shop-coords').value.split(',');
+
+            if (!name || currentShopItems.length === 0) return alert("Provide shop details and sub items entries.");
+
+            set(ref(db, 'shop_requests/' + userUid), {
+                uid: userUid, shopName: name, ownerName: userName,
+                lat: parseFloat(coords[0]), lng: parseFloat(coords[1]),
+                items: currentShopItems, status: "Pending", submittedAt: Date.now()
+            }).then(() => {
+                document.getElementById('action-modal-overlay').classList.add('hidden');
+                alert("Shop request transmitted for Admin verification checks mapping!");
+                currentShopItems = [];
+                document.getElementById('added-items-list').innerHTML = "";
+            });
+        });
+
+        // --- HAIVERSINE MATHEMATICAL EQUATION (Tracks radius constraints up to 10km ranges) ---
+        function calculateDistanceHaversineKm(lat1, lon1, lat2, lon2) {
+            const R = 6371; 
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+        }
+
+        // --- READ LIVE STREAM DATA FEEDS CLUSTERS ---
+        onValue(ref(db, 'helps_posts'), (snapshot) => {
+            const feed = document.getElementById('helps-feed-output');
+            feed.innerHTML = "";
+            if (!snapshot.exists()) return;
+
+            let posts = Object.values(snapshot.val());
+            // Force present user active post queries directly up to the top of list
+            posts.sort((x, y) => (x.uid === userUid ? -1 : y.uid === userUid ? 1 : 0));
+
+            posts.forEach(p => {
+                const card = document.createElement('div');
+                card.className = `p-4 rounded-2xl shadow-sm border text-xs flex flex-col space-y-1.5 ${p.uid === userUid ? 'bg-blue-50/70 border-blue-200' : 'bg-white border-slate-100'}`;
+                card.innerHTML = `
+                    <div class="flex justify-between font-bold"><span class="text-slate-800 text-sm">${p.posterName}</span><span class="text-slate-400 text-[10px]">${p.uid === userUid ? 'My Request' : 'Nearby Help'}</span></div>
+                    <p class="text-slate-600 font-medium leading-relaxed">${p.desc}</p>
+                    <div class="pt-1 flex justify-between text-[10px] font-mono text-slate-400"><span>Contact: ${p.phone}</span><span>Coordinates: ${p.lat.toFixed(4)}, ${p.lng.toFixed(4)}</span></div>
+                `;
+                feed.appendChild(card);
+            });
+        });
+
+        onValue(ref(db, 'approved_shops'), (snapshot) => {
+            const feed = document.getElementById('grocery-feed-output');
+            feed.innerHTML = "";
+            if (!snapshot.exists()) return;
+
+            let shops = Object.values(snapshot.val());
+            // Sort to place user shop at top
+            shops.sort((x, y) => (x.uid === userUid ? -1 : y.uid === userUid ? 1 : 0));
+
+            shops.forEach(s => {
+                // Filter range constraints using the Haversine formula mapping keys
+                const distance = calculateDistanceHaversineKm(centerLat, centerLng, s.lat, s.lng);
+                if (distance > 10 && s.uid !== userUid) return; // Cut out data if out of range
+
+                const card = document.createElement('div');
+                card.className = "p-4 bg-white rounded-2xl shadow-sm border border-slate-100 text-xs flex flex-col space-y-2";
+                
+                let listItemsHtml = "";
+                s.items.forEach(i => {
+                    listItemsHtml += `<div class="flex justify-between py-0.5 border-b border-dashed border-slate-100">
+                        <span class="font-medium text-slate-700">${i.title}</span>
+                        <span class="font-bold text-slate-900">${i.price}</span>
+                    </div>`;
+                });
+
+                card.innerHTML = `
+                    <div class="border-b pb-1.5 flex justify-between items-center">
+                        <div>
+                            <h4 class="font-black text-slate-900 text-sm">${s.shopName}</h4>
+                            <span class="text-[10px] text-slate-400">Owner: ${s.ownerName} (${distance.toFixed(1)} km away)</span>
+                        </div>
+                        ${s.uid === userUid ? '<span class="bg-blue-100 text-blue-700 text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase">My Shop</span>' : ''}
+                    </div>
+                    <div class="space-y-1 max-h-32 overflow-y-auto">${listItemsHtml}</div>
+                `;
+                feed.appendChild(card);
+            });
+        });
+    </script>
+</body>
+</html>
