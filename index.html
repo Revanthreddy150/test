@@ -24,13 +24,13 @@
         <div id="grocery-feed-output" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
     </div>
 
-    <button id="btn-floating-action" class="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-tr from-blue-600 to-indigo-600 text-white rounded-full text-2xl font-black shadow-xl hover:scale-105 transition active:scale-95 flex items-center justify-center cursor-pointer select-none z-40">
+    <button id="btn-floating-action" class="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-tr from-blue-600 to-indigo-600 text-white rounded-full text-2xl font-black shadow-xl hover:scale-105 transition active:scale-[0.95] flex items-center justify-center cursor-pointer select-none z-40">
         +
     </button>
 
     <div id="action-modal-overlay" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl p-6 w-full max-w-lg shadow-2xl relative border border-slate-100 max-h-[90vh] overflow-y-auto">
-            <button id="btn-close-action-modal" class="absolute top-4 right-4 text-slate-400 text-xl font-bold cursor-pointer">&times;</button>
+            <button id="btn-close-action-modal" class="absolute top-4 right-4 text-slate-400 text-xl font-bold cursor-pointer">×</button>
             
             <div class="flex border-b pb-2 mb-4 space-x-4 text-sm font-bold">
                 <button id="form-help-tab" class="text-blue-600 border-b-2 border-blue-600 pb-1 cursor-pointer">Request Help</button>
@@ -67,7 +67,7 @@
 
     <div id="shop-details-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[60] flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl p-6 w-full max-w-lg shadow-2xl relative max-h-[85vh] flex flex-col">
-            <button id="btn-close-shop-modal" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-xl font-bold cursor-pointer">&times;</button>
+            <button id="btn-close-shop-modal" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-xl font-bold cursor-pointer">×</button>
             <div class="border-b pb-3 mb-4">
                 <h3 id="modal-shop-name" class="font-black text-slate-900 text-xl">Shop Details</h3>
                 <p id="modal-shop-meta" class="text-xs text-slate-400 mt-0.5"></p>
@@ -230,7 +230,7 @@
             return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
         }
 
-        // --- RENDER INBOX READ HELPS (Coordinates Hidden for Privacy) ---
+        // --- RENDER INBOX READ HELPS ---
         onValue(ref(db, 'helps_posts'), (snapshot) => {
             const feed = document.getElementById('helps-feed-output');
             feed.innerHTML = "";
@@ -242,7 +242,6 @@
             posts.forEach(p => {
                 const card = document.createElement('div');
                 card.className = `p-4 rounded-2xl shadow-sm border text-xs flex flex-col space-y-2 ${p.uid === userUid ? 'bg-blue-50/70 border-blue-200' : 'bg-white border-slate-100'}`;
-                // FIXED: Coordinates text output omitted for all users
                 card.innerHTML = `
                     <div class="flex justify-between font-bold"><span class="text-slate-800 text-sm">${p.posterName}</span><span class="text-slate-400 text-[10px]">${p.uid === userUid ? 'My Request' : 'Nearby Help'}</span></div>
                     <p class="text-slate-600 font-medium leading-relaxed">${p.desc}</p>
@@ -254,7 +253,7 @@
             });
         });
 
-        // --- RENDER DYNAMIC SHops GRID ---
+        // --- RENDER DYNAMIC MARKETPLACE STORES ---
         onValue(ref(db, 'approved_shops'), (snapshot) => {
             const feed = document.getElementById('grocery-feed-output');
             feed.innerHTML = "";
@@ -272,13 +271,13 @@
                 card.className = "bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100 flex flex-col hover:shadow-md transition duration-200 cursor-pointer shop-grid-card";
                 card.setAttribute('data-uid', s.uid);
 
+                // FIXED: Pulls the true updated s.shopImgUrl directly from the database schema field parameter
                 const coverImg = s.shopImgUrl || "https://images.unsplash.com/photo-1542838132-92c53300491e?w=600";
 
-                // FIXED: Direct menu listings hidden. Displays clean image, title, and Google Maps click button
                 card.innerHTML = `
                     <div class="h-40 w-full relative bg-slate-100">
-                        <img src="${coverImg}" class="w-full h-full object-cover" alt="Shop Cover">
-                        ${s.uid === userUid ? '<span class="absolute top-3 left-3 bg-blue-600 text-white text-[9px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider">My Shop</span>' : ''}
+                        <img src="${coverImg}" class="w-full h-full object-cover" alt="Shop Cover Image">
+                        ${s.uid === userUid ? '<span class="absolute top-3 left-3 bg-blue-600 text-white text-[9px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider z-10">My Shop</span>' : ''}
                     </div>
                     <div class="p-4 flex flex-col flex-grow justify-between space-y-3">
                         <div>
@@ -293,27 +292,27 @@
                 feed.appendChild(card);
             });
 
-            // Bind card overlay grid click configurations
+            // Bind full profile card overlays click logic
             document.querySelectorAll('.shop-grid-card').forEach(card => {
                 card.addEventListener('click', (e) => {
-                    if (e.target.closest('.btn-gmaps-link')) return; // ignore if clicking map link button
+                    if (e.target.closest('.btn-gmaps-link')) return; 
                     const targetUid = card.getAttribute('data-uid');
                     openShopDetailsModal(allLiveShopsCached[targetUid]);
                 });
             });
 
-            // Bind external Google Maps redirect anchors
+            // Bind external map redirect loop triggers
             document.querySelectorAll('.btn-gmaps-link').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     const lat = btn.getAttribute('data-lat');
                     const lng = btn.getAttribute('data-lng');
-                    window.open(`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`, '_blank');
+                    window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank');
                 });
             });
         });
 
-        // --- POPUP MODAL GENERATOR FOR INDIVIDUAL STORE VIEWS ---
+        // --- POPUP MODAL GENERATOR FOR DETAILED MENU ITEMS ---
         function openShopDetailsModal(shop) {
             document.getElementById('modal-shop-name').innerText = shop.shopName;
             document.getElementById('modal-shop-meta').innerText = `Managed by: ${shop.ownerName}`;
@@ -325,11 +324,12 @@
                 const row = document.createElement('div');
                 row.className = "bg-slate-50 rounded-2xl p-3 border border-slate-100 flex flex-col space-y-2";
                 
+                // FIXED: Pulls the specific i.imgUrl saved to the corresponding object inside the array
                 const itemImg = i.imgUrl || "https://images.unsplash.com/photo-1542838132-92c53300491e?w=300";
 
                 row.innerHTML = `
-                    <div class="h-28 w-full bg-slate-200 rounded-xl overflow-hidden shadow-inner">
-                        <img src="${itemImg}" class="w-full h-full object-cover" alt="Item Image">
+                    <div class="h-28 w-full bg-slate-200 rounded-xl overflow-hidden shadow-inner relative">
+                        <img src="${itemImg}" class="w-full h-full object-cover" alt="Item Image Graphic">
                     </div>
                     <div class="flex justify-between items-center px-0.5">
                         <span class="font-bold text-slate-800 text-xs truncate max-w-[140px]">${i.title}</span>
