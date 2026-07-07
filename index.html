@@ -25,7 +25,6 @@
     </div>
 
     <div class="max-w-5xl mx-auto">
-        
         <div id="view-food" class="space-y-4">
             <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">🍽️ Registered Nearby Restaurants</h2>
             <div id="food-feed-output" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
@@ -38,7 +37,7 @@
 
         <div id="view-medicines" class="hidden space-y-4">
             <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">🔒 My Private Medical & Agent Call Requests</h2>
-            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider bg-slate-100 p-2.5 rounded-xl inline-block">🛡️ Secure Privacy: Other users cannot see your requests</p>
+            <p class="text-xs font-semibold text-slate-400 bg-slate-100 p-2.5 rounded-xl inline-block">Only you can view these requests.</p>
             <div id="medicines-feed-output" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2"></div>
         </div>
         
@@ -48,52 +47,39 @@
         </div>
     </div>
 
-    <div id="success-tick-overlay" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[200] flex flex-col items-center justify-center animate-fade-in">
+    <div id="success-tick-overlay" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[200] flex flex-col items-center justify-center">
         <div class="bg-white p-10 rounded-3xl shadow-2xl flex flex-col items-center text-center max-w-sm border-4 border-green-500">
             <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-4xl font-black mb-4">✓</div>
             <h4 class="text-2xl font-black text-slate-900">Request Sent!</h4>
-            <p class="text-sm text-slate-500 mt-2 leading-relaxed font-medium">Your submission has been logged securely. Looking for local delivery agents near your location coordinates...</p>
+            <p class="text-sm text-slate-500 mt-2">Logged securely. Searching for local agents near your area...</p>
         </div>
     </div>
 
-    <button id="btn-floating-action" class="fixed bottom-6 right-6 w-16 h-14 bg-gradient-to-tr from-blue-600 to-indigo-600 text-white rounded-2xl text-3xl font-black shadow-xl flex items-center justify-center cursor-pointer hover:scale-105 active:scale-95 transition-all z-40 select-none">
-        +
-    </button>
+    <button id="btn-floating-action" class="fixed bottom-6 right-6 w-16 h-14 bg-gradient-to-tr from-blue-600 to-indigo-600 text-white rounded-2xl text-3xl font-black shadow-xl flex items-center justify-center cursor-pointer hover:scale-105 transition-all z-40">+</button>
 
-    <div id="shop-details-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[60] flex items-center justify-center p-4 animate-fade-in">
-        <div class="bg-white rounded-3xl p-6 w-full max-w-5xl h-[88vh] shadow-2xl relative flex flex-col lg:flex-row gap-6 border border-slate-100">
+    <div id="shop-details-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[60] flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-5xl h-[88vh] shadow-2xl relative flex flex-col lg:flex-row gap-6">
             <button id="btn-close-shop-modal" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-2xl font-black p-2 cursor-pointer">×</button>
-            
             <div class="flex-1 flex flex-col min-h-0">
-                <div class="border-b pb-2 mb-3"><h3 id="modal-shop-name" class="font-black text-slate-900 text-2xl">Menu Items</h3><p id="modal-shop-meta" class="text-xs font-bold text-slate-400 uppercase tracking-wide"></p></div>
+                <div class="border-b pb-2 mb-3"><h3 id="modal-shop-name" class="font-black text-slate-900 text-2xl">Menu</h3><p id="modal-shop-meta" class="text-xs font-bold text-slate-400 uppercase"></p></div>
                 <div id="modal-items-grid" class="flex-grow overflow-y-auto space-y-3 grid grid-cols-1 sm:grid-cols-2 gap-4 content-start pr-1"></div>
             </div>
-
-            <div class="w-full lg:w-85 border-t lg:border-t-0 lg:border-l pt-4 lg:pt-0 lg:pl-5 flex flex-col justify-between min-h-0 shrink-0">
+            <div class="w-full lg:w-85 border-t lg:border-t-0 lg:border-l pt-4 lg:pt-0 lg:pl-5 flex flex-col justify-between min-h-0">
                 <div class="flex flex-col min-h-0 flex-grow overflow-y-auto pr-1 space-y-4">
-                    <h4 class="font-black text-slate-800 text-base uppercase tracking-wider border-b pb-2">🛒 Basket Items</h4>
+                    <h4 class="font-black text-slate-800 text-base uppercase tracking-wider border-b pb-2">🛒 Basket</h4>
                     <div id="cart-items-wrapper" class="space-y-3 divide-y divide-slate-100 text-sm font-medium"></div>
-                    
                     <div class="border-t pt-3 space-y-3 text-xs font-bold">
-                        <div>
-                            <label class="text-slate-400 tracking-wide uppercase text-[10px] block mb-1">Confirm Contact Phone Number</label>
-                            <input type="tel" id="cart-phone-input" class="w-full p-2.5 bg-slate-50 border-2 border-slate-200 rounded-xl font-bold text-sm text-slate-800 focus:border-blue-500 focus:outline-none">
-                        </div>
-                        <div>
-                            <label class="text-slate-400 tracking-wide uppercase text-[10px] block mb-1">Delivery Address Destination</label>
-                            <textarea id="cart-delivery-address-input" rows="2" class="w-full p-2.5 bg-slate-50 border-2 border-slate-200 rounded-xl font-bold text-xs text-slate-700 focus:border-blue-500 focus:outline-none" placeholder="Type delivery destination address here..."></textarea>
-                        </div>
+                        <div><label class="text-slate-400 text-[10px] block mb-1">Confirm Phone Number</label><input type="tel" id="cart-phone-input" class="w-full p-2.5 bg-slate-50 border-2 border-slate-200 rounded-xl font-bold text-sm"></div>
+                        <div><label class="text-slate-400 text-[10px] block mb-1">Delivery Destination Address</label><textarea id="cart-delivery-address-input" rows="2" class="w-full p-2.5 bg-slate-50 border-2 border-slate-200 rounded-xl font-bold text-xs"></textarea></div>
                         <div class="space-y-1">
-                            <label class="text-slate-400 tracking-wide uppercase text-[10px] block">Pinpoint Destination Spot on Map</label>
                             <div id="cart-checkout-map" class="h-28 w-full bg-slate-100 rounded-xl border-2 border-slate-200 overflow-hidden relative"></div>
-                            <input type="text" id="cart-selected-coords" readonly class="w-full p-2 bg-slate-100 border text-[10px] font-mono text-slate-500 rounded-lg text-center" placeholder="Click map to lock precise delivery coordinate">
+                            <input type="text" id="cart-selected-coords" readonly class="w-full p-2 bg-slate-100 border text-[10px] font-mono text-slate-500 rounded-lg text-center">
                         </div>
                     </div>
                 </div>
-                <div class="border-t pt-3 mt-3 space-y-3 bg-slate-50 p-3 rounded-2xl border border-slate-100">
-                    <div class="flex justify-between font-black text-lg text-slate-900"><span>Grand Total Bill:</span><span id="cart-grand-total" class="text-blue-600">₹0</span></div>
-                    <p class="text-[10px] text-emerald-700 font-extrabold bg-emerald-100 border border-emerald-200 py-1.5 rounded-xl text-center uppercase tracking-wide">Cash on Delivery (COD)</p>
-                    <button id="btn-checkout-cart" class="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-sm py-3.5 rounded-2xl shadow-md cursor-pointer active:scale-98 transition-all">Book Order (Place COD)</button>
+                <div class="border-t pt-3 space-y-2 bg-slate-50 p-3 rounded-2xl">
+                    <div class="flex justify-between font-black text-lg text-slate-900"><span>Grand Total:</span><span id="cart-grand-total" class="text-blue-600">₹0</span></div>
+                    <button id="btn-checkout-cart" class="w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white font-black text-sm py-3 rounded-2xl shadow-md cursor-pointer">Place COD Order</button>
                 </div>
             </div>
         </div>
@@ -101,54 +87,11 @@
 
     <div id="action-modal-overlay" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl p-6 w-full max-w-xl shadow-2xl relative border-2 max-h-[92vh] overflow-y-auto">
-            <button id="btn-close-action-modal" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-2xl font-black p-1 cursor-pointer">×</button>
+            <button id="btn-close-action-modal" class="absolute top-4 right-4 text-slate-400 text-2xl font-black p-1 cursor-pointer">×</button>
+            <div id="modal-form-routing-header" class="text-slate-800 border-b pb-3 mb-4 font-black text-lg">Create Entry Request</div>
             
-            <div class="grid grid-cols-2 gap-2 border-b pb-3 mb-4 text-sm font-black uppercase tracking-wider">
-                <button id="form-help-tab" class="text-blue-600 border-b-4 border-blue-600 pb-1 cursor-pointer text-center">💊 I Need Medicines</button>
-                <button id="form-shop-tab" class="text-slate-400 pb-1 cursor-pointer text-center">🏃 Need Help Agent</button>
-            </div>
-
-            <div id="form-help-block" class="space-y-4 text-xs font-bold">
-                <div>
-                    <label class="block text-slate-600 uppercase mb-1">Patient Full Name</label>
-                    <input type="text" id="help-fullname" class="w-full p-3 bg-slate-50 border-2 border-slate-200 rounded-xl font-bold text-sm" placeholder="Type full name spelling">
+            <div id="form-workspace-fields" class="space-y-4 text-xs font-bold">
                 </div>
-                <div>
-                    <label class="block text-slate-600 uppercase mb-1">Confirm Geolocation Address (Pin dropped on Map)</label>
-                    <div class="h-44 bg-slate-100 rounded-2xl overflow-hidden relative" id="map-help-box"></div>
-                    <input type="text" id="help-coords" readonly class="w-full p-2 bg-slate-100 border text-[10px] font-mono rounded-lg text-center mt-1 text-slate-400">
-                </div>
-                <div>
-                    <label class="block text-slate-600 uppercase mb-1">Active Contact Number</label>
-                    <input type="tel" id="help-phone" class="w-full p-3 bg-slate-50 border-2 border-slate-200 rounded-xl font-bold text-sm" placeholder="Type operating mobile number">
-                </div>
-                <div>
-                    <label class="block text-slate-600 uppercase mb-1">List Required Medicines / Description</label>
-                    <textarea id="help-desc" class="w-full p-3 bg-slate-50 border-2 border-slate-200 rounded-xl font-medium text-sm h-20" placeholder="Type names of tablets or syrup required..."></textarea>
-                </div>
-                <button id="btn-submit-help" class="w-full bg-blue-600 text-white font-black text-sm py-3 rounded-2xl shadow cursor-pointer">Submit Medical Request</button>
-            </div>
-
-            <div id="form-shop-block" class="hidden space-y-4 text-xs font-bold">
-                <div>
-                    <label class="block text-slate-600 uppercase mb-1">Your Full Name</label>
-                    <input type="text" id="agent-req-name" class="w-full p-3 bg-slate-50 border-2 border-slate-200 rounded-xl font-bold text-sm" placeholder="Type your full name">
-                </div>
-                <div>
-                    <label class="block text-slate-600 uppercase mb-1">Confirm Assistance Spot (Pin dropped on Map)</label>
-                    <div class="h-44 bg-slate-100 rounded-2xl overflow-hidden relative" id="map-shop-box"></div>
-                    <input type="text" id="shop-coords" readonly class="w-full p-2 bg-slate-100 border text-[10px] font-mono rounded-lg text-center mt-1 text-slate-400">
-                </div>
-                <div>
-                    <label class="block text-slate-700 text-xs font-bold uppercase mb-1">Contact Phone Number</label>
-                    <input type="tel" id="agent-req-phone" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold" placeholder="Type working number">
-                </div>
-                <div>
-                    <label class="block text-slate-700 text-xs font-bold uppercase mb-1">Describe what work or help you require</label>
-                    <textarea id="agent-req-desc" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium h-20" placeholder="Describe task like bring groceries, bank work support..."></textarea>
-                </div>
-                <button id="btn-submit-shop" class="w-full bg-emerald-600 text-white font-bold py-3 rounded-xl text-sm cursor-pointer">Book Local Agent Assistant</button>
-            </div>
         </div>
     </div>
 
@@ -179,182 +122,195 @@
         const profileSavedAddress = decodeURIComponent(params.get('savedAddress') || "");
         const userContactPhone = decodeURIComponent(params.get('phone') || "");
 
-        let mapHelp = null, mapShop = null, mapCartCheckout = null;
-        let markerHelp = null, markerShop = null, markerCartCheckout = null;
-        let activeCart = [], activeCartShopUid = null, activeCartShopName = null, allShopsCached = {};
+        let activeTab = "food", currentItemsListArray = [], activeMapInstance = null, activeMarkerInstance = null;
 
         document.getElementById('tab-food-btn').addEventListener('click', () => switchTab('food'));
         document.getElementById('tab-grocery-btn').addEventListener('click', () => switchTab('grocery'));
         document.getElementById('tab-medicines-btn').addEventListener('click', () => switchTab('medicines'));
         document.getElementById('tab-orders-btn').addEventListener('click', () => switchTab('orders'));
-
-        function switchTab(t) {
-            ['food', 'grocery', 'medicines', 'orders'].forEach(v => {
-                document.getElementById(`tab-${v}-btn`).className = "px-4 py-3.5 rounded-2xl text-sm font-black tracking-wide transition text-center bg-white text-slate-700 border border-slate-200 hover:bg-slate-100 flex flex-col items-center justify-center gap-1 cursor-pointer";
-                document.getElementById(`view-${v}`).classList.add('hidden');
-            });
-            document.getElementById(`tab-${t}-btn`).className = "px-4 py-3.5 rounded-2xl text-sm font-black tracking-wide transition text-center bg-blue-600 text-white flex flex-col items-center justify-center gap-1 cursor-pointer shadow-md";
-            document.getElementById(`view-${t}`).classList.remove('hidden');
-        }
-
-        document.getElementById('btn-floating-action').addEventListener('click', () => {
-            if (userAadharStatus !== "Verified") { alert(`Profile documentation is unverified. Current State: [${userAadharStatus}]`); return; }
-            document.getElementById('action-modal-overlay').classList.remove('hidden'); initializeFormMaps();
-        });
-
         document.getElementById('btn-close-action-modal').addEventListener('click', () => document.getElementById('action-modal-overlay').classList.add('hidden'));
         document.getElementById('btn-close-shop-modal').addEventListener('click', () => document.getElementById('shop-details-modal').classList.add('hidden'));
 
-        document.getElementById('form-help-tab').addEventListener('click', () => {
-            document.getElementById('form-help-block').classList.remove('hidden'); document.getElementById('form-shop-block').classList.add('hidden');
-            document.getElementById('form-help-tab').className = "text-blue-600 border-b-4 border-blue-600 pb-1 cursor-pointer text-center"; document.getElementById('form-shop-tab').className = "text-slate-400 pb-1 cursor-pointer text-center";
-        });
-        document.getElementById('form-shop-tab').addEventListener('click', () => {
-            document.getElementById('form-shop-block').classList.remove('hidden'); document.getElementById('form-help-block').classList.add('hidden');
-            document.getElementById('form-shop-tab').className = "text-blue-600 border-b-4 border-blue-600 pb-1 cursor-pointer text-center"; document.getElementById('form-help-tab').className = "text-slate-400 pb-1 cursor-pointer text-center";
-        });
-
-        function initializeFormMaps() {
-            setTimeout(() => {
-                if (!mapHelp) {
-                    mapHelp = L.map('map-help-box').setView([centerLat, centerLng], 15); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapHelp);
-                    markerHelp = L.marker([centerLat, centerLng], { draggable: true }).addTo(mapHelp);
-                    document.getElementById('help-coords').value = `${centerLat}, ${centerLng}`;
-                    mapHelp.on('click', (e) => { markerHelp.setLatLng(e.latlng); document.getElementById('help-coords').value = `${e.latlng.lat}, ${e.latlng.lng}`; });
-                }
-                if (!mapShop) {
-                    mapShop = L.map('map-shop-box').setView([centerLat, centerLng], 15); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapShop);
-                    markerShop = L.marker([centerLat, centerLng], { draggable: true }).addTo(mapShop);
-                    document.getElementById('shop-coords').value = `${centerLat}, ${centerLng}`;
-                    mapShop.on('click', (e) => { markerShop.setLatLng(e.latlng); document.getElementById('shop-coords').value = `${e.latlng.lat}, ${e.latlng.lng}`; });
-                }
-            }, 200);
+        function switchTab(t) {
+            activeTab = t;
+            ['food', 'grocery', 'medicines', 'orders'].forEach(v => {
+                document.getElementById(`tab-${v}-btn`).className = "px-4 py-3.5 rounded-2xl text-sm font-black transition text-center bg-white text-slate-700 border border-slate-200 flex flex-col items-center justify-center gap-1 cursor-pointer";
+                document.getElementById(`view-${v}`).classList.add('hidden');
+            });
+            document.getElementById(`tab-${t}-btn`).className = "px-4 py-3.5 rounded-2xl text-sm font-black transition text-center bg-blue-600 text-white flex flex-col items-center justify-center gap-1 cursor-pointer shadow-md";
+            document.getElementById(`view-${t}`).classList.remove('hidden');
         }
 
-        // --- SUBMIT PRIVATE MEDICAL / AGENT ASSISTANCE REQUESTS ---
-        document.getElementById('btn-submit-help').addEventListener('click', () => {
-            const c = document.getElementById('help-coords').value.split(',');
-            const desc = document.getElementById('help-desc').value.trim();
-            const phone = document.getElementById('help-phone').value.trim();
-            if(!desc || !phone) return alert("Fill mandatory description.");
+        // --- DYNAMIC DUAL SUBMISSIONS SETUP MANAGER ---
+        document.getElementById('btn-floating-action').addEventListener('click', () => {
+            if (userAadharStatus !== "Verified") { alert("Aadhaar Verification required."); return; }
+            const container = document.getElementById('form-workspace-fields');
+            const header = document.getElementById('modal-form-routing-header');
+            container.innerHTML = ""; currentItemsListArray = [];
+            document.getElementById('action-modal-overlay').classList.remove('hidden');
 
-            const pushRef = push(ref(db, 'helps_posts'));
-            set(pushRef, { 
-                postId: pushRef.key, uid: userUid, category: "Medicine",
-                posterName: document.getElementById('help-fullname').value.trim() || userName, 
-                phone, desc, lat: parseFloat(c[0]), lng: parseFloat(c[1]), timestamp: Date.now() 
-            }).then(() => { 
-                document.getElementById('action-modal-overlay').classList.add('hidden');
-                triggerAnimatedGreenSuccessTickOverlayGate();
-            });
+            if (activeTab === "food" || activeTab === "grocery") {
+                header.innerText = activeTab === "food" ? "🍴 Submit New Restaurant Profile" : "🏪 Submit New Grocery Store Profile";
+                container.innerHTML = `
+                    <div><label>Name</label><input type="text" id="f-name" class="w-full p-2 bg-slate-50 border rounded-xl"></div>
+                    <div><label>Contact Phone Number</label><input type="tel" id="f-phone" class="w-full p-2 bg-slate-50 border rounded-xl"></div>
+                    <div><label>Pin Location on Map</label><div id="f-map" class="h-32 bg-slate-100 rounded-xl"></div><input type="text" id="f-coords" readonly class="w-full p-1.5 bg-slate-100 border font-mono mt-1 text-center text-slate-400"></div>
+                    <div class="border p-3 rounded-xl bg-slate-50 space-y-2">
+                        <span class="text-[10px] block uppercase text-slate-400">Inventory Items Menu (Max 50)</span>
+                        <div class="flex gap-1"><input type="text" id="f-i-title" class="flex-1 p-1.5 bg-white border text-xs" placeholder="Item"><input type="text" id="f-i-price" class="w-16 p-1.5 bg-white border text-xs text-center" placeholder="₹60"><button id="f-i-add" class="bg-slate-900 text-white px-3 rounded-xl text-sm font-bold cursor-pointer">+</button></div>
+                        <ul id="f-i-ul" class="text-[11px] font-mono divide-y space-y-0.5 max-h-20 overflow-y-auto"></ul>
+                    </div>
+                    <button id="f-submit-btn" class="w-full bg-blue-600 text-white py-2.5 font-bold rounded-xl text-xs uppercase cursor-pointer">Submit Profile Request</button>
+                `;
+                setTimeout(() => buildModalFormMaps('f-map', 'f-coords'), 200);
+                document.getElementById('f-i-add').addEventListener('click', addItemToDynamicInventoryList);
+                document.getElementById('f-submit-btn').addEventListener('click', submitShopOrRestaurantRegistrationRequest);
+            } else if (activeTab === "medicines") {
+                header.innerText = "💊 Request Medicines or Agent Assistance";
+                container.innerHTML = `
+                    <div class="grid grid-cols-2 gap-2 border-b pb-2 mb-2 uppercase text-center text-[11px]"><button id="btn-sub-med" class="text-blue-600 border-b-2 border-blue-600 pb-1">Medicines</button><button id="btn-sub-age" class="text-slate-400 pb-1">Agent Helper</button></div>
+                    <div id="subform-payload-block" class="space-y-3"></div>
+                `;
+                document.getElementById('btn-sub-med').addEventListener('click', () => selectMedicineSubformMode("Medicine"));
+                document.getElementById('btn-sub-age').addEventListener('click', () => selectMedicineSubformMode("Agent Help"));
+                selectMedicineSubformMode("Medicine"); // default load
+            }
         });
 
-        document.getElementById('btn-submit-shop').addEventListener('click', () => {
-            const c = document.getElementById('shop-coords').value.split(',');
-            const desc = document.getElementById('agent-req-desc').value.trim();
-            const phone = document.getElementById('agent-req-phone').value.trim();
-            if(!desc || !phone) return alert("Fill details description fields.");
+        function buildModalFormMaps(mapId, coordsId) {
+            activeMapInstance = L.map(mapId).setView([centerLat, centerLng], 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(activeMapInstance);
+            activeMarkerInstance = L.marker([centerLat, centerLng], { draggable: true }).addTo(activeMapInstance);
+            document.getElementById(coordsId).value = `${centerLat}, ${centerLng}`;
+            activeMapInstance.on('click', (e) => { activeMarkerInstance.setLatLng(e.latlng); document.getElementById(coordsId).value = `${e.latlng.lat}, ${e.latlng.lng}`; });
+        }
 
-            const pushRef = push(ref(db, 'helps_posts'));
-            set(pushRef, { 
-                postId: pushRef.key, uid: userUid, category: "Agent Help",
-                posterName: document.getElementById('agent-req-name').value.trim() || userName, 
-                phone, desc, lat: parseFloat(c[0]), lng: parseFloat(c[1]), timestamp: Date.now() 
-            }).then(() => { 
+        function addItemToDynamicInventoryList() {
+            const t = document.getElementById('f-i-title').value.trim();
+            const p = document.getElementById('f-i-price').value.trim();
+            if(!t || !p || currentItemsListArray.length >= 50) return;
+            currentItemsListArray.push({ title: t, price: p });
+            const li = document.createElement('li'); li.className = "py-0.5 flex justify-between"; li.innerHTML = `<span>${t}</span><span>${p}</span>`;
+            document.getElementById('f-i-ul').appendChild(li);
+            document.getElementById('f-i-title').value = ""; document.getElementById('f-i-price').value = "";
+        }
+
+        function submitShopOrRestaurantRegistrationRequest() {
+            const name = document.getElementById('f-name').value.trim();
+            const phone = document.getElementById('f-phone').value.trim();
+            const coords = document.getElementById('f-coords').value.split(',');
+            if(!name || !phone || currentItemsListArray.length === 0) return alert("All entries require data matching.");
+
+            const destinationNodePath = activeTab === "food" ? "restaurant_requests/" : "shop_requests/";
+            set(ref(db, destinationNodePath + userUid), {
+                uid: userUid, name, ownerName: userName, phone,
+                lat: parseFloat(coords[0]), lng: parseFloat(coords[1]),
+                items: currentItemsListArray, status: "Pending", submittedAt: Date.now()
+            }).then(() => {
                 document.getElementById('action-modal-overlay').classList.add('hidden');
-                triggerAnimatedGreenSuccessTickOverlayGate();
+                alert("Application submitted for Admin review tables integration!");
             });
-        });
+        }
 
+        function selectMedicineSubformMode(mode) {
+            const medBtn = document.getElementById('btn-sub-med'); const ageBtn = document.getElementById('btn-sub-age');
+            const block = document.getElementById('subform-payload-block'); block.innerHTML = "";
+            if(mode === "Medicine") {
+                medBtn.className = "text-blue-600 border-b-2 border-blue-600 pb-1 cursor-pointer"; ageBtn.className = "text-slate-400 pb-1 cursor-pointer";
+                block.innerHTML = `
+                    <div><label>Patient Full Name</label><input type="text" id="m-name" class="w-full p-2 bg-slate-50 border rounded-xl"></div>
+                    <div><label>Phone Number</label><input type="tel" id="m-phone" class="w-full p-2 bg-slate-50 border rounded-xl"></div>
+                    <div><label>Map Spot Location</label><div id="m-map" class="h-28 bg-slate-100 rounded-xl"></div><input type="text" id="m-coords" readonly class="w-full p-1 bg-slate-100 border text-center font-mono"></div>
+                    <div><label>List Required Medicines</label><textarea id="m-desc" class="w-full p-2 bg-slate-50 border rounded-xl h-14" placeholder="Enter tablets details..."></textarea></div>
+                    <button id="m-submit" class="w-full bg-blue-600 text-white font-bold py-2 rounded-xl">Post Medicine Call</button>
+                `;
+            } else {
+                ageBtn.className = "text-blue-600 border-b-2 border-blue-600 pb-1 cursor-pointer"; medBtn.className = "text-slate-400 pb-1 cursor-pointer";
+                block.innerHTML = `
+                    <div><label>Your Name</label><input type="text" id="m-name" class="w-full p-2 bg-slate-50 border rounded-xl"></div>
+                    <div><label>Contact Phone</label><input type="tel" id="m-phone" class="w-full p-2 bg-slate-50 border rounded-xl"></div>
+                    <div><label>Map Spot Location</label><div id="m-map" class="h-28 bg-slate-100 rounded-xl"></div><input type="text" id="m-coords" readonly class="w-full p-1 bg-slate-100 border text-center font-mono"></div>
+                    <div><label>Describe Tasks Details Needed</label><textarea id="m-desc" class="w-full p-2 bg-slate-50 border rounded-xl h-14" placeholder="Describe assistance task..."></textarea></div>
+                    <button id="m-submit" class="w-full bg-emerald-600 text-white font-bold py-2 rounded-xl">Book Local Agent Assistant</button>
+                `;
+            }
+            setTimeout(() => buildModalFormMaps('m-map', 'm-coords'), 150);
+            document.getElementById('m-submit').addEventListener('click', () => {
+                const c = document.getElementById('m-coords').value.split(',');
+                const pushRef = push(ref(db, 'helps_posts'));
+                set(pushRef, { postId: pushRef.key, uid: userUid, category: mode, posterName: document.getElementById('m-name').value.trim() || userName, phone: document.getElementById('m-phone').value.trim(), desc: document.getElementById('m-desc').value.trim(), lat: parseFloat(c[0]), lng: parseFloat(c[1]), status: "Processing", timestamp: Date.now() })
+                .then(() => { document.getElementById('action-modal-overlay').classList.add('hidden'); triggerAnimatedGreenSuccessTickOverlayGate(); });
+            });
+        }
+
+        // --- MAPS CALCULATIONS READ FEEDS SYNC ---
         function calculateDistance(lat1, lon1, lat2, lon2) {
             const R = 6371; const dLat = (lat2 - lat1) * Math.PI / 180; const dLon = (lon2 - lon1) * Math.PI / 180;
             const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
             return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
         }
 
-        // --- READ INBOX MEDICINES FEED (FIXED: Defaults tracking to current user UID only) ---
         onValue(ref(db, 'helps_posts'), (snapshot) => {
             const feed = document.getElementById('medicines-feed-output'); feed.innerHTML = ""; 
-            if (!snapshot.exists()) { feed.innerHTML = `<p class="p-6 text-slate-400 font-bold text-center text-xs col-span-2">No active medicine or helper claims logged.</p>`; return; }
+            if (!snapshot.exists()) { feed.innerHTML = `<p class="p-6 text-slate-400 font-bold text-center text-xs col-span-2">No active assistance records found.</p>`; return; }
             
-            // FIXED: Omit other users posts from render logic structures completely
             const privateClaims = Object.values(snapshot.val()).filter(p => p.uid === userUid);
-            if(privateClaims.length === 0) { feed.innerHTML = `<p class="p-6 text-slate-400 font-bold text-center text-xs col-span-2">No private medical or helper agent records logged.</p>`; return; }
+            if(privateClaims.length === 0) { feed.innerHTML = `<p class="p-6 text-slate-400 font-bold text-center text-xs col-span-2">No active assistance records found.</p>`; return; }
 
             privateClaims.forEach(p => {
-                const card = document.createElement('div'); 
-                card.className = "p-5 bg-white border border-slate-200 rounded-2xl shadow-sm text-xs flex flex-col space-y-2 relative";
+                const card = document.createElement('div'); card.className = "p-5 bg-white border border-slate-200 rounded-2xl shadow-sm text-xs flex flex-col space-y-2 relative";
                 
+                // LIVE WORKING TIMER CLOCK CALCULATION LOGIC IN USER SCREEN
+                let liveCounterHtmlStr = "";
+                if (p.status === "In Work" && p.workStartTime) {
+                    const trackingMinutesElapsed = Math.floor((Date.now() - p.workStartTime) / 1000 / 60);
+                    liveCounterHtmlStr = `<div class="mt-2 p-2 bg-blue-50 text-blue-700 font-bold rounded-lg animate-pulse flex justify-between"><span>👷 Agent Work Time Elapsed:</span><span>${Math.round(trackingMinutesElapsed)} Mins</span></div>`;
+                }
+
                 card.innerHTML = `
-                    <div class="flex justify-between items-center">
-                        <span class="font-black text-slate-900 text-sm">${p.posterName}</span>
-                        <span class="text-[10px] bg-indigo-50 text-indigo-600 border border-indigo-200 font-black uppercase tracking-wider px-2 py-0.5 rounded-full">${p.category || 'Medicine'}</span>
-                    </div>
-                    <p class="text-slate-600 font-bold leading-relaxed">📋 ${p.desc}</p>
-                    <div class="pt-2 flex justify-between items-center text-[10px] font-mono text-slate-400 border-t border-slate-100">
-                        <span>📞 Phone: ${p.phone}</span>
-                        <span class="bg-amber-100 text-amber-700 px-2 py-0.5 rounded-md font-bold uppercase animate-pulse">Awaiting Agent Pick Up</span>
-                    </div>
+                    <div class="flex justify-between items-center font-bold"><span class="text-slate-800 text-sm">${p.posterName}</span><span class="text-blue-500 font-black uppercase text-[10px] tracking-widest">${p.status || 'Processing'}</span></div>
+                    <p class="text-slate-600 font-medium">${p.desc}</p>
+                    ${p.agentName ? `<div class="p-2 bg-slate-50 border rounded-xl text-[11px] text-slate-600"><b>Assigned Agent:</b> ${p.agentName} (📞 ${p.agentPhone})</div>` : ''}
+                    ${agentDetailsBlockHtml}
+                    <div class="pt-1 text-[10px] text-slate-400 font-mono">Placed: ${new Date(p.createdAt).toLocaleTimeString()}</div>
                 `;
                 feed.appendChild(card);
             });
         });
 
-        // --- READ SPLIT NETWORK DIRECTORIES: FOOD AND GROCERIES ---
+        // Sync and render Marketplace Vendor Stores directories mapping keys
         onValue(ref(db, 'approved_shops'), (snapshot) => {
-            const foodFeed = document.getElementById('food-feed-output'); foodFeed.innerHTML = "";
-            const groceryFeed = document.getElementById('grocery-feed-output'); groceryFeed.innerHTML = "";
-            if (!snapshot.exists()) return;
-
+            const gFeed = document.getElementById('grocery-feed-output'); gFeed.innerHTML = ""; if (!snapshot.exists()) return;
             allShopsCached = snapshot.val();
             Object.values(allShopsCached).forEach(s => {
-                const dist = calculateDistance(centerLat, centerLng, s.lat, s.lng);
-                if (dist > 10 && s.uid !== userUid) return;
-
-                const card = document.createElement('div'); 
-                card.className = "bg-white rounded-3xl overflow-hidden border border-slate-200/80 flex flex-col shadow-sm hover:shadow-md transition cursor-pointer shop-card-link";
+                const dist = calculateDistance(centerLat, centerLng, s.lat, s.lng); if (dist > 10 && s.uid !== userUid) return;
+                const card = document.createElement('div'); card.className = "bg-white rounded-3xl overflow-hidden border border-slate-100 flex flex-col shadow-xs cursor-pointer shop-card";
                 card.setAttribute('data-uid', s.uid);
-                card.innerHTML = `<img src="${s.shopImgUrl || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600'}" class="h-44 w-full object-cover"><div class="p-4"><h4 class="font-black text-base text-slate-900 tracking-tight leading-none">${s.shopName}</h4><p class="text-xs font-bold text-slate-400 mt-1">Managed by: ${s.ownerName} (${dist.toFixed(1)} km away)</p></div>`;
+                card.innerHTML = `<img src="${s.shopImgUrl || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600'}" class="h-36 w-full object-cover"><div class="p-4"><h4 class="font-black text-sm text-slate-900">${s.shopName}</h4><p class="text-xs text-slate-400">${s.ownerName} (${dist.toFixed(1)} km away)</p></div>`;
                 
-                // FIXED: Categorize vendors into separate panels dynamically by name identifiers keywords checks
-                const targetStr = s.shopName.toLowerCase();
-                if(targetStr.includes('hotel') || targetStr.includes('restaurant') || targetStr.includes('cafe') || targetStr.includes('food') || targetStr.includes('baking') || targetStr.includes('bakery') || targetStr.includes('tiffins')) {
-                    foodFeed.appendChild(card);
-                } else {
-                    groceryFeed.appendChild(card);
-                }
+                // Route vendors down to food vs grocery listings grid structures partitions arrays
+                const t = s.shopName.toLowerCase();
+                if(t.includes('hotel')||t.includes('restaurant')||t.includes('cafe')||t.includes('food')||t.includes('bakery')||t.includes('tiffins')) {
+                    document.getElementById('food-feed-output').appendChild(card);
+                } else { gFeed.appendChild(card); }
             });
-
-            // Fallback empty slots renders
-            if(foodFeed.children.length === 0) foodFeed.innerHTML = `<p class="text-xs text-slate-400 font-bold p-6">No nearby restaurants registered within 10km range.</p>`;
-            if(groceryFeed.children.length === 0) groceryFeed.innerHTML = `<p class="text-xs text-slate-400 font-bold p-6">No nearby grocery stores registered within 10km range.</p>`;
-
-            document.querySelectorAll('.shop-card-link').forEach(c => c.addEventListener('click', () => openShopDetailsModal(allShopsCached[c.getAttribute('data-uid')])));
+            document.querySelectorAll('.shop-card').forEach(c => c.addEventListener('click', () => openShopDetailsModal(allShopsCached[c.getAttribute('data-uid')])));
         });
 
         function openShopDetailsModal(shop) {
             document.getElementById('modal-shop-name').innerText = shop.shopName;
             document.getElementById('modal-shop-meta').innerText = `Owner: ${shop.ownerName}`;
             activeCartShopUid = shop.uid; activeCartShopName = shop.shopName;
-            
             document.getElementById('cart-delivery-address-input').value = profileSavedAddress;
             document.getElementById('cart-phone-input').value = userContactPhone;
             
             const grid = document.getElementById('modal-items-grid'); grid.innerHTML = "";
             shop.items.forEach((item, idx) => {
-                const div = document.createElement('div'); div.className = "bg-slate-50 rounded-2xl p-3 border border-slate-100 flex flex-col justify-between space-y-2 shadow-inner";
-                div.innerHTML = `
-                    <img src="${item.imgUrl || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=300'}" class="h-28 w-full object-cover rounded-xl shadow-xs">
-                    <div class="flex justify-between items-center text-xs font-bold"><span class="truncate max-w-[120px]">${item.title}</span><span class="text-blue-600 font-mono text-sm">${item.price}</span></div>
-                    <button class="btn-add-to-cart bg-slate-900 text-white text-[10px] font-black py-2 rounded-xl uppercase tracking-wider cursor-pointer shadow-md hover:bg-slate-800" data-title="${item.title}" data-price="${item.price}">Add to Cart</button>
-                `;
+                const div = document.createElement('div'); div.className = "bg-slate-50 rounded-2xl p-3 border border-slate-100 flex flex-col justify-between space-y-2";
+                div.innerHTML = `<img src="${item.imgUrl || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=300'}" class="h-24 w-full object-cover rounded-xl"><div class="flex justify-between items-center text-xs font-bold"><span class="truncate">${item.title}</span><span class="text-blue-600">${item.price}</span></div><button class="btn-add-to-cart bg-slate-900 text-white text-[10px] font-black py-1.5 rounded-xl uppercase tracking-wider cursor-pointer" data-title="${item.title}" data-price="${item.price}">Add to Cart</button>`;
                 grid.appendChild(div);
             });
-
-            document.querySelectorAll('.btn-add-to-cart').forEach(btn => {
-                btn.addEventListener('click', (e) => { addItemToCartArray(e.target.getAttribute('data-title'), e.target.getAttribute('data-price')); });
-            });
-
+            document.querySelectorAll('.btn-add-to-cart').forEach(btn => btn.addEventListener('click', (e) => addItemToCartArray(e.target.getAttribute('data-title'), e.target.getAttribute('data-price'))));
             document.getElementById('shop-details-modal').classList.remove('hidden');
             initializeCartCheckoutDeliveryMap();
         }
@@ -362,12 +318,11 @@
         function initializeCartCheckoutDeliveryMap() {
             setTimeout(() => {
                 if (!mapCartCheckout) {
-                    mapCartCheckout = L.map('cart-checkout-map').setView([centerLat, centerLng], 16);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapCartCheckout);
+                    mapCartCheckout = L.map('cart-checkout-map').setView([centerLat, centerLng], 16); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapCartCheckout);
                     markerCartCheckout = L.marker([centerLat, centerLng]).addTo(mapCartCheckout);
                     document.getElementById('cart-selected-coords').value = `${centerLat}, ${centerLng}`;
                     mapCartCheckout.on('click', (e) => { markerCartCheckout.setLatLng(e.latlng); document.getElementById('cart-selected-coords').value = `${e.latlng.lat}, ${e.latlng.lng}`; });
-                } else { mapCartCheckout.setView([centerLat, centerLng], 16); markerCartCheckout.setLatLng([centerLat, centerLng]); mapCartCheckout.invalidateSize(); }
+                } else { mapCartCheckout.invalidateSize(); }
             }, 250);
         }
 
@@ -380,41 +335,21 @@
 
         function renderCartInterfaceView() {
             const wrap = document.getElementById('cart-items-wrapper'); wrap.innerHTML = "";
-            if (activeCart.length === 0) { wrap.innerHTML = `<p class="text-slate-400 text-center py-6">Your cart is empty.</p>`; document.getElementById('cart-grand-total').innerText = "₹0"; return; }
-            
+            if (activeCart.length === 0) { wrap.innerHTML = `<p class="text-slate-400 text-center py-4">Your cart is empty.</p>`; document.getElementById('cart-grand-total').innerText = "₹0"; return; }
             let total = 0;
             activeCart.forEach((item, index) => {
                 const cost = item.price * item.qty; total += cost;
-                const row = document.createElement('div'); row.className = "flex justify-between items-center py-2.5 text-xs text-slate-700 border-b border-slate-100 font-bold";
-                row.innerHTML = `
-                    <div>
-                        <span class="font-bold text-slate-900">${item.title}</span>
-                        <div class="flex items-center space-x-2 mt-1.5">
-                            <button class="btn-cart-minus bg-slate-200 hover:bg-slate-300 text-slate-800 px-2 py-0.5 rounded-lg text-sm font-black cursor-pointer" data-idx="${index}">-</button>
-                            <span class="font-mono text-sm px-1">${item.qty}</span>
-                            <button class="btn-cart-plus bg-slate-200 hover:bg-slate-300 text-slate-800 px-2 py-0.5 rounded-lg text-sm font-black cursor-pointer" data-idx="${index}">+</button>
-                        </div>
-                    </div>
-                    <span class="font-mono text-slate-900 text-sm">₹${cost}</span>
-                `;
+                const row = document.createElement('div'); row.className = "flex justify-between items-center py-2 text-xs border-b font-bold";
+                row.innerHTML = `<div><span>${item.title}</span><div class="flex space-x-1 mt-1"><button class="btn-m bg-slate-200 px-1 rounded cursor-pointer" data-idx="${index}">-</button><span>${item.qty}</span><button class="btn-p bg-slate-200 px-1 rounded cursor-pointer" data-idx="${index}">+</button></div></div><span>₹${cost}</span>`;
                 wrap.appendChild(row);
             });
             document.getElementById('cart-grand-total').innerText = `₹${total}`;
-
-            document.querySelectorAll('.btn-cart-minus').forEach(b => b.addEventListener('click', (e) => {
-                const idx = parseInt(e.target.getAttribute('data-idx'));
-                if(activeCart[idx].qty > 1) activeCart[idx].qty--; else activeCart.splice(idx, 1);
-                renderCartInterfaceView();
-            }));
-            document.querySelectorAll('.btn-cart-plus').forEach(b => b.addEventListener('click', (e) => {
-                activeCart[parseInt(e.target.getAttribute('data-idx'))].qty++;
-                renderCartInterfaceView();
-            }));
+            document.querySelectorAll('.btn-m').forEach(b => b.addEventListener('click', (e) => { const idx = parseInt(e.target.getAttribute('data-idx')); if(activeCart[idx].qty > 1) activeCart[idx].qty--; else activeCart.splice(idx, 1); renderCartInterfaceView(); }));
+            document.querySelectorAll('.btn-p').forEach(b => b.addEventListener('click', (e) => { activeCart[parseInt(e.target.getAttribute('data-idx'))].qty++; renderCartInterfaceView(); }));
         }
 
         function triggerAnimatedGreenSuccessTickOverlayGate() {
-            const overlay = document.getElementById('success-tick-overlay');
-            overlay.classList.remove('hidden');
+            const overlay = document.getElementById('success-tick-overlay'); overlay.classList.remove('hidden');
             setTimeout(() => { overlay.classList.add('hidden'); switchTab('orders'); }, 3000);
         }
 
@@ -423,76 +358,18 @@
             const deliveryDestinationStr = document.getElementById('cart-delivery-address-input').value.trim();
             const contactPhone = document.getElementById('cart-phone-input').value.trim();
             const selectedCoords = document.getElementById('cart-selected-coords').value.split(',');
+            if(!deliveryDestinationStr || !contactPhone) return alert("Fill delivery address and phone lines.");
 
-            if(!deliveryDestinationStr || !contactPhone || selectedCoords.length !== 2) {
-                alert("Fill destination inputs parameters, phone, and select map coordinate.");
-                return;
-            }
-
-            const totalBill = document.getElementById('cart-grand-total').innerText;
             const pushOrderRef = push(ref(db, 'orders'));
-            
-            set(pushOrderRef, {
-                orderId: pushOrderRef.key, uid: userUid, userName,
-                shopUid: activeCartShopUid, shopName: activeCartShopName,
-                items: activeCart, totalBill, status: "Processing",
-                deliveryAddress: deliveryDestinationStr, userPhone: contactPhone,
-                lat: parseFloat(selectedCoords[0]), lng: parseFloat(selectedCoords[1]), timestamp: Date.now()
-            }).then(() => {
-                activeCart = []; renderCartInterfaceView();
-                document.getElementById('shop-details-modal').classList.add('hidden');
-                triggerAnimatedGreenSuccessTickOverlayGate();
-            });
+            set(pushOrderRef, { orderId: pushOrderRef.key, uid: userUid, userName, shopUid: activeCartShopUid, shopName: activeCartShopName, items: activeCart, totalBill: document.getElementById('cart-grand-total').innerText, status: "Processing", deliveryAddress: deliveryDestinationStr, userPhone: contactPhone, lat: parseFloat(selectedCoords[0]), lng: parseFloat(selectedCoords[1]), timestamp: Date.now() })
+            .then(() => { activeCart = []; renderCartInterfaceView(); document.getElementById('shop-details-modal').classList.add('hidden'); triggerAnimatedGreenSuccessTickOverlayGate(); });
         });
 
         onValue(ref(db, 'orders'), (snapshot) => {
-            const container = document.getElementById('orders-feed-output'); container.innerHTML = "";
-            if (!snapshot.exists()) { container.innerHTML = `<p class="text-slate-400 text-center py-8 text-xs font-bold">No registered dispatch records found.</p>`; return; }
-            
+            const container = document.getElementById('orders-feed-output'); container.innerHTML = ""; if (!snapshot.exists()) return;
             Object.values(snapshot.val()).filter(o => o.uid === userUid).forEach(order => {
-                const elapsedMinutes = (Date.now() - order.timestamp) / 1000 / 60;
-                let currentStatus = order.status;
-
-                if (currentStatus === "Processing" && elapsedMinutes > 30) {
-                    currentStatus = "Cancelled";
-                    update(ref(db, `orders/${order.orderId}`), { status: "Cancelled", reason: "agents are not available" });
-                }
-
-                const card = document.createElement('div'); card.className = "p-5 bg-white rounded-3xl border border-slate-200/80 flex flex-col space-y-2.5 relative shadow-sm";
-                
-                let statusTextHtml = `<span class="text-amber-500 font-bold uppercase">${currentStatus}</span>`;
-                if (currentStatus === "Approved") {
-                    statusTextHtml = `<span class="text-green-600 font-extrabold uppercase bg-green-50 px-2.5 py-1 rounded-xl border border-green-200">Order Confirmed</span>`;
-                } else if (currentStatus === "Picked Up") {
-                    statusTextHtml = `<span class="text-indigo-600 font-extrabold uppercase bg-indigo-50 px-2.5 py-1 rounded-xl border border-indigo-200 animate-pulse">Picked Up / On the Way</span>`;
-                } else if (currentStatus === "Delivered") {
-                    statusTextHtml = `<span class="text-emerald-700 font-extrabold uppercase bg-emerald-100 px-2.5 py-1 rounded-xl">Delivered Successfully</span>`;
-                } else if (currentStatus === "Cancelled") {
-                    statusTextHtml = `<span class="text-red-500 font-extrabold uppercase bg-red-50 px-2.5 py-1 rounded-xl border border-red-200">Cancelled</span>`;
-                }
-
-                let itemsText = order.items.map(i => `${i.title} (x${i.qty})`).join(', ');
-
-                let agentDetailsBlockHtml = "";
-                if ((currentStatus === "Approved" || currentStatus === "Picked Up" || currentStatus === "Delivered") && order.agentName) {
-                    agentDetailsBlockHtml = `
-                        <div class="mt-2 p-3 bg-slate-50 border border-slate-200 rounded-2xl text-slate-700 text-xs font-bold space-y-1">
-                            <p class="text-slate-800 text-sm font-black">🚴 Delivery Partner Assigned</p>
-                            <p><b>Agent Name:</b> ${order.agentName}</p>
-                            <p><b>Agent Mobile Contact:</b> ${order.agentPhone || 'N/A'}</p>
-                        </div>`;
-                }
-
-                card.innerHTML = `
-                    <div class="flex justify-between items-center font-black">
-                        <span class="text-base text-slate-900 tracking-tight">${order.shopName || 'Market Order'}</span>
-                        ${statusTextHtml}
-                    </div>
-                    <p class="text-slate-600 font-bold text-xs"><b>Items summary:</b> ${itemsText}</p>
-                    <p class="text-xs text-slate-500 font-medium"><b>Destination Address:</b> ${order.deliveryAddress}</p>
-                    ${agentDetailsBlockHtml}
-                    <div class="pt-2 text-[10px] text-slate-400 font-mono border-t border-slate-50">Time Placed: ${new Date(order.timestamp).toLocaleString()}</div>
-                `;
+                const card = document.createElement('div'); card.className = "p-5 bg-white rounded-3xl border border-slate-200/80 flex flex-col space-y-2 text-xs shadow-sm";
+                card.innerHTML = `<div class="flex justify-between font-black"><span class="text-sm">${order.shopName}</span><span class="text-blue-600 uppercase">${order.status}</span></div><p class="text-slate-600"><b>Summary:</b> ${order.items.map(i=>i.title+'(x'+i.qty+')').join(', ')}</p><p class="text-slate-400 font-mono">Time: ${new Date(order.timestamp).toLocaleTimeString()}</p>${order.agentName ? `<div class="p-2 bg-green-50 border border-green-100 rounded-xl">Agent Assigned: ${order.agentName} (📞 ${order.agentPhone})</div>`:''}`;
                 container.appendChild(card);
             });
         });
