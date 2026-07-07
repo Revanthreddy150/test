@@ -2,107 +2,158 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Sub User Hub</title>
+    <title>Easy Community Assistant - Workspace</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
-<body class="bg-white text-slate-800 p-4 font-sans min-h-screen relative pb-24">
+<body class="bg-slate-50 text-slate-900 p-4 font-sans min-h-screen relative pb-28 selection:bg-blue-200">
 
-    <div class="flex items-center space-x-2 mb-6 border-b pb-4 border-slate-100">
-        <button id="tab-helps-btn" class="px-5 py-2 rounded-full text-xs font-bold tracking-wide transition bg-blue-600 text-white shadow-md cursor-pointer">Helps Feed</button>
-        <button id="tab-grocery-btn" class="px-5 py-2 rounded-full text-xs font-bold tracking-wide transition bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer">Food & Grocery</button>
-        <button id="tab-orders-btn" class="px-5 py-2 rounded-full text-xs font-bold tracking-wide transition bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer">My Orders</button>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6 border-b pb-5 border-slate-200 max-w-5xl mx-auto">
+        <button id="tab-food-btn" class="px-4 py-3.5 rounded-2xl text-sm font-black tracking-wide transition shadow-md cursor-pointer text-center bg-blue-600 text-white flex flex-col items-center justify-center gap-1">
+            <span class="text-xl">🍔</span> Order Food
+        </button>
+        <button id="tab-grocery-btn" class="px-4 py-3.5 rounded-2xl text-sm font-black tracking-wide transition cursor-pointer text-center bg-white text-slate-700 border border-slate-200 hover:bg-slate-100 flex flex-col items-center justify-center gap-1">
+            <span class="text-xl">🛒</span> Groceries
+        </button>
+        <button id="tab-medicines-btn" class="px-4 py-3.5 rounded-2xl text-sm font-black tracking-wide transition cursor-pointer text-center bg-white text-slate-700 border border-slate-200 hover:bg-slate-100 flex flex-col items-center justify-center gap-1">
+            <span class="text-xl">💊</span> Medicines / Agent
+        </button>
+        <button id="tab-orders-btn" class="px-4 py-3.5 rounded-2xl text-sm font-black tracking-wide transition cursor-pointer text-center bg-white text-slate-700 border border-slate-200 hover:bg-slate-100 flex flex-col items-center justify-center gap-1">
+            <span class="text-xl">📋</span> My Orders
+        </button>
     </div>
 
-    <div id="view-helps" class="space-y-4"><div id="helps-feed-output" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div></div>
-    <div id="view-grocery" class="hidden space-y-4"><div id="grocery-feed-output" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div></div>
-    
-    <div id="view-orders" class="hidden space-y-4">
-        <h3 class="text-sm font-black uppercase tracking-wider text-slate-400 mb-2">My Placed Assistance Calls & Orders Feed</h3>
-        <div id="orders-feed-output" class="space-y-3"></div>
-    </div>
+    <div class="max-w-5xl mx-auto">
+        
+        <div id="view-food" class="space-y-4">
+            <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">🍽️ Registered Nearby Restaurants</h2>
+            <div id="food-feed-output" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+        </div>
 
-    <div id="success-tick-overlay" class="hidden fixed inset-0 bg-slate-900/70 z-[200] flex flex-col items-center justify-center">
-        <div class="bg-white p-8 rounded-3xl shadow-2xl flex flex-col items-center text-center max-w-xs">
-            <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-3xl font-black mb-4">✓</div>
-            <h4 class="text-xl font-black text-slate-900">Order Placed!</h4>
-            <p class="text-xs text-slate-500 mt-1 leading-relaxed">Your order has been logged. Checking for local delivery agents near your range node coordinates...</p>
+        <div id="view-grocery" class="hidden space-y-4">
+            <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">🏪 Registered Local Grocery Shops</h2>
+            <div id="grocery-feed-output" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+        </div>
+
+        <div id="view-medicines" class="hidden space-y-4">
+            <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">🔒 My Private Medical & Agent Call Requests</h2>
+            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider bg-slate-100 p-2.5 rounded-xl inline-block">🛡️ Secure Privacy: Other users cannot see your requests</p>
+            <div id="medicines-feed-output" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2"></div>
+        </div>
+        
+        <div id="view-orders" class="hidden space-y-4">
+            <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">📦 Delivery Tracking Status (Cash on Delivery)</h2>
+            <div id="orders-feed-output" class="space-y-4"></div>
         </div>
     </div>
 
-    <button id="btn-floating-action" class="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-tr from-blue-600 to-indigo-600 text-white rounded-full text-2xl font-black shadow-xl flex items-center justify-center cursor-pointer z-40">+</button>
+    <div id="success-tick-overlay" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[200] flex flex-col items-center justify-center animate-fade-in">
+        <div class="bg-white p-10 rounded-3xl shadow-2xl flex flex-col items-center text-center max-w-sm border-4 border-green-500">
+            <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-4xl font-black mb-4">✓</div>
+            <h4 class="text-2xl font-black text-slate-900">Request Sent!</h4>
+            <p class="text-sm text-slate-500 mt-2 leading-relaxed font-medium">Your submission has been logged securely. Looking for local delivery agents near your location coordinates...</p>
+        </div>
+    </div>
 
-    <div id="shop-details-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[60] flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl p-6 w-full max-w-4xl h-[85vh] shadow-2xl relative flex flex-col lg:flex-row gap-6">
-            <button id="btn-close-shop-modal" class="absolute top-4 right-4 text-slate-400 text-xl font-bold cursor-pointer">×</button>
+    <button id="btn-floating-action" class="fixed bottom-6 right-6 w-16 h-14 bg-gradient-to-tr from-blue-600 to-indigo-600 text-white rounded-2xl text-3xl font-black shadow-xl flex items-center justify-center cursor-pointer hover:scale-105 active:scale-95 transition-all z-40 select-none">
+        +
+    </button>
+
+    <div id="shop-details-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[60] flex items-center justify-center p-4 animate-fade-in">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-5xl h-[88vh] shadow-2xl relative flex flex-col lg:flex-row gap-6 border border-slate-100">
+            <button id="btn-close-shop-modal" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-2xl font-black p-2 cursor-pointer">×</button>
             
             <div class="flex-1 flex flex-col min-h-0">
-                <div class="border-b pb-2 mb-3"><h3 id="modal-shop-name" class="font-black text-slate-900 text-xl">Shop Items</h3><p id="modal-shop-meta" class="text-xs text-slate-400"></p></div>
-                <div id="modal-items-grid" class="flex-grow overflow-y-auto space-y-3 grid grid-cols-1 sm:grid-cols-2 gap-3 content-start"></div>
+                <div class="border-b pb-2 mb-3"><h3 id="modal-shop-name" class="font-black text-slate-900 text-2xl">Menu Items</h3><p id="modal-shop-meta" class="text-xs font-bold text-slate-400 uppercase tracking-wide"></p></div>
+                <div id="modal-items-grid" class="flex-grow overflow-y-auto space-y-3 grid grid-cols-1 sm:grid-cols-2 gap-4 content-start pr-1"></div>
             </div>
 
-            <div class="w-full lg:w-80 border-t lg:border-t-0 lg:border-l pt-4 lg:pt-0 lg:pl-4 flex flex-col justify-between min-h-0">
-                <div class="flex flex-col min-h-0 flex-grow overflow-y-auto pr-1 space-y-3">
-                    <h4 class="font-black text-slate-800 text-sm uppercase tracking-wider">🛒 Shopping Cart</h4>
-                    <div id="cart-items-wrapper" class="space-y-2 text-xs divide-y divide-slate-100"></div>
+            <div class="w-full lg:w-85 border-t lg:border-t-0 lg:border-l pt-4 lg:pt-0 lg:pl-5 flex flex-col justify-between min-h-0 shrink-0">
+                <div class="flex flex-col min-h-0 flex-grow overflow-y-auto pr-1 space-y-4">
+                    <h4 class="font-black text-slate-800 text-base uppercase tracking-wider border-b pb-2">🛒 Basket Items</h4>
+                    <div id="cart-items-wrapper" class="space-y-3 divide-y divide-slate-100 text-sm font-medium"></div>
                     
-                    <div class="border-t pt-3 space-y-2 text-xs">
+                    <div class="border-t pt-3 space-y-3 text-xs font-bold">
                         <div>
-                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wide block mb-1">Confirm Phone Number</label>
-                            <input type="tel" id="cart-phone-input" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold focus:outline-blue-500 text-slate-800">
+                            <label class="text-slate-400 tracking-wide uppercase text-[10px] block mb-1">Confirm Contact Phone Number</label>
+                            <input type="tel" id="cart-phone-input" class="w-full p-2.5 bg-slate-50 border-2 border-slate-200 rounded-xl font-bold text-sm text-slate-800 focus:border-blue-500 focus:outline-none">
                         </div>
                         <div>
-                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wide block mb-1">Delivery Address Destination</label>
-                            <textarea id="cart-delivery-address-input" rows="2" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl font-medium focus:outline-blue-500 text-slate-700" placeholder="Type text address destination..."></textarea>
+                            <label class="text-slate-400 tracking-wide uppercase text-[10px] block mb-1">Delivery Address Destination</label>
+                            <textarea id="cart-delivery-address-input" rows="2" class="w-full p-2.5 bg-slate-50 border-2 border-slate-200 rounded-xl font-bold text-xs text-slate-700 focus:border-blue-500 focus:outline-none" placeholder="Type delivery destination address here..."></textarea>
                         </div>
-                        
                         <div class="space-y-1">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wide block">Pinpoint Delivery Spot on Map</label>
-                            <div id="cart-checkout-map" class="h-28 w-full bg-slate-100 rounded-xl border border-slate-200 overflow-hidden relative"></div>
-                            <input type="text" id="cart-selected-coords" readonly class="w-full p-1.5 bg-slate-100 text-[9px] font-mono text-slate-500 rounded-lg text-center" placeholder="Click map to lock precise delivery coordinates">
+                            <label class="text-slate-400 tracking-wide uppercase text-[10px] block">Pinpoint Destination Spot on Map</label>
+                            <div id="cart-checkout-map" class="h-28 w-full bg-slate-100 rounded-xl border-2 border-slate-200 overflow-hidden relative"></div>
+                            <input type="text" id="cart-selected-coords" readonly class="w-full p-2 bg-slate-100 border text-[10px] font-mono text-slate-500 rounded-lg text-center" placeholder="Click map to lock precise delivery coordinate">
                         </div>
                     </div>
                 </div>
-                <div class="border-t pt-3 space-y-2">
-                    <div class="flex justify-between font-black text-sm text-slate-900"><span>Grand Total Bill:</span><span id="cart-grand-total">₹0</span></div>
-                    <p class="text-[10px] text-emerald-600 font-bold bg-emerald-50 p-1.5 rounded text-center">Payment Method: Cash on Delivery (COD) Only</p>
-                    <button id="btn-checkout-cart" class="w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold text-xs py-3 rounded-xl transition cursor-pointer">Book Order (Place COD)</button>
+                <div class="border-t pt-3 mt-3 space-y-3 bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                    <div class="flex justify-between font-black text-lg text-slate-900"><span>Grand Total Bill:</span><span id="cart-grand-total" class="text-blue-600">₹0</span></div>
+                    <p class="text-[10px] text-emerald-700 font-extrabold bg-emerald-100 border border-emerald-200 py-1.5 rounded-xl text-center uppercase tracking-wide">Cash on Delivery (COD)</p>
+                    <button id="btn-checkout-cart" class="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-sm py-3.5 rounded-2xl shadow-md cursor-pointer active:scale-98 transition-all">Book Order (Place COD)</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="action-modal-overlay" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl p-6 w-full max-w-lg shadow-2xl relative border max-h-[90vh] overflow-y-auto">
-            <button id="btn-close-action-modal" class="absolute top-4 right-4 text-slate-400 text-xl font-bold cursor-pointer">×</button>
-            <div class="flex border-b pb-2 mb-4 space-x-4 text-sm font-bold"><button id="form-help-tab" class="text-blue-600 border-b-2 border-blue-600 pb-1">Request Help</button><button id="form-shop-tab" class="text-slate-400 pb-1">Add My Shop</button></div>
+    <div id="action-modal-overlay" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-xl shadow-2xl relative border-2 max-h-[92vh] overflow-y-auto">
+            <button id="btn-close-action-modal" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-2xl font-black p-1 cursor-pointer">×</button>
             
-            <div id="form-help-block" class="space-y-3">
-                <input type="text" id="help-fullname" class="w-full p-2.5 bg-slate-50 border rounded-xl text-xs font-semibold" placeholder="Your Full Name">
-                <div class="h-40 bg-slate-100 rounded-xl overflow-hidden relative" id="map-help-box"></div>
-                <input type="text" id="help-coords" readonly class="w-full p-2 bg-slate-100 text-[10px] font-mono rounded-lg">
-                <input type="tel" id="help-phone" class="w-full p-2.5 bg-slate-50 border rounded-xl text-xs" placeholder="Working Number">
-                <textarea id="help-desc" class="w-full p-2.5 bg-slate-50 border rounded-xl text-xs h-16" placeholder="Describe assistance needed..."></textarea>
-                <button id="btn-submit-help" class="w-full bg-blue-600 text-white text-xs font-bold py-2 rounded-xl cursor-pointer">Post Help Request</button>
+            <div class="grid grid-cols-2 gap-2 border-b pb-3 mb-4 text-sm font-black uppercase tracking-wider">
+                <button id="form-help-tab" class="text-blue-600 border-b-4 border-blue-600 pb-1 cursor-pointer text-center">💊 I Need Medicines</button>
+                <button id="form-shop-tab" class="text-slate-400 pb-1 cursor-pointer text-center">🏃 Need Help Agent</button>
             </div>
-            
-            <div id="form-shop-block" class="hidden space-y-3">
-                <input type="text" id="shop-name" class="w-full p-2.5 bg-slate-50 border rounded-xl text-xs" placeholder="Shop Name">
-                <div class="h-40 bg-slate-100 rounded-xl overflow-hidden relative" id="map-shop-box"></div>
-                <input type="text" id="shop-coords" readonly class="w-full p-2 bg-slate-100 text-[10px] font-mono rounded-lg">
-                <div class="border p-3 rounded-xl bg-slate-50 space-y-2">
-                    <div class="flex gap-2"><input type="text" id="item-title" class="flex-1 p-2 bg-white border text-xs" placeholder="Item Name"><input type="text" id="item-price" class="w-16 p-2 bg-white border text-xs text-center" placeholder="₹60"><button id="btn-add-subitem" class="bg-slate-800 text-white px-2 rounded cursor-pointer">+</button></div>
-                    <ul id="added-items-list" class="text-xs space-y-1 max-h-20 overflow-y-auto"></ul>
+
+            <div id="form-help-block" class="space-y-4 text-xs font-bold">
+                <div>
+                    <label class="block text-slate-600 uppercase mb-1">Patient Full Name</label>
+                    <input type="text" id="help-fullname" class="w-full p-3 bg-slate-50 border-2 border-slate-200 rounded-xl font-bold text-sm" placeholder="Type full name spelling">
                 </div>
-                <button id="btn-submit-shop" class="w-full bg-emerald-600 text-white text-xs font-bold py-2 rounded-xl cursor-pointer">Submit Shop</button>
+                <div>
+                    <label class="block text-slate-600 uppercase mb-1">Confirm Geolocation Address (Pin dropped on Map)</label>
+                    <div class="h-44 bg-slate-100 rounded-2xl overflow-hidden relative" id="map-help-box"></div>
+                    <input type="text" id="help-coords" readonly class="w-full p-2 bg-slate-100 border text-[10px] font-mono rounded-lg text-center mt-1 text-slate-400">
+                </div>
+                <div>
+                    <label class="block text-slate-600 uppercase mb-1">Active Contact Number</label>
+                    <input type="tel" id="help-phone" class="w-full p-3 bg-slate-50 border-2 border-slate-200 rounded-xl font-bold text-sm" placeholder="Type operating mobile number">
+                </div>
+                <div>
+                    <label class="block text-slate-600 uppercase mb-1">List Required Medicines / Description</label>
+                    <textarea id="help-desc" class="w-full p-3 bg-slate-50 border-2 border-slate-200 rounded-xl font-medium text-sm h-20" placeholder="Type names of tablets or syrup required..."></textarea>
+                </div>
+                <button id="btn-submit-help" class="w-full bg-blue-600 text-white font-black text-sm py-3 rounded-2xl shadow cursor-pointer">Submit Medical Request</button>
+            </div>
+
+            <div id="form-shop-block" class="hidden space-y-4 text-xs font-bold">
+                <div>
+                    <label class="block text-slate-600 uppercase mb-1">Your Full Name</label>
+                    <input type="text" id="agent-req-name" class="w-full p-3 bg-slate-50 border-2 border-slate-200 rounded-xl font-bold text-sm" placeholder="Type your full name">
+                </div>
+                <div>
+                    <label class="block text-slate-600 uppercase mb-1">Confirm Assistance Spot (Pin dropped on Map)</label>
+                    <div class="h-44 bg-slate-100 rounded-2xl overflow-hidden relative" id="map-shop-box"></div>
+                    <input type="text" id="shop-coords" readonly class="w-full p-2 bg-slate-100 border text-[10px] font-mono rounded-lg text-center mt-1 text-slate-400">
+                </div>
+                <div>
+                    <label class="block text-slate-700 text-xs font-bold uppercase mb-1">Contact Phone Number</label>
+                    <input type="tel" id="agent-req-phone" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold" placeholder="Type working number">
+                </div>
+                <div>
+                    <label class="block text-slate-700 text-xs font-bold uppercase mb-1">Describe what work or help you require</label>
+                    <textarea id="agent-req-desc" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium h-20" placeholder="Describe task like bring groceries, bank work support..."></textarea>
+                </div>
+                <button id="btn-submit-shop" class="w-full bg-emerald-600 text-white font-bold py-3 rounded-xl text-sm cursor-pointer">Book Local Agent Assistant</button>
             </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        // FIXED: Shifted database operators to load from firebase-database.js natively!
         import { getDatabase, ref, set, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
@@ -126,27 +177,28 @@
         const centerLat = parseFloat(params.get('lat')) || 17.3850;
         const centerLng = parseFloat(params.get('lng')) || 78.4867;
         const profileSavedAddress = decodeURIComponent(params.get('savedAddress') || "");
-        const userContactPhone = params.get('phone') || "";
+        const userContactPhone = decodeURIComponent(params.get('phone') || "");
 
         let mapHelp = null, mapShop = null, mapCartCheckout = null;
         let markerHelp = null, markerShop = null, markerCartCheckout = null;
-        let currentShopItems = [], activeCart = [], activeCartShopUid = null, activeCartShopName = null, allShopsCached = {};
+        let activeCart = [], activeCartShopUid = null, activeCartShopName = null, allShopsCached = {};
 
-        document.getElementById('tab-helps-btn').addEventListener('click', () => switchTab('helps'));
+        document.getElementById('tab-food-btn').addEventListener('click', () => switchTab('food'));
         document.getElementById('tab-grocery-btn').addEventListener('click', () => switchTab('grocery'));
+        document.getElementById('tab-medicines-btn').addEventListener('click', () => switchTab('medicines'));
         document.getElementById('tab-orders-btn').addEventListener('click', () => switchTab('orders'));
 
         function switchTab(t) {
-            ['helps', 'grocery', 'orders'].forEach(v => {
-                document.getElementById(`tab-${v}-btn`).className = "px-5 py-2 rounded-full text-xs font-bold tracking-wide transition bg-slate-100 text-slate-600 cursor-pointer";
+            ['food', 'grocery', 'medicines', 'orders'].forEach(v => {
+                document.getElementById(`tab-${v}-btn`).className = "px-4 py-3.5 rounded-2xl text-sm font-black tracking-wide transition text-center bg-white text-slate-700 border border-slate-200 hover:bg-slate-100 flex flex-col items-center justify-center gap-1 cursor-pointer";
                 document.getElementById(`view-${v}`).classList.add('hidden');
             });
-            document.getElementById(`tab-${t}-btn`).className = "px-5 py-2 rounded-full text-xs font-bold tracking-wide transition bg-blue-600 text-white shadow-md cursor-pointer";
+            document.getElementById(`tab-${t}-btn`).className = "px-4 py-3.5 rounded-2xl text-sm font-black tracking-wide transition text-center bg-blue-600 text-white flex flex-col items-center justify-center gap-1 cursor-pointer shadow-md";
             document.getElementById(`view-${t}`).classList.remove('hidden');
         }
 
         document.getElementById('btn-floating-action').addEventListener('click', () => {
-            if (userAadharStatus !== "Verified") { alert(`Verification Pending. Aadhar state: ${userAadharStatus}`); return; }
+            if (userAadharStatus !== "Verified") { alert(`Profile documentation is unverified. Current State: [${userAadharStatus}]`); return; }
             document.getElementById('action-modal-overlay').classList.remove('hidden'); initializeFormMaps();
         });
 
@@ -155,20 +207,11 @@
 
         document.getElementById('form-help-tab').addEventListener('click', () => {
             document.getElementById('form-help-block').classList.remove('hidden'); document.getElementById('form-shop-block').classList.add('hidden');
-            document.getElementById('form-help-tab').className = "text-blue-600 border-b-2 border-blue-600 pb-1"; document.getElementById('form-shop-tab').className = "text-slate-400 pb-1";
+            document.getElementById('form-help-tab').className = "text-blue-600 border-b-4 border-blue-600 pb-1 cursor-pointer text-center"; document.getElementById('form-shop-tab').className = "text-slate-400 pb-1 cursor-pointer text-center";
         });
         document.getElementById('form-shop-tab').addEventListener('click', () => {
             document.getElementById('form-shop-block').classList.remove('hidden'); document.getElementById('form-help-block').classList.add('hidden');
-            document.getElementById('form-shop-tab').className = "text-blue-600 border-b-2 border-blue-600 pb-1"; document.getElementById('form-help-tab').className = "text-slate-400 pb-1";
-        });
-
-        document.getElementById('btn-add-subitem').addEventListener('click', () => {
-            const t = document.getElementById('item-title').value.trim(); const p = document.getElementById('item-price').value.trim();
-            if (!t || !p || currentShopItems.length >= 50) return;
-            currentShopItems.push({ title: t, price: p });
-            const li = document.createElement('li'); li.innerHTML = `<span>${t}</span> - <span>${p}</span>`;
-            document.getElementById('added-items-list').appendChild(li);
-            document.getElementById('item-title').value = ""; document.getElementById('item-price').value = "";
+            document.getElementById('form-shop-tab').className = "text-blue-600 border-b-4 border-blue-600 pb-1 cursor-pointer text-center"; document.getElementById('form-help-tab').className = "text-slate-400 pb-1 cursor-pointer text-center";
         });
 
         function initializeFormMaps() {
@@ -188,11 +231,19 @@
             }, 200);
         }
 
+        // --- SUBMIT PRIVATE MEDICAL / AGENT ASSISTANCE REQUESTS ---
         document.getElementById('btn-submit-help').addEventListener('click', () => {
             const c = document.getElementById('help-coords').value.split(',');
+            const desc = document.getElementById('help-desc').value.trim();
+            const phone = document.getElementById('help-phone').value.trim();
+            if(!desc || !phone) return alert("Fill mandatory description.");
+
             const pushRef = push(ref(db, 'helps_posts'));
-            set(pushRef, { postId: pushRef.key, uid: userUid, posterName: document.getElementById('help-fullname').value.trim() || userName, phone: document.getElementById('help-phone').value.trim(), desc: document.getElementById('help-desc').value.trim(), lat: parseFloat(c[0]), lng: parseFloat(c[1]), createdAt: Date.now() })
-            .then(() => { 
+            set(pushRef, { 
+                postId: pushRef.key, uid: userUid, category: "Medicine",
+                posterName: document.getElementById('help-fullname').value.trim() || userName, 
+                phone, desc, lat: parseFloat(c[0]), lng: parseFloat(c[1]), timestamp: Date.now() 
+            }).then(() => { 
                 document.getElementById('action-modal-overlay').classList.add('hidden');
                 triggerAnimatedGreenSuccessTickOverlayGate();
             });
@@ -200,8 +251,19 @@
 
         document.getElementById('btn-submit-shop').addEventListener('click', () => {
             const c = document.getElementById('shop-coords').value.split(',');
-            set(ref(db, 'shop_requests/' + userUid), { uid: userUid, shopName: document.getElementById('shop-name').value.trim(), ownerName: userName, lat: parseFloat(c[0]), lng: parseFloat(c[1]), items: currentShopItems, status: "Pending", submittedAt: Date.now() })
-            .then(() => { document.getElementById('action-modal-overlay').classList.add('hidden'); alert("Shop request submitted!"); currentShopItems = []; document.getElementById('added-items-list').innerHTML = ""; });
+            const desc = document.getElementById('agent-req-desc').value.trim();
+            const phone = document.getElementById('agent-req-phone').value.trim();
+            if(!desc || !phone) return alert("Fill details description fields.");
+
+            const pushRef = push(ref(db, 'helps_posts'));
+            set(pushRef, { 
+                postId: pushRef.key, uid: userUid, category: "Agent Help",
+                posterName: document.getElementById('agent-req-name').value.trim() || userName, 
+                phone, desc, lat: parseFloat(c[0]), lng: parseFloat(c[1]), timestamp: Date.now() 
+            }).then(() => { 
+                document.getElementById('action-modal-overlay').classList.add('hidden');
+                triggerAnimatedGreenSuccessTickOverlayGate();
+            });
         });
 
         function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -210,26 +272,64 @@
             return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
         }
 
+        // --- READ INBOX MEDICINES FEED (FIXED: Defaults tracking to current user UID only) ---
         onValue(ref(db, 'helps_posts'), (snapshot) => {
-            const feed = document.getElementById('helps-feed-output'); feed.innerHTML = ""; if (!snapshot.exists()) return;
-            Object.values(snapshot.val()).sort((x, y) => (x.uid === userUid ? -1 : y.uid === userUid ? 1 : 0)).forEach(p => {
-                const card = document.createElement('div'); card.className = `p-4 rounded-2xl border text-xs flex flex-col space-y-1.5 ${p.uid === userUid ? 'bg-blue-50 border-blue-200' : 'bg-white border-slate-100'}`;
-                card.innerHTML = `<div class="flex justify-between font-bold"><span class="text-slate-800 text-sm">${p.posterName}</span></div><p class="text-slate-600 leading-relaxed">${p.desc}</p><span class="text-[10px] text-slate-400">Contact: ${p.phone}</span>`;
+            const feed = document.getElementById('medicines-feed-output'); feed.innerHTML = ""; 
+            if (!snapshot.exists()) { feed.innerHTML = `<p class="p-6 text-slate-400 font-bold text-center text-xs col-span-2">No active medicine or helper claims logged.</p>`; return; }
+            
+            // FIXED: Omit other users posts from render logic structures completely
+            const privateClaims = Object.values(snapshot.val()).filter(p => p.uid === userUid);
+            if(privateClaims.length === 0) { feed.innerHTML = `<p class="p-6 text-slate-400 font-bold text-center text-xs col-span-2">No private medical or helper agent records logged.</p>`; return; }
+
+            privateClaims.forEach(p => {
+                const card = document.createElement('div'); 
+                card.className = "p-5 bg-white border border-slate-200 rounded-2xl shadow-sm text-xs flex flex-col space-y-2 relative";
+                
+                card.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="font-black text-slate-900 text-sm">${p.posterName}</span>
+                        <span class="text-[10px] bg-indigo-50 text-indigo-600 border border-indigo-200 font-black uppercase tracking-wider px-2 py-0.5 rounded-full">${p.category || 'Medicine'}</span>
+                    </div>
+                    <p class="text-slate-600 font-bold leading-relaxed">📋 ${p.desc}</p>
+                    <div class="pt-2 flex justify-between items-center text-[10px] font-mono text-slate-400 border-t border-slate-100">
+                        <span>📞 Phone: ${p.phone}</span>
+                        <span class="bg-amber-100 text-amber-700 px-2 py-0.5 rounded-md font-bold uppercase animate-pulse">Awaiting Agent Pick Up</span>
+                    </div>
+                `;
                 feed.appendChild(card);
             });
         });
 
+        // --- READ SPLIT NETWORK DIRECTORIES: FOOD AND GROCERIES ---
         onValue(ref(db, 'approved_shops'), (snapshot) => {
-            const feed = document.getElementById('grocery-feed-output'); feed.innerHTML = ""; if (!snapshot.exists()) return;
+            const foodFeed = document.getElementById('food-feed-output'); foodFeed.innerHTML = "";
+            const groceryFeed = document.getElementById('grocery-feed-output'); groceryFeed.innerHTML = "";
+            if (!snapshot.exists()) return;
+
             allShopsCached = snapshot.val();
             Object.values(allShopsCached).forEach(s => {
-                const dist = calculateDistance(centerLat, centerLng, s.lat, s.lng); if (dist > 10 && s.uid !== userUid) return;
-                const card = document.createElement('div'); card.className = "bg-white rounded-3xl overflow-hidden border border-slate-100 flex flex-col shadow-xs cursor-pointer shop-card";
+                const dist = calculateDistance(centerLat, centerLng, s.lat, s.lng);
+                if (dist > 10 && s.uid !== userUid) return;
+
+                const card = document.createElement('div'); 
+                card.className = "bg-white rounded-3xl overflow-hidden border border-slate-200/80 flex flex-col shadow-sm hover:shadow-md transition cursor-pointer shop-card-link";
                 card.setAttribute('data-uid', s.uid);
-                card.innerHTML = `<img src="${s.shopImgUrl || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600'}" class="h-36 w-full object-cover"><div class="p-4"><h4 class="font-black text-sm text-slate-900">${s.shopName}</h4><p class="text-xs text-slate-400">${s.ownerName} (${dist.toFixed(1)} km away)</p></div>`;
-                feed.appendChild(card);
+                card.innerHTML = `<img src="${s.shopImgUrl || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600'}" class="h-44 w-full object-cover"><div class="p-4"><h4 class="font-black text-base text-slate-900 tracking-tight leading-none">${s.shopName}</h4><p class="text-xs font-bold text-slate-400 mt-1">Managed by: ${s.ownerName} (${dist.toFixed(1)} km away)</p></div>`;
+                
+                // FIXED: Categorize vendors into separate panels dynamically by name identifiers keywords checks
+                const targetStr = s.shopName.toLowerCase();
+                if(targetStr.includes('hotel') || targetStr.includes('restaurant') || targetStr.includes('cafe') || targetStr.includes('food') || targetStr.includes('baking') || targetStr.includes('bakery') || targetStr.includes('tiffins')) {
+                    foodFeed.appendChild(card);
+                } else {
+                    groceryFeed.appendChild(card);
+                }
             });
-            document.querySelectorAll('.shop-card').forEach(c => c.addEventListener('click', () => openShopDetailsModal(allShopsCached[c.getAttribute('data-uid')])));
+
+            // Fallback empty slots renders
+            if(foodFeed.children.length === 0) foodFeed.innerHTML = `<p class="text-xs text-slate-400 font-bold p-6">No nearby restaurants registered within 10km range.</p>`;
+            if(groceryFeed.children.length === 0) groceryFeed.innerHTML = `<p class="text-xs text-slate-400 font-bold p-6">No nearby grocery stores registered within 10km range.</p>`;
+
+            document.querySelectorAll('.shop-card-link').forEach(c => c.addEventListener('click', () => openShopDetailsModal(allShopsCached[c.getAttribute('data-uid')])));
         });
 
         function openShopDetailsModal(shop) {
@@ -242,19 +342,17 @@
             
             const grid = document.getElementById('modal-items-grid'); grid.innerHTML = "";
             shop.items.forEach((item, idx) => {
-                const div = document.createElement('div'); div.className = "bg-slate-50 rounded-2xl p-3 border border-slate-100 flex flex-col justify-between space-y-2";
+                const div = document.createElement('div'); div.className = "bg-slate-50 rounded-2xl p-3 border border-slate-100 flex flex-col justify-between space-y-2 shadow-inner";
                 div.innerHTML = `
-                    <img src="${item.imgUrl || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=300'}" class="h-24 w-full object-cover rounded-xl">
-                    <div class="flex justify-between items-center text-xs font-bold"><span class="truncate">${item.title}</span><span class="text-blue-600">${item.price}</span></div>
-                    <button class="btn-add-to-cart bg-slate-900 text-white text-[10px] font-black py-1.5 rounded-xl uppercase tracking-wider cursor-pointer shadow-xs" data-title="${item.title}" data-price="${item.price}">Add to Cart</button>
+                    <img src="${item.imgUrl || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=300'}" class="h-28 w-full object-cover rounded-xl shadow-xs">
+                    <div class="flex justify-between items-center text-xs font-bold"><span class="truncate max-w-[120px]">${item.title}</span><span class="text-blue-600 font-mono text-sm">${item.price}</span></div>
+                    <button class="btn-add-to-cart bg-slate-900 text-white text-[10px] font-black py-2 rounded-xl uppercase tracking-wider cursor-pointer shadow-md hover:bg-slate-800" data-title="${item.title}" data-price="${item.price}">Add to Cart</button>
                 `;
                 grid.appendChild(div);
             });
 
             document.querySelectorAll('.btn-add-to-cart').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    addItemToCartArray(e.target.getAttribute('data-title'), e.target.getAttribute('data-price'));
-                });
+                btn.addEventListener('click', (e) => { addItemToCartArray(e.target.getAttribute('data-title'), e.target.getAttribute('data-price')); });
             });
 
             document.getElementById('shop-details-modal').classList.remove('hidden');
@@ -268,16 +366,8 @@
                     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapCartCheckout);
                     markerCartCheckout = L.marker([centerLat, centerLng]).addTo(mapCartCheckout);
                     document.getElementById('cart-selected-coords').value = `${centerLat}, ${centerLng}`;
-                    
-                    mapCartCheckout.on('click', (e) => {
-                        markerCartCheckout.setLatLng(e.latlng);
-                        document.getElementById('cart-selected-coords').value = `${e.latlng.lat}, ${e.latlng.lng}`;
-                    });
-                } else {
-                    mapCartCheckout.setView([centerLat, centerLng], 16);
-                    markerCartCheckout.setLatLng([centerLat, centerLng]);
-                    mapCartCheckout.invalidateSize();
-                }
+                    mapCartCheckout.on('click', (e) => { markerCartCheckout.setLatLng(e.latlng); document.getElementById('cart-selected-coords').value = `${e.latlng.lat}, ${e.latlng.lng}`; });
+                } else { mapCartCheckout.setView([centerLat, centerLng], 16); markerCartCheckout.setLatLng([centerLat, centerLng]); mapCartCheckout.invalidateSize(); }
             }, 250);
         }
 
@@ -290,22 +380,22 @@
 
         function renderCartInterfaceView() {
             const wrap = document.getElementById('cart-items-wrapper'); wrap.innerHTML = "";
-            if (activeCart.length === 0) { wrap.innerHTML = `<p class="text-slate-400 text-center py-4">Your cart is empty.</p>`; document.getElementById('cart-grand-total').innerText = "₹0"; return; }
+            if (activeCart.length === 0) { wrap.innerHTML = `<p class="text-slate-400 text-center py-6">Your cart is empty.</p>`; document.getElementById('cart-grand-total').innerText = "₹0"; return; }
             
             let total = 0;
             activeCart.forEach((item, index) => {
                 const cost = item.price * item.qty; total += cost;
-                const row = document.createElement('div'); row.className = "flex justify-between items-center py-2 text-xs text-slate-700 border-b border-slate-50";
+                const row = document.createElement('div'); row.className = "flex justify-between items-center py-2.5 text-xs text-slate-700 border-b border-slate-100 font-bold";
                 row.innerHTML = `
                     <div>
-                        <span class="font-bold">${item.title}</span>
-                        <div class="flex items-center space-x-2 mt-1">
-                            <button class="btn-cart-minus bg-slate-200 text-slate-700 px-1.5 rounded font-black cursor-pointer" data-idx="${index}">-</button>
-                            <span class="font-mono font-bold">${item.qty}</span>
-                            <button class="btn-cart-plus bg-slate-200 text-slate-700 px-1.5 rounded font-black cursor-pointer" data-idx="${index}">+</button>
+                        <span class="font-bold text-slate-900">${item.title}</span>
+                        <div class="flex items-center space-x-2 mt-1.5">
+                            <button class="btn-cart-minus bg-slate-200 hover:bg-slate-300 text-slate-800 px-2 py-0.5 rounded-lg text-sm font-black cursor-pointer" data-idx="${index}">-</button>
+                            <span class="font-mono text-sm px-1">${item.qty}</span>
+                            <button class="btn-cart-plus bg-slate-200 hover:bg-slate-300 text-slate-800 px-2 py-0.5 rounded-lg text-sm font-black cursor-pointer" data-idx="${index}">+</button>
                         </div>
                     </div>
-                    <span class="font-mono font-bold">₹${cost}</span>
+                    <span class="font-mono text-slate-900 text-sm">₹${cost}</span>
                 `;
                 wrap.appendChild(row);
             });
@@ -335,7 +425,7 @@
             const selectedCoords = document.getElementById('cart-selected-coords').value.split(',');
 
             if(!deliveryDestinationStr || !contactPhone || selectedCoords.length !== 2) {
-                alert("Fill address, phone and pin your location on the map.");
+                alert("Fill destination inputs parameters, phone, and select map coordinate.");
                 return;
             }
 
@@ -357,7 +447,7 @@
 
         onValue(ref(db, 'orders'), (snapshot) => {
             const container = document.getElementById('orders-feed-output'); container.innerHTML = "";
-            if (!snapshot.exists()) { container.innerHTML = `<p class="text-slate-400 text-center py-6 text-xs">No orders recorded.</p>`; return; }
+            if (!snapshot.exists()) { container.innerHTML = `<p class="text-slate-400 text-center py-8 text-xs font-bold">No registered dispatch records found.</p>`; return; }
             
             Object.values(snapshot.val()).filter(o => o.uid === userUid).forEach(order => {
                 const elapsedMinutes = (Date.now() - order.timestamp) / 1000 / 60;
@@ -368,17 +458,17 @@
                     update(ref(db, `orders/${order.orderId}`), { status: "Cancelled", reason: "agents are not available" });
                 }
 
-                const card = document.createElement('div'); card.className = "p-4 bg-white rounded-2xl border border-slate-100 flex flex-col space-y-2 text-xs relative shadow-xs";
+                const card = document.createElement('div'); card.className = "p-5 bg-white rounded-3xl border border-slate-200/80 flex flex-col space-y-2.5 relative shadow-sm";
                 
                 let statusTextHtml = `<span class="text-amber-500 font-bold uppercase">${currentStatus}</span>`;
                 if (currentStatus === "Approved") {
-                    statusTextHtml = `<span class="text-green-600 font-extrabold uppercase">Order Confirmed</span>`;
+                    statusTextHtml = `<span class="text-green-600 font-extrabold uppercase bg-green-50 px-2.5 py-1 rounded-xl border border-green-200">Order Confirmed</span>`;
                 } else if (currentStatus === "Picked Up") {
-                    statusTextHtml = `<span class="text-blue-600 font-extrabold uppercase animate-pulse">Picked Up / On the Way</span>`;
+                    statusTextHtml = `<span class="text-indigo-600 font-extrabold uppercase bg-indigo-50 px-2.5 py-1 rounded-xl border border-indigo-200 animate-pulse">Picked Up / On the Way</span>`;
                 } else if (currentStatus === "Delivered") {
-                    statusTextHtml = `<span class="text-emerald-700 font-extrabold uppercase">Delivered Successfully</span>`;
+                    statusTextHtml = `<span class="text-emerald-700 font-extrabold uppercase bg-emerald-100 px-2.5 py-1 rounded-xl">Delivered Successfully</span>`;
                 } else if (currentStatus === "Cancelled") {
-                    statusTextHtml = `<span class="text-red-500 font-extrabold uppercase">Cancelled (${order.reason || 'Timeout'})</span>`;
+                    statusTextHtml = `<span class="text-red-500 font-extrabold uppercase bg-red-50 px-2.5 py-1 rounded-xl border border-red-200">Cancelled</span>`;
                 }
 
                 let itemsText = order.items.map(i => `${i.title} (x${i.qty})`).join(', ');
@@ -386,21 +476,22 @@
                 let agentDetailsBlockHtml = "";
                 if ((currentStatus === "Approved" || currentStatus === "Picked Up" || currentStatus === "Delivered") && order.agentName) {
                     agentDetailsBlockHtml = `
-                        <div class="mt-2 p-2.5 bg-green-50 border border-green-100 rounded-xl text-slate-700 text-[11px] space-y-0.5">
-                            <p><b>Assigned Agent:</b> ${order.agentName}</p>
-                            <p><b>Agent Contact Phone:</b> ${order.agentPhone || 'N/A'}</p>
+                        <div class="mt-2 p-3 bg-slate-50 border border-slate-200 rounded-2xl text-slate-700 text-xs font-bold space-y-1">
+                            <p class="text-slate-800 text-sm font-black">🚴 Delivery Partner Assigned</p>
+                            <p><b>Agent Name:</b> ${order.agentName}</p>
+                            <p><b>Agent Mobile Contact:</b> ${order.agentPhone || 'N/A'}</p>
                         </div>`;
                 }
 
                 card.innerHTML = `
-                    <div class="flex justify-between items-center font-bold">
-                        <span class="text-sm text-slate-900">${order.shopName || 'Assistance Request'}</span>
+                    <div class="flex justify-between items-center font-black">
+                        <span class="text-base text-slate-900 tracking-tight">${order.shopName || 'Market Order'}</span>
                         ${statusTextHtml}
                     </div>
-                    <p class="text-slate-600 font-medium"><b>Summary:</b> ${itemsText || 'Emergency Assistance Post Call Link'}</p>
-                    <p class="text-[11px] text-slate-500"><b>Destination:</b> ${order.deliveryAddress || 'Current GPS Coordinate Fix'}</p>
+                    <p class="text-slate-600 font-bold text-xs"><b>Items summary:</b> ${itemsText}</p>
+                    <p class="text-xs text-slate-500 font-medium"><b>Destination Address:</b> ${order.deliveryAddress}</p>
                     ${agentDetailsBlockHtml}
-                    <div class="pt-1 text-[10px] text-slate-400 font-mono">Time Placed: ${new Date(order.timestamp).toLocaleTimeString()}</div>
+                    <div class="pt-2 text-[10px] text-slate-400 font-mono border-t border-slate-50">Time Placed: ${new Date(order.timestamp).toLocaleString()}</div>
                 `;
                 container.appendChild(card);
             });
