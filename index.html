@@ -9,6 +9,7 @@
 </head>
 <body class="bg-slate-50 text-slate-900 p-4 font-sans min-h-screen relative pb-28 selection:bg-blue-200">
 
+    <!-- NAVIGATION TABS BAR -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6 border-b pb-5 border-slate-200 max-w-5xl mx-auto">
         <button id="tab-food-btn" class="px-4 py-3.5 rounded-2xl text-sm font-black transition bg-blue-600 text-white flex flex-col items-center justify-center gap-1 cursor-pointer shadow-md">
             <span class="text-xl">🍔</span> Order Food
@@ -24,6 +25,7 @@
         </button>
     </div>
 
+    <!-- MAIN DISPLAY PANELS -->
     <div class="max-w-5xl mx-auto">
         <div id="view-food" class="space-y-4">
             <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">🍽️ Nearby Restaurants</h2>
@@ -47,6 +49,7 @@
         </div>
     </div>
 
+    <!-- SUCCESS INTERACTIVE OVERLAY -->
     <div id="success-tick-overlay" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[200] flex flex-col items-center justify-center">
         <div class="bg-white p-10 rounded-3xl shadow-2xl flex flex-col items-center text-center max-w-sm">
             <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-3xl font-black mb-4">✓</div>
@@ -55,8 +58,10 @@
         </div>
     </div>
 
+    <!-- FLOATING ACTION BUTTON (+) -->
     <button id="btn-floating-action" class="fixed bottom-6 right-6 w-16 h-14 bg-gradient-to-tr from-blue-600 to-indigo-600 text-white rounded-2xl text-3xl font-black shadow-xl flex items-center justify-center cursor-pointer hover:scale-105 transition-all z-40">+</button>
 
+    <!-- ITEM DETAIL & CART MODAL -->
     <div id="shop-details-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[60] flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl p-6 w-full max-w-5xl h-[85vh] shadow-2xl relative flex flex-col lg:flex-row gap-6">
             <button id="btn-close-shop-modal" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-2xl font-black cursor-pointer">×</button>
@@ -85,6 +90,7 @@
         </div>
     </div>
 
+    <!-- ACTION MODAL -->
     <div id="action-modal-overlay" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl p-6 w-full max-w-lg shadow-2xl relative max-h-[92vh] overflow-y-auto border border-slate-100">
             <button id="btn-close-action-modal" class="absolute top-4 right-4 text-slate-400 text-2xl font-black cursor-pointer">×</button>
@@ -165,7 +171,7 @@
             } else if (activeTab === "medicines") {
                 header.innerText = "💊 Request Medicines or Agent Assistance";
                 container.innerHTML = `
-                    <div class="grid grid-cols-2 gap-2 border-b pb-2 mb-2 uppercase text-center text-[11px]"><button id="btn-sub-med" class="text-blue-600 border-b-2 border-blue-600 pb-1">Medicines</button><button id="btn-sub-age" class="text-slate-400 pb-1">Agent Helper</button></div>
+                    <div class="grid grid-cols-2 gap-2 border-b pb-2 mb-2 uppercase text-center text-[11px] font-bold"><button id="btn-sub-med" class="text-blue-600 border-b-2 border-blue-600 pb-1 cursor-pointer">Medicines</button><button id="btn-sub-age" class="text-slate-400 pb-1 cursor-pointer">Agent Helper</button></div>
                     <div id="subform-payload-block" class="space-y-3"></div>
                 `;
                 document.getElementById('btn-sub-med').addEventListener('click', () => selectMedicineSubformMode("Medicine"));
@@ -247,32 +253,7 @@
             return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
         }
 
-        onValue(ref(db, 'helps_posts'), (snapshot) => {
-            const feed = document.getElementById('medicines-feed-output'); feed.innerHTML = ""; 
-            if (!snapshot.exists()) { feed.innerHTML = `<p class="p-4 text-slate-400 font-bold text-center text-xs col-span-2">No active medicine or helper records logged.</p>`; return; }
-            
-            const privateClaims = Object.values(snapshot.val()).filter(p => p.uid === userUid);
-            if(privateClaims.length === 0) { feed.innerHTML = `<p class="p-4 text-slate-400 font-bold text-center text-xs col-span-2">No private medical or helper records logged.</p>`; return; }
-
-            privateClaims.forEach(p => {
-                const card = document.createElement('div'); card.className = "p-4 bg-white border border-slate-200 rounded-2xl text-xs flex flex-col space-y-1.5 relative shadow-xs";
-                let timerHtml = "";
-                if(p.status === "In Work" && p.workStartTime) {
-                    const elapsed = Math.floor((Date.now() - p.workStartTime) / 1000 / 60);
-                    timerHtml = `<div class="p-2 bg-blue-50 text-blue-700 font-bold rounded-lg animate-pulse">⏰ Work Counter: ${elapsed} Mins in Progress</div>`;
-                }
-                card.innerHTML = `
-                    <div class="flex justify-between items-center font-bold"><span class="text-slate-800 text-sm">${p.posterName}</span><span class="text-blue-500 uppercase text-[10px] tracking-widest bg-blue-50 px-2 py-0.5 border border-blue-200 rounded-full">${p.status || 'Processing'}</span></div>
-                    <p class="text-slate-600 font-bold leading-relaxed">📋 Type: ${p.category} | ${p.desc}</p>
-                    ${timerHtml}
-                    ${p.agentName ? `<div class="p-2 bg-slate-50 border rounded-xl text-slate-600"><b>Agent:</b> ${p.agentName} (📞 ${p.agentPhone})</div>` : ''}
-                    <div class="pt-1 text-[10px] text-slate-400 font-mono">Time: ${new Date(p.createdAt || Date.now()).toLocaleTimeString()}</div>
-                `;
-                feed.appendChild(card);
-            });
-        });
-
-        // --- FIXED DISPLAY PARSING ROUTINE ---
+        // --- FIXED SEPARATED DIRECTORY FILTER ENGINE ---
         onValue(ref(db, 'approved_shops'), (snapshot) => {
             const foodFeed = document.getElementById('food-feed-output'); foodFeed.innerHTML = "";
             const groceryFeed = document.getElementById('grocery-feed-output'); groceryFeed.innerHTML = "";
@@ -283,23 +264,22 @@
                 const dist = calculateDistance(centerLat, centerLng, s.lat, s.lng);
                 if (dist > 10 && s.uid !== userUid) return;
 
-                const card = document.createElement('div'); card.className = "bg-white rounded-3xl overflow-hidden border border-slate-200/80 flex flex-col shadow-xs cursor-pointer shop-card-node";
+                const card = document.createElement('div'); card.className = "bg-white rounded-3xl overflow-hidden border border-slate-200/80 flex flex-col shadow-xs cursor-pointer shop-card-node animate-in fade-in";
                 card.setAttribute('data-uid', s.uid);
                 
-                // FIXED: Property lookups aligned to correctly evaluate both request schemas strings parameters
                 const nominalName = s.shopName || s.name || "Business Entity";
                 card.innerHTML = `<img src="${s.shopImgUrl || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600'}" class="h-36 w-full object-cover"><div class="p-4"><h4 class="font-black text-sm text-slate-900 leading-none">${nominalName}</h4><p class="text-xs text-slate-400 mt-1">${s.ownerName} (${dist.toFixed(1)} km away)</p></div>`;
                 
-                const lowerName = nominalName.toLowerCase();
-                if(lowerName.includes('hotel') || lowerName.includes('restaurant') || lowerName.includes('cafe') || lowerName.includes('food') || lowerName.includes('bakery') || lowerName.includes('tiffins') || lowerName.includes('eatery')) {
+                // FIX: Filters completely based on the Admin stamped parameter string flags
+                if (s.category === "food") {
                     foodFeed.appendChild(card);
                 } else { 
                     groceryFeed.appendChild(card); 
                 }
             });
             
-            if(foodFeed.children.length === 0) foodFeed.innerHTML = `<p class="text-xs text-slate-400 font-bold p-4">No eateries within 10km.</p>`;
-            if(groceryFeed.children.length === 0) groceryFeed.innerHTML = `<p class="text-xs text-slate-400 font-bold p-4">No grocery stores within 10km.</p>`;
+            if(foodFeed.children.length === 0) foodFeed.innerHTML = `<p class="text-xs text-slate-400 font-bold p-4">No eateries found nearby.</p>`;
+            if(groceryFeed.children.length === 0) groceryFeed.innerHTML = `<p class="text-xs text-slate-400 font-bold p-4">No grocery stores found nearby.</p>`;
             
             document.querySelectorAll('.shop-card-node').forEach(c => c.addEventListener('click', () => openShopDetailsModal(allShopsCached[c.getAttribute('data-uid')])));
         });
