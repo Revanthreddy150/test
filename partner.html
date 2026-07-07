@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QHP Partner Console</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+</head>
+<body class="bg-gradient-to-br from-slate-900 to-slate-950 font-sans min-h-screen text-slate-100">
+
+    <div id="auth-container" class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-slate-800 border border-slate-700 p-8 rounded-3xl shadow-2xl w-full max-w-md">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-black text-blue-400">QHP Partner Network</h2>
+                <p class="text-xs text-slate-400 mt-1 uppercase tracking-wider font-bold">Agent Access Node</p>
+            </div>
+
+            <div id="login-section">
+                <div class="mb-4">
+                    <label class="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Email Address or Phone</label>
+                    <input type="text" id="login-identifier" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white focus:outline-blue-500" placeholder="Enter credentials">
+                </div>
+                <div class="mb-5">
+                    <label class="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Password</label>
+                    <input type="password" id="login-password" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white focus:outline-blue-500" placeholder="••••••••">
+                </div>
+                <button id="btn-login" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition shadow cursor-pointer">Login as Agent</button>
+                <button id="go-to-register" class="w-full text-center text-xs text-slate-400 font-medium hover:underline mt-5 block cursor-pointer">New Agent? Apply for Verification Link</button>
+            </div>
+
+            <div id="register-section" class="hidden space-y-4">
+                <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wide">Submit Verification Credentials</h3>
+                <div><input type="text" id="reg-name" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white" placeholder="Full Name"></div>
+                <div><input type="number" id="reg-age" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white" placeholder="Age"></div>
+                <div><input type="text" id="reg-email" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white" placeholder="Email Address"></div>
+                <div><input type="tel" id="reg-phone" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white" placeholder="Phone Number"></div>
+                <div><input type="text" id="reg-aadhar" maxlength="12" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white" placeholder="12 Digit Aadhaar Card Number"></div>
+                <div><input type="text" id="reg-pan" maxlength="10" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white uppercase" placeholder="PAN Card Identity Number"></div>
+                <div><input type="text" id="reg-dl" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white uppercase" placeholder="Driving Licence (DL) Serial"></div>
+                
+                <button id="btn-submit-application" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-xs uppercase cursor-pointer">Submit Onboarding Application</button>
+                <button id="back-to-login" class="w-full text-center text-xs text-slate-500 font-medium hover:underline mt-2 block cursor-pointer">Back to Login</button>
+            </div>
+
+            <div id="waiting-section" class="hidden text-center py-6">
+                <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <h3 class="text-base font-bold text-white mb-2">Onboarding Verification Link Dispatched</h3>
+                <p class="text-xs text-slate-400 leading-relaxed">Check your email inbox or spam folder. Click the verification link to initialize password mapping credentials nodes.</p>
+            </div>
+
+            <div id="password-setup-section" class="hidden space-y-4">
+                <h3 class="text-base font-bold text-emerald-400 text-center">Identity Verified!</h3>
+                <p class="text-xs text-slate-400 text-center">Configure an authentication login password to unlock the workspace node.</p>
+                <div><input type="password" id="setup-password" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white" placeholder="Choose Password (min 6 chars)"></div>
+                <button id="btn-complete-setup" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs cursor-pointer">Finalize Password Config</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="home-container" class="hidden min-h-screen flex flex-col bg-slate-950">
+        <nav class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex justify-between items-center relative">
+            <div class="flex items-center space-x-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 shadow-inner">
+                <span id="geo-dot" class="w-2 h-2 rounded-full bg-amber-500"></span>
+                <span id="geo-location-display" class="text-xs font-mono font-bold text-slate-400">Locking Agent GPS...</span>
+            </div>
+            
+            <h1 class="text-lg font-black text-blue-400 tracking-tight absolute left-1/2 transform -translate-x-1/2">QHP Agent Hub</h1>
+            
+            <div class="flex items-center space-x-3">
+                <span id="partner-status-badge" class="text-[9px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Unverified</span>
+                <button id="btn-logout" class="bg-slate-800 hover:bg-red-950 text-slate-300 hover:text-red-400 px-3 py-1.5 border border-slate-700 hover:border-red-900 text-xs font-bold rounded-xl transition cursor-pointer">Sign Out</button>
+            </div>
+        </nav>
+
+        <main class="flex-grow p-6 grid grid-cols-1 lg:grid-cols-2 gap-6 overflow-y-auto max-h-[88vh]">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 border-b border-slate-800 pb-2">🆘 Neighborhood Assistance Requests (20 KM)</h3>
+                <div id="agent-helps-feed" class="space-y-3 overflow-y-auto flex-1 pr-1 content-start"></div>
+            </div>
+
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 border-b border-slate-800 pb-2">📦 Store Delivery Orders (20 KM COD)</h3>
+                <div id="agent-orders-feed" class="space-y-3 overflow-y-auto flex-1 pr-1 content-start"></div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getDatabase, ref, set, get, child, update, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDGI7b17RRfpgctXIVIgPtyECtUBLEcMAU",
+            authDomain: "skill-bc495.firebaseapp.com",
+            databaseURL: "https://skill-bc495-default-rtdb.firebaseio.com",
+            projectId: "skill-bc495",
+            storageBucket: "skill-bc495.firebasestorage.app",
+            messagingSenderId: "53919238872",
+            appId: "1:53919238872:web:711de8f103089c653025ad",
+            measurementId: "G-6H5D0771NE"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        let verificationLoopWorker = null;
+        let partnerLat = null, partnerLng = null;
+        let partnerAadharVerifiedState = "Unverified";
+        let liveFeedsListenersMap = {};
+
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById('go-to-register').addEventListener('click', () => showView('register'));
+            document.getElementById('back-to-login').addEventListener('click', () => showView('login'));
+            document.getElementById('btn-submit-application').addEventListener('click', executePartnerRegistrationStepOne);
+            document.getElementById('btn-complete-setup').addEventListener('click', completePartnerPasswordSetup);
+            document.getElementById('btn-login').addEventListener('click', executePartnerLogin);
+            document.getElementById('btn-logout').addEventListener('click', () => signOut(auth));
+        });
+
+        function showView(view) {
+            document.getElementById('auth-container').classList.add('hidden');
+            document.getElementById('home-container').classList.add('hidden');
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('register-section').classList.add('hidden');
+            document.getElementById('waiting-section').classList.add('hidden');
+            document.getElementById('password-setup-section').classList.add('hidden');
+            if (view === 'home') { document.getElementById('home-container').classList.remove('hidden'); triggerAgentGPSHardwareTrack(); }
+            else { document.getElementById('auth-container').classList.remove('hidden'); document.getElementById(view + '-section').classList.remove('hidden'); }
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                if (user.emailVerified) {
+                    clearInterval(verificationLoopWorker);
+                    onValue(ref(db, `partners/${user.uid}`), (snap) => {
+                        if (snap.exists()) {
+                            const data = snap.val();
+                            if (!data.passwordConfigured) { showView('password-setup'); return; }
+                            
+                            partnerAadharVerifiedState = data.verificationStatus || "Unverified";
+                            const badge = document.getElementById('partner-status-badge');
+                            badge.innerText = `Agent: ${partnerAadharVerifiedState}`;
+                            badge.className = partnerAadharVerifiedState === "Verified" ? "text-[9px] bg-green-950 text-green-400 px-2 py-0.5 rounded-full font-bold border border-green-900" : "text-[9px] bg-amber-950 text-amber-400 px-2 py-0.5 rounded-full font-bold border border-amber-900";
+                            
+                            showView('home');
+                        } else { showView('password-setup'); }
+                    });
+                } else { showView('waiting'); startVerificationLoopTracker(user); }
+            } else { Object.values(liveFeedsListenersMap).forEach(un => un()); showView('login'); }
+        });
+
+        // Haversine Distance Calculation Rule
+        function getDistanceHaversine(lat1, lon1, lat2, lon2) {
+            const R = 6371; const dLat = (lat2 - lat1) * Math.PI / 180; const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
+            return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+        }
+
+        function triggerAgentGPSHardwareTrack() {
+            navigator.geolocation.watchPosition((pos) => {
+                partnerLat = pos.coords.latitude; partnerLng = pos.coords.longitude;
+                document.getElementById('geo-location-display').innerText = `Locked: ${partnerLat.toFixed(4)}, ${partnerLng.toFixed(4)}`;
+                document.getElementById('geo-dot').className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
+                sync20KmRadiusLiveFeeds();
+            }, null, { enableHighAccuracy: true });
+        }
+
+        // --- MONITOR FEEDS LIVE SYNC WITHIN 20KM RADIUS ---
+        function sync20KmRadiusLiveFeeds() {
+            if (!partnerLat || !partnerLng) return;
+            Object.values(liveFeedsListenersMap).forEach(un => un());
+
+            // 1. Sync Helps Requests
+            liveFeedsListenersMap.helps = onValue(ref(db, 'helps_posts'), (snap) => {
+                const feed = document.getElementById('agent-helps-feed'); feed.innerHTML = "";
+                if (!snap.exists()) { feed.innerHTML = `<p class="text-xs text-slate-500 p-4">No assistance requests active.</p>`; return; }
+                
+                Object.values(snap.val()).forEach(p => {
+                    const dist = getDistanceHaversine(partnerLat, partnerLng, p.lat, p.lng);
+                    if (dist > 20) return; // Hide if outside 20km radius constraint
+
+                    const div = document.createElement('div');
+                    div.className = "p-4 bg-slate-900 border border-slate-800 rounded-xl space-y-2 text-xs";
+                    div.innerHTML = `
+                        <div class="flex justify-between items-center"><span class="font-bold text-white text-sm">${p.posterName}</span><span class="text-slate-500 font-mono">${dist.toFixed(1)} km away</span></div>
+                        <p class="text-slate-400 leading-relaxed">${p.desc}</p>
+                        <div class="flex justify-between text-[11px] text-slate-500 font-mono"><span>Contact: ${p.phone}</span></div>
+                        <button class="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 rounded-lg btn-accept-job cursor-pointer" data-uid="${p.uid}" data-pid="helps" data-key="${p.postId}">Accept Help Assignment</button>
+                    `;
+                    feed.appendChild(div);
+                });
+                bindAcceptJobControlButtons();
+            });
+
+            // 2. Sync Store Orders
+            liveFeedsListenersMap.orders = onValue(ref(db, 'orders'), (snap) => {
+                const feed = document.getElementById('agent-orders-feed'); feed.innerHTML = "";
+                if (!snap.exists()) { feed.innerHTML = `<p class="text-xs text-slate-500 p-4">No active delivery orders pending.</p>`; return; }
+                
+                Object.values(snap.val()).forEach(o => {
+                    const dist = getDistanceHaversine(partnerLat, partnerLng, o.lat, o.lng);
+                    if (dist > 20 || o.status !== "Processing") return; // 30 min cancellation timeout monitored via user client rules
+
+                    const itemsText = o.items.map(i => `${i.title} (x${i.qty})`).join(', ');
+                    const div = document.createElement('div');
+                    div.className = "p-4 bg-slate-900 border border-slate-800 rounded-xl space-y-2 text-xs";
+                    div.innerHTML = `
+                        <div class="flex justify-between items-center"><span class="font-bold text-white text-sm">${o.shopName}</span><span class="text-amber-500 font-mono font-bold">${o.totalBill} (${dist.toFixed(1)} km)</span></div>
+                        <p class="text-slate-400"><b>Items:</b> ${itemsText}</p>
+                        <p class="text-slate-500"><b>Deliver To:</b> ${o.userName}</p>
+                        <button class="w-full mt-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1.5 rounded-lg btn-accept-job cursor-pointer" data-uid="${o.uid}" data-pid="orders" data-key="${o.orderId}">Accept COD Delivery</button>
+                    `;
+                    feed.appendChild(div);
+                });
+                bindAcceptJobControlButtons();
+            });
+        }
+
+        function bindAcceptJobControlButtons() {
+            document.querySelectorAll('.btn-accept-job').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    if (partnerAadharVerifiedState !== "Verified") {
+                        alert("Access Denied! You cannot accept requests until an Admin reviews and sets your Onboarding Documentation parameters to Verified status.");
+                        return;
+                    }
+                    const userUidKey = btn.getAttribute('data-uid');
+                    const parentId = btn.getAttribute('data-pid');
+                    const objectKey = btn.getAttribute('data-key');
+
+                    try {
+                        const agentPid = auth.currentUser.uid;
+                        // 1. Notify User Side Natively via independent notifications reference node path
+                        const notiPushRef = push(ref(db, `notifications/${userUidKey}`));
+                        await set(notiPushRef, { title: "Request Accepted!", body: `An active QHP Agent has picked up your ${parentId === 'helps' ? 'assistance call request' : 'grocery order claim'}. Contacting shortly.`, timestamp: Date.now() });
+
+                        // 2. Clear or update status properties from matching global fields root nodes
+                        if (parentId === 'helps') {
+                            await remove(ref(db, `helps_posts/${objectKey}`));
+                        } else {
+                            await update(ref(db, `orders/${objectKey}`), { status: "Approved", assignedAgent: agentPid });
+                        }
+                        alert("Job successfully accepted and linked!");
+                    } catch(err) { alert(err.message); }
+                });
+            });
+        }
+
+        // Onboarding flow logic operations block mapping variables data
+        async function executePartnerRegistrationStepOne() {
+            const email = document.getElementById('reg-email').value.trim();
+            const phone = document.getElementById('reg-phone').value.trim();
+            const name = document.getElementById('reg-name').value.trim();
+            const age = document.getElementById('reg-age').value.trim();
+            const aadh = document.getElementById('reg-aadhar').value.trim();
+            const pan = document.getElementById('reg-pan').value.trim();
+            const dl = document.getElementById('reg-dl').value.trim();
+
+            if (!email || !phone || !name || aadh.length !== 12) return alert("Verify mandatory document fields.");
+            window.localStorage.setItem('cached_p_phone', phone);
+            window.localStorage.setItem('cached_p_name', name);
+
+            try {
+                const res = await createUserWithEmailAndPassword(auth, email, "TEMP_SEED_" + Math.random().toString(36).substring(2, 9));
+                // Send onboarding application info to Admin review folder path logs
+                await set(ref(db, 'partner_verification_requests/' + res.user.uid), { uid: res.user.uid, email, name, phone, age, aadhar: aadh, pan, drivingLicence: dl, submittedAt: Date.now() });
+                await set(ref(db, 'partners/' + res.user.uid), { uid: res.user.uid, email, name, phone, verificationStatus: "Pending", passwordConfigured: false });
+                await sendEmailVerification(res.user);
+                showView('waiting');
+            } catch(e) { alert(e.message); }
+        }
+
+        async function completePartnerPasswordSetup() {
+            const pass = document.getElementById('setup-password').value.trim();
+            if (pass.length < 6) return alert("Min 6 characters.");
+            try {
+                await update(ref(db, `partners/${auth.currentUser.uid}`), { passwordConfigured: true, verificationStatus: "Pending" });
+                alert("Account configured perfectly! Awaiting Admin onboarding review parameters.");
+                window.location.reload();
+            } catch(e) { alert(e.message); }
+        }
+
+        async function executePartnerLogin() {
+            try { await signInWithEmailAndPassword(auth, document.getElementById('login-identifier').value.trim(), document.getElementById('login-password').value.trim()); } catch(e) { alert(e.message); }
+        }
+
+        function startVerificationLoopTracker(user) {
+            clearInterval(verificationLoopWorker);
+            verificationLoopWorker = setInterval(async () => { await user.reload(); if (user.emailVerified) { clearInterval(verificationLoopWorker); window.location.reload(); } }, 3000);
+        }
+    </script>
+</body>
+</html>
