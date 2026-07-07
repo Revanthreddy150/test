@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Quick Helping Partner</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>#live-map-container { height: 100%; width: 100%; border-radius: 1rem; }</style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-blue-100 font-sans min-h-screen text-slate-800">
+
+    <div id="auth-container" class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white/90 backdrop-blur-md p-8 rounded-3xl shadow-2xl w-full max-w-md border border-white/40">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">The Quick Helping Partner</h2>
+                <p class="text-xs font-semibold text-slate-400 mt-1 uppercase tracking-wider">Secure Access Hub</p>
+            </div>
+            
+            <div id="login-section">
+                <div class="mb-4">
+                    <label class="block text-slate-700 text-xs font-bold uppercase tracking-wider mb-2">Email or Phone</label>
+                    <input type="text" id="login-identifier" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm" placeholder="Enter email or phone number">
+                </div>
+                <div class="mb-5">
+                    <label class="block text-slate-700 text-xs font-bold uppercase tracking-wider mb-2">Password</label>
+                    <input type="password" id="login-password" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm" placeholder="••••••••">
+                </div>
+                <button id="btn-login" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-3 px-4 rounded-xl shadow-md cursor-pointer">Login</button>
+                <div class="flex justify-between items-center mt-6 text-xs font-semibold">
+                    <button id="go-to-forgot" class="text-blue-600 hover:underline cursor-pointer">Forgot Password?</button>
+                    <button id="go-to-register" class="text-slate-500 hover:underline cursor-pointer">Create an Account</button>
+                </div>
+            </div>
+
+            <div id="register-section" class="hidden">
+                <h3 class="text-base font-bold text-slate-700 mb-4">Sign Up Verification</h3>
+                <div class="mb-4">
+                    <label class="block text-slate-700 text-xs font-bold uppercase tracking-wider mb-1">Phone Number</label>
+                    <input type="tel" id="reg-phone" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm" placeholder="Enter mobile number">
+                </div>
+                <div class="mb-5">
+                    <label class="block text-slate-700 text-xs font-bold uppercase tracking-wider mb-1">Email Address</label>
+                    <input type="email" id="reg-email" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm" placeholder="Enter real email">
+                </div>
+                <button id="btn-send-link" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold py-3 px-4 rounded-xl cursor-pointer">Send Verification Link</button>
+                <button id="back-to-login" class="w-full text-center text-xs text-slate-400 font-medium hover:underline mt-4 block cursor-pointer">Back to Sign In</button>
+            </div>
+
+            <div id="waiting-section" class="hidden text-center py-6">
+                <div class="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <h3 class="text-lg font-bold text-slate-800 mb-1">Awaiting Email Validation</h3>
+                <p class="text-xs text-slate-500 mb-4">Check your inbox or spam folder to unlock account setup!</p>
+            </div>
+
+            <div id="setup-account-section" class="hidden">
+                <h3 class="text-lg font-black text-indigo-700 mb-1 text-center">Email Verified!</h3>
+                <div class="mb-4">
+                    <label class="block text-slate-700 text-xs font-bold uppercase tracking-wider mb-1">Your Full Name</label>
+                    <input type="text" id="setup-name" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium" placeholder="Enter your name">
+                </div>
+                <div id="setup-password-wrapper" class="mb-5">
+                    <label class="block text-slate-700 text-xs font-bold uppercase tracking-wider mb-1">Set Password</label>
+                    <input type="password" id="setup-password" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm" placeholder="Minimum 6 characters">
+                </div>
+                <button id="btn-complete-setup" class="w-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold py-3 px-4 rounded-xl cursor-pointer">Finalize Profile</button>
+            </div>
+
+            <div id="forgot-section" class="hidden">
+                <h3 class="text-base font-bold text-slate-700 mb-1">Reset Password</h3>
+                <div class="mb-5">
+                    <label class="block text-slate-700 text-xs font-bold uppercase tracking-wider mb-2">Registered Email Address</label>
+                    <input type="email" id="forgot-email" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm" placeholder="name@example.com">
+                </div>
+                <button id="btn-reset-password" class="w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold py-3 px-4 rounded-xl cursor-pointer">Send Reset Link</button>
+                <button id="forgot-back-to-login" class="w-full text-center text-xs text-slate-400 font-medium hover:underline mt-4 block cursor-pointer">Back to Login</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="home-container" class="hidden min-h-screen flex flex-col bg-slate-50">
+        <nav class="bg-white shadow-sm px-6 py-4 flex justify-between items-center border-b border-slate-100 relative z-30">
+            <div id="badge-location-trigger" class="flex items-center space-x-2 bg-slate-100 hover:bg-blue-50 px-3 py-1.5 rounded-xl border border-slate-200 shadow-inner max-w-xs cursor-pointer transition-all">
+                <span id="geo-dot" class="w-2 h-2 rounded-full bg-amber-500 shrink-0"></span>
+                <span id="geo-location-display" class="text-xs font-bold text-slate-600 truncate">Identifying location...</span>
+                <button id="btn-request-location" class="hidden text-[10px] bg-blue-600 text-white font-bold px-2 py-0.5 rounded hover:bg-blue-700 ml-1 shrink-0">Allow GPS</button>
+            </div>
+            
+            <div class="flex items-center space-x-4 ml-auto">
+                <div class="relative">
+                    <button id="noti-menu-btn" class="p-2 bg-slate-100 rounded-full hover:bg-slate-200 relative cursor-pointer text-sm">🔔<span id="noti-badge-count" class="hidden absolute -top-1 -right-1 bg-red-500 text-white font-black text-[9px] w-4 h-4 rounded-full flex items-center justify-center">0</span></button>
+                    <div id="noti-dropdown" class="hidden absolute right-0 mt-3 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 p-4 z-50 max-h-80 overflow-y-auto">
+                        <h4 class="font-bold text-slate-800 text-xs border-b pb-2 mb-2 uppercase tracking-wider">Activity Updates</h4>
+                        <div id="noti-items-list" class="space-y-2 divide-y divide-slate-50 text-xs text-slate-600"><p class="p-2 text-center text-slate-400">No active notices.</p></div>
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <button id="profile-menu-btn" class="w-10 h-10 bg-gradient-to-tr from-blue-600 to-indigo-600 text-white rounded-full flex items-center justify-center font-bold tracking-wider font-mono shadow-md focus:outline-none cursor-pointer">?</button>
+                    <div id="profile-dropdown" class="hidden absolute right-0 mt-3 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 p-5 z-50">
+                        <div class="flex items-center space-x-3 border-b border-slate-100 pb-3 mb-4">
+                            <div id="avatar-fallback" class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-black text-base shadow-sm">?</div>
+                            <div class="flex-1 min-w-0">
+                                <div id="name-display-box" class="flex items-center justify-between"><h4 id="prof-display-name" class="font-bold text-slate-800 text-sm truncate">Loading...</h4><button id="btn-edit-name" class="text-blue-500 text-xs font-semibold underline ml-2 cursor-pointer">Edit</button></div>
+                                <div id="name-edit-box" class="hidden flex items-center space-x-1"><input type="text" id="input-edit-name" class="border rounded px-1.5 py-0.5 text-xs font-medium w-32 bg-slate-50"><button id="btn-save-name" class="bg-blue-600 text-white text-[10px] px-2 py-1 rounded font-bold hover:bg-blue-700 cursor-pointer">Save</button></div>
+                                <span id="user-aadhar-badge" class="text-[9px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider mt-1 inline-block">Unverified</span>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2.5 text-xs text-slate-600 mb-4">
+                            <div><span class="text-slate-400 font-bold uppercase text-[9px] block">Global UID Key</span><span id="prof-uid" class="text-slate-800 font-mono text-[10px] break-all font-semibold select-all">Loading...</span></div>
+                            <div><span class="text-slate-400 font-bold uppercase text-[9px] block">Email Address</span><span id="prof-email" class="text-slate-800 font-mono break-all font-medium">Loading...</span></div>
+                            <div><span class="text-slate-400 font-bold uppercase text-[9px] block">Phone Contact</span><span id="prof-phone" class="text-slate-800 font-mono font-medium">Loading...</span></div>
+                            
+                            <div class="border-t pt-2 mt-2">
+                                <label class="text-slate-400 font-bold uppercase text-[9px] block mb-1">Saved Delivery Address</label>
+                                <textarea id="prof-delivery-address" rows="2" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-blue-500" placeholder="No delivery address configured yet..."></textarea>
+                                <button id="btn-save-address" class="w-full mt-1 bg-slate-800 hover:bg-slate-900 text-white text-[10px] font-bold py-1 rounded-lg cursor-pointer transition">Save Address Book</button>
+                            </div>
+                        </div>
+                        <button id="btn-trigger-aadhar-modal" class="w-full bg-blue-50 text-blue-600 border border-blue-200 font-bold text-xs py-2 rounded-xl hover:bg-blue-100 transition cursor-pointer">Verify Aadhar ID</button>
+                        <button id="btn-logout" class="w-full bg-slate-50 hover:bg-red-50 text-gray-700 font-bold text-xs py-2 rounded-xl mt-2 cursor-pointer">Sign Out</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <main class="flex-grow w-full h-full relative p-2">
+            <iframe id="sub-user-frame" class="w-full h-[82vh] rounded-2xl shadow-inner border border-slate-200/60 bg-white" src="about:blank"></iframe>
+        </main>
+    </div>
+
+    <div id="map-modal-overlay" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-2xl h-[75vh] flex flex-col overflow-hidden shadow-2xl relative"><div class="p-4 border-b flex justify-between items-center bg-slate-50"><h3 class="font-bold text-slate-800 text-sm">High-Accuracy GPS Position</h3><button id="btn-close-map" class="text-slate-400 font-black text-lg p-1 px-2.5 rounded-lg hover:bg-slate-200 cursor-pointer">&times;</button></div><div class="flex-grow p-4 bg-slate-100"><div id="live-map-container"></div></div></div>
+    </div>
+
+    <div id="aadhar-modal-overlay" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
+            <div class="flex justify-between items-center border-b pb-3 mb-4"><h3 class="font-bold text-slate-800 text-base">Verify Aadhar Documentation</h3><button id="btn-close-aadhar-modal" class="text-slate-400 font-black text-lg cursor-pointer">&times;</button></div>
+            <div class="space-y-4">
+                <div><label class="block text-slate-700 text-xs font-bold uppercase mb-1">Aadhar Number</label><input type="text" id="aadh-number" maxlength="12" class="w-full px-3 py-2 bg-slate-50 border rounded-xl text-sm" placeholder="12 Digit Number"></div>
+                <div><label class="block text-slate-700 text-xs font-bold uppercase mb-1">Full Name</label><input type="text" id="aadh-name" class="w-full px-3 py-2 bg-slate-50 border rounded-xl text-sm" placeholder="Name as per Aadhar"></div>
+                <div><label class="block text-slate-700 text-xs font-bold uppercase mb-1">Date of Birth</label><input type="date" id="aadh-dob" class="w-full px-3 py-2 bg-slate-50 border rounded-xl text-sm"></div>
+                <button id="btn-submit-aadhar-request" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-2.5 rounded-xl text-sm cursor-pointer">Submit Verification</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getDatabase, ref, set, get, child, update, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDGI7b17RRfpgctXIVIgPtyECtUBLEcMAU",
+            authDomain: "skill-bc495.firebaseapp.com",
+            databaseURL: "https://skill-bc495-default-rtdb.firebaseio.com",
+            projectId: "skill-bc495",
+            storageBucket: "skill-bc495.firebasestorage.app",
+            messagingSenderId: "53919238872",
+            appId: "1:53919238872:web:711de8f103089c653025ad",
+            measurementId: "G-6H5D0771NE"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        let verificationLoopWorker = null, globalLat = null, globalLng = null, mapInstance = null, markerInstance = null, liveDbListener = null;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById('go-to-register').addEventListener('click', () => showView('register'));
+            document.getElementById('back-to-login').addEventListener('click', () => showView('login'));
+            document.getElementById('go-to-forgot').addEventListener('click', () => showView('forgot'));
+            document.getElementById('forgot-back-to-login').addEventListener('click', () => showView('login'));
+            
+            document.getElementById('profile-menu-btn').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('profile-dropdown').classList.toggle('hidden'); });
+            document.getElementById('noti-menu-btn').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('noti-dropdown').classList.toggle('hidden'); });
+            document.addEventListener('click', () => { document.getElementById('profile-dropdown').classList.add('hidden'); document.getElementById('noti-dropdown').classList.add('hidden'); });
+            document.getElementById('profile-dropdown').addEventListener('click', (e) => e.stopPropagation());
+            document.getElementById('noti-dropdown').addEventListener('click', (e) => e.stopPropagation());
+
+            document.getElementById('btn-edit-name').addEventListener('click', () => {
+                document.getElementById('input-edit-name').value = document.getElementById('prof-display-name').innerText;
+                document.getElementById('name-display-box').classList.add('hidden'); document.getElementById('name-edit-box').classList.remove('hidden');
+            });
+
+            document.getElementById('btn-request-location').addEventListener('click', () => triggerExactLocationScanner(true));
+            document.getElementById('badge-location-trigger').addEventListener('click', openLiveInteractiveMapModal);
+            document.getElementById('btn-close-map').addEventListener('click', () => document.getElementById('map-modal-overlay').classList.add('hidden'));
+            document.getElementById('btn-trigger-aadhar-modal').addEventListener('click', () => document.getElementById('aadhar-modal-overlay').classList.remove('hidden'));
+            document.getElementById('btn-close-aadhar-modal').addEventListener('click', () => document.getElementById('aadhar-modal-overlay').classList.add('hidden'));
+
+            document.getElementById('btn-send-link').addEventListener('click', registerStepOne);
+            document.getElementById('btn-complete-setup').addEventListener('click', finalizeAccountSetup);
+            document.getElementById('btn-save-name').addEventListener('click', saveProfileNameEdit);
+            document.getElementById('btn-save-address').addEventListener('click', saveProfileDeliveryAddressBookRecord);
+            document.getElementById('btn-login').addEventListener('click', executeUnifiedLogin);
+            document.getElementById('btn-reset-password').addEventListener('click', processForgotPasswordReset);
+            document.getElementById('btn-logout').addEventListener('click', () => signOut(auth));
+            document.getElementById('btn-submit-aadhar-request').addEventListener('click', submitAadharVerificationDocumentData);
+        });
+
+        function showView(view) {
+            document.getElementById('auth-container').classList.add('hidden'); document.getElementById('home-container').classList.add('hidden');
+            document.getElementById('login-section').classList.add('hidden'); document.getElementById('register-section').classList.add('hidden');
+            document.getElementById('waiting-section').classList.add('hidden'); document.getElementById('setup-account-section').classList.add('hidden');
+            document.getElementById('forgot-section').classList.add('hidden');
+            if (view === 'home') { document.getElementById('home-container').classList.remove('hidden'); triggerExactLocationScanner(); }
+            else { document.getElementById('auth-container').classList.remove('hidden'); document.getElementById(view + '-section').classList.remove('hidden'); }
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                if (user.emailVerified) {
+                    clearInterval(verificationLoopWorker); if (liveDbListener) liveDbListener();
+                    
+                    liveDbListener = onValue(ref(db, `users/${user.uid}`), (snapshot) => {
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            if (!data.name) { showView('setup-account'); document.getElementById('setup-password-wrapper').classList.add('hidden'); return; }
+                            
+                            document.getElementById('prof-uid').innerText = data.uid;
+                            document.getElementById('prof-email').innerText = data.email;
+                            document.getElementById('prof-phone').innerText = data.phone || "N/A";
+                            document.getElementById('prof-display-name').innerText = data.name;
+                            document.getElementById('prof-delivery-address').value = data.deliveryAddress || "";
+                            
+                            const letter = data.name.charAt(0).toUpperCase();
+                            document.getElementById('profile-menu-btn').innerText = letter;
+                            document.getElementById('avatar-fallback').innerText = letter;
+
+                            const status = data.aadharStatus || "Unverified";
+                            document.getElementById('user-aadhar-badge').innerText = status;
+
+                            // Sync embedded sub-user viewport components passing full payload arguments
+                            const subUserIframeUrl = `https://revanthreddy150.github.io/test/?uid=${data.uid}&name=${encodeURIComponent(data.name)}&email=${data.email}&phone=${data.phone || ''}&aadharStatus=${status}&lat=${globalLat || ''}&lng=${globalLng || ''}&savedAddress=${encodeURIComponent(data.deliveryAddress || '')}`;
+                            if (document.getElementById('sub-user-frame').src !== subUserIframeUrl && globalLat) {
+                                document.getElementById('sub-user-frame').src = subUserIframeUrl;
+                            }
+                            showView('home');
+                        }
+                    });
+
+                    onValue(ref(db, `notifications/${user.uid}`), (snap) => {
+                        const container = document.getElementById('noti-items-list'); const badge = document.getElementById('noti-badge-count');
+                        container.innerHTML = ""; if (!snap.exists()) { container.innerHTML = `<p class="p-2 text-center text-slate-400">No active notices.</p>`; badge.classList.add('hidden'); return; }
+                        const items = Object.values(snap.val()).reverse(); badge.innerText = items.length; badge.classList.remove('hidden');
+                        items.forEach(n => {
+                            const div = document.createElement('div'); div.className = "p-2 bg-blue-50/50 rounded-lg mb-1 border border-blue-100";
+                            div.innerHTML = `<p class="font-semibold text-slate-800">${n.title}</p><p class="text-[11px] text-slate-500">${n.body}</p>`; container.appendChild(div);
+                        });
+                    });
+                } else { showView('waiting'); startVerificationLoopTracker(user); }
+            } else { showView('login'); }
+        });
+
+        async function saveProfileDeliveryAddressBookRecord() {
+            const addr = document.getElementById('prof-delivery-address').value.trim();
+            if(!addr) return showToast("Address entry cannot remain empty.", "#ef4444");
+            try {
+                await update(ref(db, `users/${auth.currentUser.uid}`), { deliveryAddress: addr });
+                showToast("Delivery address book synchronized!", "#16a34a");
+            } catch(e) { showToast(e.message, "#ef4444"); }
+        }
+
+        function triggerExactLocationScanner(explicitClick = false) {
+            if (!navigator.geolocation) return;
+            navigator.geolocation.getCurrentPosition((pos) => {
+                globalLat = pos.coords.latitude; globalLng = pos.coords.longitude;
+                fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${globalLat}&lon=${globalLng}&zoom=18&addressdetails=1`)
+                    .then(r => r.json()).then(data => {
+                        if (data && data.address) {
+                            const area = data.address.suburb || data.address.neighbourhood || data.address.road || "My Area";
+                            document.getElementById('geo-location-display').innerText = area;
+                            document.getElementById('geo-dot').className = "w-2 h-2 rounded-full bg-emerald-500";
+                            document.getElementById('btn-request-location').classList.add('hidden');
+                            if (auth.currentUser) {
+                                get(child(ref(db), `users/${auth.currentUser.uid}`)).then(snap => {
+                                    if(snap.exists()) {
+                                        document.getElementById('sub-user-frame').src = `https://revanthreddy150.github.io/test/?uid=${snap.val().uid}&name=${encodeURIComponent(snap.val().name)}&email=${snap.val().email}&phone=${snap.val().phone || ''}&aadharStatus=${snap.val().aadharStatus || 'Unverified'}&lat=${globalLat}&lng=${globalLng}&savedAddress=${encodeURIComponent(snap.val().deliveryAddress || '')}`;
+                                    }
+                                });
+                            }
+                        }
+                    });
+            }, null, { enableHighAccuracy: true });
+        }
+
+        function openLiveInteractiveMapModal() {
+            if (!globalLat || !globalLng) return;
+            document.getElementById('map-modal-overlay').classList.remove('hidden');
+            setTimeout(() => {
+                if (!mapInstance) {
+                    mapInstance = L.map('live-map-container').setView([globalLat, globalLng], 17);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapInstance);
+                    markerInstance = L.marker([globalLat, globalLng]).addTo(mapInstance).bindPopup("Current Fix").openPopup();
+                } else { mapInstance.setView([globalLat, globalLng], 17); markerInstance.setLatLng([globalLat, globalLng]); mapInstance.invalidateSize(); }
+            }, 250);
+        }
+
+        async function submitAadharVerificationDocumentData() {
+            const cardNum = document.getElementById('aadh-number').value.trim();
+            const cardName = document.getElementById('aadh-name').value.trim();
+            const cardDob = document.getElementById('aadh-dob').value;
+            if (cardNum.length !== 12 || isNaN(cardNum) || !cardName || !cardDob) return alert("Invalid inputs.");
+            await set(ref(db, 'verification_requests/' + auth.currentUser.uid), { uid: auth.currentUser.uid, email: auth.currentUser.email, aadharNumber: cardNum, nameAsPerAadhar: cardName, dobAsPerAadhar: cardDob, submittedAt: Date.now() });
+            await update(ref(db, `users/${auth.currentUser.uid}`), { aadharStatus: "Pending" });
+            document.getElementById('aadhar-modal-overlay').classList.add('hidden');
+        }
+
+        function startVerificationLoopTracker(user) {
+            clearInterval(verificationLoopWorker);
+            verificationLoopWorker = setInterval(async () => { await user.reload(); if (user.emailVerified) { clearInterval(verificationLoopWorker); window.location.reload(); } }, 3000);
+        }
+
+        async function registerStepOne() {
+            const email = document.getElementById('reg-email').value.trim();
+            const phone = document.getElementById('reg-phone').value.trim();
+            window.localStorage.setItem('temp_reg_phone', phone);
+            try {
+                const res = await createUserWithEmailAndPassword(auth, email, "PARTNER_" + Math.random().toString(36).substring(2, 10));
+                await sendEmailVerification(res.user); showView('waiting');
+            } catch(e) { alert(e.message); }
+        }
+
+        async function finalizeAccountSetup() {
+            const name = document.getElementById('setup-name').value.trim();
+            try {
+                await set(ref(db, 'users/' + auth.currentUser.uid), { uid: auth.currentUser.uid, email: auth.currentUser.email, phone: window.localStorage.getItem('temp_reg_phone') || '', name, aadharStatus: "Unverified", createdAt: Date.now() });
+                window.location.reload();
+            } catch(e) { alert(e.message); }
+        }
+
+        async function saveProfileNameEdit() {
+            await update(ref(db, `users/${auth.currentUser.uid}`), { name: document.getElementById('input-edit-name').value.trim() });
+            document.getElementById('name-edit-box').classList.add('hidden'); document.getElementById('name-display-box').classList.remove('hidden');
+        }
+
+        async function executeUnifiedLogin() {
+            let em = document.getElementById('login-identifier').value.trim();
+            if (!em.includes('@')) {
+                const snap = await get(child(ref(db), `phone_lookup/${em.replace(/[^0-9]/g, '')}`));
+                if (snap.exists()) em = snap.val().email;
+            }
+            try {
+                const res = await signInWithEmailAndPassword(auth, em, document.getElementById('login-password').value.trim());
+                if (!res.user.emailVerified) showView('waiting');
+            } catch(e) { alert(e.message); }
+        }
+
+        async function processForgotPasswordReset() {
+            try { await sendPasswordResetEmail(auth, document.getElementById('forgot-email').value.trim()); showToast("chek in the spams you got a resetpassword email", "#f97316"); showView('login'); } catch(e) { alert(e.message); }
+        }
+    </script>
+</body>
+</html>
