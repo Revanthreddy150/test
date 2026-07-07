@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    // head
     <meta charset="UTF-8">
     <title>Sub User Hub</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
@@ -11,22 +10,25 @@
 <body class="bg-white text-slate-800 p-4 font-sans min-h-screen relative pb-24">
 
     <div class="flex items-center space-x-2 mb-6 border-b pb-4 border-slate-100">
-        <button id="tab-helps-btn" class="px-5 py-2 rounded-full text-xs font-bold tracking-wide transition bg-blue-600 text-white shadow-md">Helps Feed</button>
-        <button id="tab-grocery-btn" class="px-5 py-2 rounded-full text-xs font-bold tracking-wide transition bg-slate-100 text-slate-600 hover:bg-slate-200">Food & Grocery</button>
-        <button id="tab-orders-btn" class="px-5 py-2 rounded-full text-xs font-bold tracking-wide transition bg-slate-100 text-slate-600 hover:bg-slate-200">My Orders</button>
+        <button id="tab-helps-btn" class="px-5 py-2 rounded-full text-xs font-bold tracking-wide transition bg-blue-600 text-white shadow-md cursor-pointer">Helps Feed</button>
+        <button id="tab-grocery-btn" class="px-5 py-2 rounded-full text-xs font-bold tracking-wide transition bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer">Food & Grocery</button>
+        <button id="tab-orders-btn" class="px-5 py-2 rounded-full text-xs font-bold tracking-wide transition bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer">My Orders</button>
     </div>
 
-    <div id="view-helps" class="space-y-4">
-        <div id="helps-feed-output" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-    </div>
-
-    <div id="view-grocery" class="hidden space-y-4">
-        <div id="grocery-feed-output" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
-    </div>
-
+    <div id="view-helps" class="space-y-4"><div id="helps-feed-output" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div></div>
+    <div id="view-grocery" class="hidden space-y-4"><div id="grocery-feed-output" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div></div>
+    
     <div id="view-orders" class="hidden space-y-4">
-        <h3 class="text-sm font-black uppercase tracking-wider text-slate-400 mb-2">My Placed Orders (COD Only)</h3>
+        <h3 class="text-sm font-black uppercase tracking-wider text-slate-400 mb-2">My Placed Assistance Calls & Orders Feed</h3>
         <div id="orders-feed-output" class="space-y-3"></div>
+    </div>
+
+    <div id="success-tick-overlay" class="hidden fixed inset-0 bg-slate-900/70 z-[200] flex flex-col items-center justify-center animate-fade-in">
+        <div class="bg-white p-8 rounded-3xl shadow-2xl flex flex-col items-center text-center max-w-xs transform scale-95 animate-bounce duration-500">
+            <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-3xl font-black mb-4">✓</div>
+            <h4 class="text-xl font-black text-slate-900">Order Placed!</h4>
+            <p class="text-xs text-slate-500 mt-1 leading-relaxed">Your order has been logged. Checking for local delivery agents near your range node coordinates...</p>
+        </div>
     </div>
 
     <button id="btn-floating-action" class="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-tr from-blue-600 to-indigo-600 text-white rounded-full text-2xl font-black shadow-xl flex items-center justify-center cursor-pointer z-40">+</button>
@@ -34,20 +36,19 @@
     <div id="shop-details-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[60] flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl p-6 w-full max-w-4xl h-[85vh] shadow-2xl relative flex flex-col md:flex-row gap-6">
             <button id="btn-close-shop-modal" class="absolute top-4 right-4 text-slate-400 text-xl font-bold cursor-pointer">×</button>
-            
             <div class="flex-1 flex flex-col min-h-0">
-                <div class="border-b pb-2 mb-3">
-                    <h3 id="modal-shop-name" class="font-black text-slate-900 text-xl">Shop Items</h3>
-                    <p id="modal-shop-meta" class="text-xs text-slate-400"></p>
-                </div>
+                <div class="border-b pb-2 mb-3"><h3 id="modal-shop-name" class="font-black text-slate-900 text-xl">Shop Items</h3><p id="modal-shop-meta" class="text-xs text-slate-400"></p></div>
                 <div id="modal-items-grid" class="flex-grow overflow-y-auto space-y-3 grid grid-cols-1 sm:grid-cols-2 gap-3 content-start"></div>
             </div>
 
-            <div class="w-full md:w-72 border-t md:border-t-0 md:border-l pt-4 md:pt-0 md:pl-4 flex flex-col justify-between min-h-0">
-                <div>
-                    <h4 class="font-black text-slate-800 text-sm mb-3 uppercase tracking-wider flex items-center gap-1">🛒 Shopping Cart</h4>
-                    <div id="cart-items-wrapper" class="space-y-2 max-h-48 overflow-y-auto text-xs divide-y divide-slate-100">
-                        <p class="text-slate-400 text-center py-4">Your cart is empty.</p>
+            <div class="w-full md:w-80 border-t md:border-t-0 md:border-l pt-4 md:pt-0 md:pl-4 flex flex-col justify-between min-h-0">
+                <div class="flex flex-col min-h-0 flex-grow">
+                    <h4 class="font-black text-slate-800 text-sm mb-3 uppercase tracking-wider">🛒 Shopping Cart</h4>
+                    <div id="cart-items-wrapper" class="space-y-2 overflow-y-auto text-xs divide-y divide-slate-100 flex-grow pr-1"></div>
+                    
+                    <div class="border-t pt-3 mt-2 space-y-2">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wide block">Delivery Address Destination</label>
+                        <textarea id="cart-delivery-address-input" rows="2" class="w-full p-2 bg-slate-50 border rounded-xl text-xs font-semibold focus:outline-blue-500" placeholder="Type delivery destination or use saved profile default address..."></textarea>
                     </div>
                 </div>
                 <div class="border-t pt-3 mt-3 space-y-2">
@@ -62,31 +63,24 @@
     <div id="action-modal-overlay" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl p-6 w-full max-w-lg shadow-2xl relative border max-h-[90vh] overflow-y-auto">
             <button id="btn-close-action-modal" class="absolute top-4 right-4 text-slate-400 text-xl font-bold cursor-pointer">×</button>
-            <div class="flex border-b pb-2 mb-4 space-x-4 text-sm font-bold">
-                <button id="form-help-tab" class="text-blue-600 border-b-2 border-blue-600 pb-1">Request Help</button>
-                <button id="form-shop-tab" class="text-slate-400 pb-1">Add My Shop</button>
-            </div>
+            <div class="flex border-b pb-2 mb-4 space-x-4 text-sm font-bold"><button id="form-help-tab" class="text-blue-600 border-b-2 border-blue-600 pb-1">Request Help</button><button id="form-shop-tab" class="text-slate-400 pb-1">Add My Shop</button></div>
             <div id="form-help-block" class="space-y-3">
-                <input type="text" id="help-fullname" class="w-full p-2.5 bg-slate-50 border rounded-xl text-xs" placeholder="Your Full Name">
-                <div class="h-32 bg-slate-100 rounded-xl" id="map-help-box"></div>
+                <input type="text" id="help-fullname" class="w-full p-2.5 bg-slate-50 border rounded-xl text-xs font-semibold" placeholder="Your Full Name">
+                <div class="h-40 bg-slate-100 rounded-xl overflow-hidden relative" id="map-help-box"></div>
                 <input type="text" id="help-coords" readonly class="w-full p-2 bg-slate-100 text-[10px] font-mono rounded-lg">
                 <input type="tel" id="help-phone" class="w-full p-2.5 bg-slate-50 border rounded-xl text-xs" placeholder="Working Number">
                 <textarea id="help-desc" class="w-full p-2.5 bg-slate-50 border rounded-xl text-xs h-16" placeholder="Describe assistance needed..."></textarea>
-                <button id="btn-submit-help" class="w-full bg-blue-600 text-white text-xs font-bold py-2 rounded-xl">Post Help</button>
+                <button id="btn-submit-help" class="w-full bg-blue-600 text-white text-xs font-bold py-2 rounded-xl cursor-pointer">Post Help Request</button>
             </div>
             <div id="form-shop-block" class="hidden space-y-3">
                 <input type="text" id="shop-name" class="w-full p-2.5 bg-slate-50 border rounded-xl text-xs" placeholder="Shop Name">
-                <div class="h-32 bg-slate-100 rounded-xl" id="map-shop-box"></div>
+                <div class="h-40 bg-slate-100 rounded-xl overflow-hidden relative" id="map-shop-box"></div>
                 <input type="text" id="shop-coords" readonly class="w-full p-2 bg-slate-100 text-[10px] font-mono rounded-lg">
                 <div class="border p-3 rounded-xl bg-slate-50 space-y-2">
-                    <div class="flex gap-2">
-                        <input type="text" id="item-title" class="flex-1 p-2 bg-white border text-xs" placeholder="Item Name">
-                        <input type="text" id="item-price" class="w-16 p-2 bg-white border text-xs text-center" placeholder="₹60">
-                        <button id="btn-add-subitem" class="bg-slate-800 text-white px-2 rounded">+</button>
-                    </div>
+                    <div class="flex gap-2"><input type="text" id="item-title" class="flex-1 p-2 bg-white border text-xs" placeholder="Item Name"><input type="text" id="item-price" class="w-16 p-2 bg-white border text-xs text-center" placeholder="₹60"><button id="btn-add-subitem" class="bg-slate-800 text-white px-2 rounded cursor-pointer">+</button></div>
                     <ul id="added-items-list" class="text-xs space-y-1 max-h-20 overflow-y-auto"></ul>
                 </div>
-                <button id="btn-submit-shop" class="w-full bg-emerald-600 text-white text-xs font-bold py-2 rounded-xl">Submit Shop</button>
+                <button id="btn-submit-shop" class="w-full bg-emerald-600 text-white text-xs font-bold py-2 rounded-xl cursor-pointer">Submit Shop</button>
             </div>
         </div>
     </div>
@@ -115,14 +109,9 @@
         const userAadharStatus = params.get('aadharStatus') || "Unverified";
         const centerLat = parseFloat(params.get('lat')) || 17.3850;
         const centerLng = parseFloat(params.get('lng')) || 78.4867;
+        const profileSavedAddress = decodeURIComponent(params.get('savedAddress') || "");
 
-        let mapHelp = null, mapShop = null;
-        let markerHelp = null, markerShop = null;
-        let currentShopItems = [];
-        let activeCart = [];
-        let activeCartShopUid = null;
-        let activeCartShopName = null;
-        let allShopsCached = {};
+        let mapHelp = null, mapShop = null, markerHelp = null, markerShop = null, currentShopItems = [], activeCart = [], activeCartShopUid = null, activeCartShopName = null, allShopsCached = {};
 
         document.getElementById('tab-helps-btn').addEventListener('click', () => switchTab('helps'));
         document.getElementById('tab-grocery-btn').addEventListener('click', () => switchTab('grocery'));
@@ -130,23 +119,21 @@
 
         function switchTab(t) {
             ['helps', 'grocery', 'orders'].forEach(v => {
-                document.getElementById(`tab-${v}-btn`).className = "px-5 py-2 rounded-full text-xs font-bold tracking-wide transition bg-slate-100 text-slate-600";
+                document.getElementById(`tab-${v}-btn`).className = "px-5 py-2 rounded-full text-xs font-bold tracking-wide transition bg-slate-100 text-slate-600 cursor-pointer";
                 document.getElementById(`view-${v}`).classList.add('hidden');
             });
-            document.getElementById(`tab-${t}-btn`).className = "px-5 py-2 rounded-full text-xs font-bold tracking-wide transition bg-blue-600 text-white shadow-md";
+            document.getElementById(`tab-${t}-btn`).className = "px-5 py-2 rounded-full text-xs font-bold tracking-wide transition bg-blue-600 text-white shadow-md cursor-pointer";
             document.getElementById(`view-${t}`).classList.remove('hidden');
         }
 
         document.getElementById('btn-floating-action').addEventListener('click', () => {
-            if (userAadharStatus !== "Verified") { alert("Aadhar Verification is pending or unverified."); return; }
-            document.getElementById('action-modal-overlay').classList.remove('hidden');
-            initializeFormMaps();
+            if (userAadharStatus !== "Verified") { alert(`Verification Pending. Aadhar state: ${userAadharStatus}`); return; }
+            document.getElementById('action-modal-overlay').classList.remove('hidden'); initializeFormMaps();
         });
 
         document.getElementById('btn-close-action-modal').addEventListener('click', () => document.getElementById('action-modal-overlay').classList.add('hidden'));
         document.getElementById('btn-close-shop-modal').addEventListener('click', () => document.getElementById('shop-details-modal').classList.add('hidden'));
 
-        // Form switcher sub panels
         document.getElementById('form-help-tab').addEventListener('click', () => {
             document.getElementById('form-help-block').classList.remove('hidden'); document.getElementById('form-shop-block').classList.add('hidden');
             document.getElementById('form-help-tab').className = "text-blue-600 border-b-2 border-blue-600 pb-1"; document.getElementById('form-shop-tab').className = "text-slate-400 pb-1";
@@ -157,8 +144,7 @@
         });
 
         document.getElementById('btn-add-subitem').addEventListener('click', () => {
-            const t = document.getElementById('item-title').value.trim();
-            const p = document.getElementById('item-price').value.trim();
+            const t = document.getElementById('item-title').value.trim(); const p = document.getElementById('item-price').value.trim();
             if (!t || !p || currentShopItems.length >= 50) return;
             currentShopItems.push({ title: t, price: p });
             const li = document.createElement('li'); li.innerHTML = `<span>${t}</span> - <span>${p}</span>`;
@@ -183,15 +169,16 @@
             }, 200);
         }
 
-        // Post assistance requests
         document.getElementById('btn-submit-help').addEventListener('click', () => {
             const c = document.getElementById('help-coords').value.split(',');
             const pushRef = push(ref(db, 'helps_posts'));
             set(pushRef, { postId: pushRef.key, uid: userUid, posterName: document.getElementById('help-fullname').value.trim() || userName, phone: document.getElementById('help-phone').value.trim(), desc: document.getElementById('help-desc').value.trim(), lat: parseFloat(c[0]), lng: parseFloat(c[1]), createdAt: Date.now() })
-            .then(() => { document.getElementById('action-modal-overlay').classList.add('hidden'); alert("Help request posted!"); });
+            .then(() => { 
+                document.getElementById('action-modal-overlay').classList.add('hidden');
+                triggerAnimatedGreenSuccessTickOverlayGate();
+            });
         });
 
-        // Submit shop request
         document.getElementById('btn-submit-shop').addEventListener('click', () => {
             const c = document.getElementById('shop-coords').value.split(',');
             set(ref(db, 'shop_requests/' + userUid), { uid: userUid, shopName: document.getElementById('shop-name').value.trim(), ownerName: userName, lat: parseFloat(c[0]), lng: parseFloat(c[1]), items: currentShopItems, status: "Pending", submittedAt: Date.now() })
@@ -204,7 +191,6 @@
             return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
         }
 
-        // Render feeds loops tracking posts
         onValue(ref(db, 'helps_posts'), (snapshot) => {
             const feed = document.getElementById('helps-feed-output'); feed.innerHTML = ""; if (!snapshot.exists()) return;
             Object.values(snapshot.val()).sort((x, y) => (x.uid === userUid ? -1 : y.uid === userUid ? 1 : 0)).forEach(p => {
@@ -214,40 +200,33 @@
             });
         });
 
-        // Render food grocery shops nodes
         onValue(ref(db, 'approved_shops'), (snapshot) => {
             const feed = document.getElementById('grocery-feed-output'); feed.innerHTML = ""; if (!snapshot.exists()) return;
             allShopsCached = snapshot.val();
             Object.values(allShopsCached).forEach(s => {
-                const dist = calculateDistance(centerLat, centerLng, s.lat, s.lng);
-                if (dist > 10 && s.uid !== userUid) return;
+                const dist = calculateDistance(centerLat, centerLng, s.lat, s.lng); if (dist > 10 && s.uid !== userUid) return;
                 const card = document.createElement('div'); card.className = "bg-white rounded-3xl overflow-hidden border border-slate-100 flex flex-col shadow-xs cursor-pointer shop-card";
                 card.setAttribute('data-uid', s.uid);
                 card.innerHTML = `<img src="${s.shopImgUrl || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600'}" class="h-36 w-full object-cover"><div class="p-4"><h4 class="font-black text-sm text-slate-900">${s.shopName}</h4><p class="text-xs text-slate-400">${s.ownerName} (${dist.toFixed(1)} km away)</p></div>`;
                 feed.appendChild(card);
             });
-
-            document.querySelectorAll('.shop-card').forEach(c => {
-                c.addEventListener('click', () => openShopDetailsModal(allShopsCached[c.getAttribute('data-uid')]));
-            });
+            document.querySelectorAll('.shop-card').forEach(c => c.addEventListener('click', () => openShopDetailsModal(allShopsCached[c.getAttribute('data-uid')])));
         });
 
-        // POPULATE SHOP DETAILS SHEET & ADD TO CART IMPLEMENTATION
         function openShopDetailsModal(shop) {
             document.getElementById('modal-shop-name').innerText = shop.shopName;
             document.getElementById('modal-shop-meta').innerText = `Owner: ${shop.ownerName}`;
-            activeCartShopUid = shop.uid;
-            activeCartShopName = shop.shopName;
+            activeCartShopUid = shop.uid; activeCartShopName = shop.shopName;
+            
+            // Auto-fill delivery address book parameter properties caching
+            document.getElementById('cart-delivery-address-input').value = profileSavedAddress;
             
             const grid = document.getElementById('modal-items-grid'); grid.innerHTML = "";
             shop.items.forEach((item, idx) => {
-                const div = document.createElement('div');
-                div.className = "bg-slate-50 rounded-2xl p-3 border border-slate-100 flex flex-col justify-between space-y-2";
+                const div = document.createElement('div'); div.className = "bg-slate-50 rounded-2xl p-3 border border-slate-100 flex flex-col justify-between space-y-2";
                 div.innerHTML = `
                     <img src="${item.imgUrl || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=300'}" class="h-24 w-full object-cover rounded-xl">
-                    <div class="flex justify-between items-center text-xs font-bold">
-                        <span class="truncate">${item.title}</span><span class="text-blue-600">${item.price}</span>
-                    </div>
+                    <div class="flex justify-between items-center text-xs font-bold"><span class="truncate">${item.title}</span><span class="text-blue-600">${item.price}</span></div>
                     <button class="btn-add-to-cart bg-slate-900 text-white text-[10px] font-black py-1.5 rounded-xl uppercase tracking-wider cursor-pointer shadow-xs" data-title="${item.title}" data-price="${item.price}">Add to Cart</button>
                 `;
                 grid.appendChild(div);
@@ -255,12 +234,9 @@
 
             document.querySelectorAll('.btn-add-to-cart').forEach(btn => {
                 btn.addEventListener('click', (e) => {
-                    const title = e.target.getAttribute('data-title');
-                    const price = e.target.getAttribute('data-price');
-                    addItemToCartArray(title, price);
+                    addItemToCartArray(e.target.getAttribute('data-title'), e.target.getAttribute('data-price'));
                 });
             });
-
             document.getElementById('shop-details-modal').classList.remove('hidden');
         }
 
@@ -271,46 +247,75 @@
             renderCartInterfaceView();
         }
 
+        // --- FLIPKART STYLE INCREMENT / DECREMENT CART LOGIC ---
         function renderCartInterfaceView() {
             const wrap = document.getElementById('cart-items-wrapper'); wrap.innerHTML = "";
             if (activeCart.length === 0) { wrap.innerHTML = `<p class="text-slate-400 text-center py-4">Your cart is empty.</p>`; document.getElementById('cart-grand-total').innerText = "₹0"; return; }
             
             let total = 0;
-            activeCart.forEach(i => {
-                const cost = i.price * i.qty; total += cost;
-                const row = document.createElement('div'); row.className = "flex justify-between items-center py-1.5 text-xs text-slate-700";
-                row.innerHTML = `<div><span class="font-bold">${i.title}</span> <span class="text-slate-400">x${i.qty}</span></div><span class="font-mono font-bold">₹${cost}</span>`;
+            activeCart.forEach((item, index) => {
+                const cost = item.price * item.qty; total += cost;
+                const row = document.createElement('div'); row.className = "flex justify-between items-center py-2 text-xs text-slate-700 border-b border-slate-50";
+                row.innerHTML = `
+                    <div>
+                        <span class="font-bold">${item.title}</span>
+                        <div class="flex items-center space-x-2 mt-1">
+                            <button class="btn-cart-minus bg-slate-200 text-slate-700 px-1.5 rounded font-black cursor-pointer" data-idx="${index}">-</button>
+                            <span class="font-mono font-bold">${item.qty}</span>
+                            <button class="btn-cart-plus bg-slate-200 text-slate-700 px-1.5 rounded font-black cursor-pointer" data-idx="${index}">+</button>
+                        </div>
+                    </div>
+                    <span class="font-mono font-bold">₹${cost}</span>
+                `;
                 wrap.appendChild(row);
             });
             document.getElementById('cart-grand-total').innerText = `₹${total}`;
+
+            // Attach listeners to active counter keys buttons
+            document.querySelectorAll('.btn-cart-minus').forEach(b => b.addEventListener('click', (e) => {
+                const idx = parseInt(e.target.getAttribute('data-idx'));
+                if(activeCart[idx].qty > 1) activeCart[idx].qty--; else activeCart.splice(idx, 1);
+                renderCartInterfaceView();
+            }));
+            document.querySelectorAll('.btn-cart-plus').forEach(b => b.addEventListener('click', (e) => {
+                activeCart[parseInt(e.target.getAttribute('data-idx'))].qty++;
+                renderCartInterfaceView();
+            }));
         }
 
-        // --- BOOK ORDER CHECKOUT (COD ONLY) ---
+        function triggerAnimatedGreenSuccessTickOverlayGate() {
+            const overlay = document.getElementById('success-tick-overlay');
+            overlay.classList.remove('hidden');
+            setTimeout(() => { overlay.classList.add('hidden'); switchTab('orders'); }, 3000);
+        }
+
         document.getElementById('btn-checkout-cart').addEventListener('click', () => {
             if (activeCart.length === 0) return;
+            const deliveryDestinationStr = document.getElementById('cart-delivery-address-input').value.trim();
+            if(!deliveryDestinationStr) return alert("Delivery address configuration destination required.");
+
             const totalBill = document.getElementById('cart-grand-total').innerText;
             const pushOrderRef = push(ref(db, 'orders'));
             
             set(pushOrderRef, {
-                orderId: pushOrderRef.key,
-                uid: userUid, userName,
+                orderId: pushOrderRef.key, uid: userUid, userName,
                 shopUid: activeCartShopUid, shopName: activeCartShopName,
                 items: activeCart, totalBill, status: "Processing",
+                deliveryAddress: deliveryDestinationStr, userPhone: window.localStorage.getItem('temp_reg_phone') || 'N/A',
                 lat: centerLat, lng: centerLng, timestamp: Date.now()
             }).then(() => {
                 activeCart = []; renderCartInterfaceView();
                 document.getElementById('shop-details-modal').classList.add('hidden');
-                switchTab('orders'); alert("Order placed securely via Cash on Delivery (COD)!");
+                triggerAnimatedGreenSuccessTickOverlayGate();
             });
         });
 
-        // --- RENDER MY PLACED ORDERS TIMEOUT CHECKER ---
+        // --- RENDER DYNAMIC STATUS TRACKERS IN ORDER SECTIONS FLOW ---
         onValue(ref(db, 'orders'), (snapshot) => {
             const container = document.getElementById('orders-feed-output'); container.innerHTML = "";
             if (!snapshot.exists()) { container.innerHTML = `<p class="text-slate-400 text-center py-6 text-xs">No orders recorded.</p>`; return; }
             
             Object.values(snapshot.val()).filter(o => o.uid === userUid).forEach(order => {
-                // AUTOMATED 30 MINUTE CANCELLATION TIMEOUT CHECKER
                 const elapsedMinutes = (Date.now() - order.timestamp) / 1000 / 60;
                 let currentStatus = order.status;
 
@@ -319,27 +324,39 @@
                     update(ref(db, `orders/${order.orderId}`), { status: "Cancelled", reason: "agents are not available" });
                 }
 
-                const card = document.createElement('div');
-                card.className = "p-4 bg-white rounded-2xl border border-slate-100 flex flex-col space-y-2 text-xs relative shadow-xs";
+                const card = document.createElement('div'); card.className = "p-4 bg-white rounded-2xl border border-slate-100 flex flex-col space-y-2 text-xs relative shadow-xs";
                 
-                let colorClass = "text-amber-500 animate-pulse";
-                if (currentStatus === "Approved") colorColor = "text-green-500 font-bold";
-                if (currentStatus === "Rejected") colorColor = "text-red-500 font-bold";
+                // Switch styling based on current state transitions
+                let statusTextHtml = `<span class="text-amber-500 font-bold uppercase">${currentStatus}</span>`;
+                if (currentStatus === "Approved") {
+                    statusTextHtml = `<span class="text-green-600 font-extrabold uppercase">Order Confirmed</span>`;
+                } else if (currentStatus === "Cancelled") {
+                    statusTextHtml = `<span class="text-red-500 font-extrabold uppercase">Cancelled (${order.reason || 'Timeout'})</span>`;
+                }
 
-                let itemsListText = order.items.map(i => `${i.title} (${i.price})`).join(', ');
+                let itemsText = order.items.map(i => `${i.title} (x${i.qty})`).join(', ');
+
+                // FIXED: Displays Agent credentials block natively if current state equals Approved
+                let agentDetailsBlockHtml = "";
+                if (currentStatus === "Approved" && order.agentName) {
+                    agentDetailsBlockHtml = `
+                        <div class="mt-2 p-2 bg-green-50 border border-green-200 rounded-xl text-slate-700 text-[11px]">
+                            <p><b>Assigned Agent:</b> ${order.agentName}</p>
+                            <p><b>Agent Phone Number:</b> ${order.agentPhone || 'N/A'}</p>
+                        </div>`;
+                }
 
                 card.innerHTML = `
                     <div class="flex justify-between items-center font-bold">
-                        <span class="text-sm text-slate-900">${order.shopName}</span>
-                        <span class="${currentStatus === 'Approved' ? 'text-green-600' : currentStatus === 'Pending' ? 'text-amber-500' : 'text-red-500'} font-extrabold uppercase text-[10px] tracking-wider">${currentStatus}</span>
+                        <span class="text-sm text-slate-900">${order.shopName || 'Assistance Request'}</span>
+                        ${statusTextHtml}
                     </div>
-                    <p class="text-slate-600 font-medium"><b>Items:</b> ${listItemsHtmlString ? listItemsHtmlString : "Products List"} -> ${itemsListOutputHTMLString || listItemsHtml || itemsListHtml}</p>
-                    <div class="flex justify-between text-[10px] text-slate-400 font-mono">
-                        <span>Total: ${order.items.reduce((acc, i) => acc + (parseFloat(i.price.replace(/[^0-9]/g, '')) || 0), 0)}</span>
-                        <span>${currentStatus === 'Rejected' ? 'Status: Rejected. Try Again' : 'Time: ' + new Date(order.submittedAt || order.createdAt).toLocaleTimeString()}</span>
-                    </div>
+                    <p class="text-slate-600 font-medium"><b>Summary:</b> ${itemsText || 'Emergency Assistance Post Call Link'}</p>
+                    <p class="text-[11px] text-slate-500"><b>Destination:</b> ${order.deliveryAddress || 'Current GPS Coordinate Fix'}</p>
+                    ${agentDetailsBlockHtml}
+                    <div class="pt-1 text-[10px] text-slate-400 font-mono">Time Placed: ${new Date(order.timestamp).toLocaleTimeString()}</div>
                 `;
-                tbody.appendChild(tr);
+                container.appendChild(card);
             });
         });
     </script>
