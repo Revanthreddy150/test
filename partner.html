@@ -10,6 +10,7 @@
 </head>
 <body class="bg-gradient-to-br from-slate-900 to-slate-950 font-sans min-h-screen text-slate-100">
 
+    <!-- Auth Windows -->
     <div id="auth-container" class="flex items-center justify-center min-h-screen p-4">
         <div class="bg-slate-800 border border-slate-700 p-8 rounded-3xl shadow-2xl w-full max-w-md">
             <div class="text-center mb-6">
@@ -17,19 +18,21 @@
                 <p class="text-xs text-slate-400 mt-1 uppercase tracking-wider font-bold">Agent Access Node</p>
             </div>
 
+            <!-- Login -->
             <div id="login-section">
                 <div class="mb-4">
                     <label class="block text-slate-400 text-xs font-bold uppercase mb-2">Email or Phone</label>
-                    <input type="text" id="login-identifier" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white" placeholder="Enter credentials">
+                    <input type="text" id="login-identifier" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="Enter credentials">
                 </div>
                 <div class="mb-5">
                     <label class="block text-slate-400 text-xs font-bold uppercase mb-2">Password</label>
-                    <input type="password" id="login-password" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white" placeholder="••••••••">
+                    <input type="password" id="login-password" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="••••••••">
                 </div>
-                <button id="btn-login" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition cursor-pointer">Login as Agent</button>
+                <button id="btn-login" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl cursor-pointer">Login as Agent</button>
                 <button id="go-to-register" class="w-full text-center text-xs text-slate-400 font-medium hover:underline mt-5 block cursor-pointer">New Agent Registration</button>
             </div>
 
+            <!-- Registration Documents Upload Form -->
             <div id="register-section" class="hidden space-y-4">
                 <h3 class="text-sm font-bold text-slate-300 uppercase">Submit Onboarding Credentials</h3>
                 <div><input type="text" id="reg-name" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white" placeholder="Full Name"></div>
@@ -43,11 +46,13 @@
                 <button id="back-to-login" class="w-full text-center text-xs text-slate-500 hover:underline mt-2 block cursor-pointer">Back to Login</button>
             </div>
 
+            <!-- Waiting Panel -->
             <div id="waiting-section" class="hidden text-center py-6">
                 <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
                 <h3 class="text-base font-bold text-white mb-2">Onboarding Verification Link Dispatched</h3>
             </div>
 
+            <!-- Setup Password -->
             <div id="password-setup-section" class="hidden space-y-4">
                 <h3 class="text-base font-bold text-emerald-400 text-center">Identity Verified!</h3>
                 <div><input type="password" id="setup-password" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white" placeholder="Choose Password (min 6 chars)"></div>
@@ -56,37 +61,69 @@
         </div>
     </div>
 
+    <!-- MAIN AGENT WORKSPACE HOME -->
     <div id="home-container" class="hidden min-h-screen flex flex-col bg-slate-950">
         <nav class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex justify-between items-center relative">
             <div class="flex items-center space-x-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 shadow-inner">
                 <span id="geo-dot" class="w-2 h-2 rounded-full bg-amber-500"></span>
                 <span id="geo-location-display" class="text-xs font-mono font-bold text-slate-400">Locking Agent GPS...</span>
             </div>
-            <h1 class="text-lg font-black text-blue-400 absolute left-1/2 transform -translate-x-1/2">QHP Agent Hub</h1>
-            <div class="flex items-center space-x-3">
-                <span id="partner-status-badge" class="text-[9px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Unverified</span>
-                <button id="btn-logout" class="bg-slate-800 hover:bg-red-950 text-slate-300 px-3 py-1.5 border border-slate-700 text-xs font-bold rounded-xl cursor-pointer">Sign Out</button>
+            
+            <!-- Dashboard Menu Navigation Sub Tabs -->
+            <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800 space-x-1 text-[11px] font-bold uppercase tracking-wide">
+                <button id="tab-avail-btn" class="px-3 py-1.5 rounded-lg text-white bg-blue-600 cursor-pointer">Available Jobs</button>
+                <button id="tab-active-btn" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white cursor-pointer">Active Deliveries</button>
+            </div>
+            
+            <!-- FIXED UPGRADE: Profile Dropdown to view Agent credentials metadata -->
+            <div class="relative">
+                <button id="profile-menu-btn" class="w-9 h-10 bg-slate-800 border border-slate-700 text-blue-400 rounded-full flex items-center justify-center font-bold font-mono shadow-md focus:outline-none cursor-pointer">?</button>
+                <div id="profile-dropdown" class="hidden absolute right-0 mt-3 w-72 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-4 z-50 text-xs">
+                    <div class="border-b border-slate-800 pb-2 mb-3">
+                        <h4 id="prof-agent-name" class="font-black text-white text-sm">Agent Name</h4>
+                        <span id="partner-status-badge" class="text-[9px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider mt-1 inline-block">Unverified</span>
+                    </div>
+                    <div class="space-y-2 font-mono text-slate-400 text-[11px]">
+                        <p class="break-all"><b>Agent UID:</b> <span id="prof-agent-uid" class="text-slate-200">Loading...</span></p>
+                        <p><b>Contact Phone:</b> <span id="prof-agent-phone" class="text-slate-200">Loading...</span></p>
+                    </div>
+                    <button id="btn-logout" class="w-full mt-4 bg-slate-800 hover:bg-red-950 text-slate-400 hover:text-red-400 font-bold py-2 rounded-xl border border-slate-700 hover:border-red-900 transition cursor-pointer">Sign Out Account</button>
+                </div>
             </div>
         </nav>
 
-        <main class="flex-grow p-6 grid grid-cols-1 lg:grid-cols-2 gap-6 overflow-y-auto max-h-[88vh]">
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 border-b border-slate-800 pb-2">🆘 Assistance Requests (20 KM)</h3>
-                <div id="agent-helps-feed" class="space-y-3 overflow-y-auto flex-1 content-start"></div>
+        <!-- SUB WORKSPACE PANELS -->
+        <main class="flex-grow p-6 overflow-y-auto max-h-[88vh]">
+            
+            <!-- PANEL A: JOB FEEDS SECTIONS -->
+            <div id="panel-avail-jobs" class="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full content-start">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 border-b border-slate-800 pb-2">🆘 Help Calls Requests (20 KM)</h3>
+                    <div id="agent-helps-feed" class="space-y-3 overflow-y-auto flex-1 content-start"></div>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 border-b border-slate-800 pb-2">📦 Delivery Orders Queue (20 KM)</h3>
+                    <div id="agent-orders-feed" class="space-y-3 overflow-y-auto flex-1 content-start"></div>
+                </div>
             </div>
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 border-b border-slate-800 pb-2">📦 Delivery Orders (20 KM COD)</h3>
-                <div id="agent-orders-feed" class="space-y-3 overflow-y-auto flex-1 content-start"></div>
+
+            <!-- FIXED UPGRADE PANEL B: ACTIVE ACTIVE ORDERS MILESTONE TRACKERS -->
+            <div id="panel-active-deliveries" class="hidden max-w-4xl mx-auto bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col h-full content-start">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 border-b border-slate-800 pb-2">📋 My Active Deliveries Progress Pipeline</h3>
+                <div id="active-jobs-progress-list" class="space-y-4 overflow-y-auto flex-1 content-start">
+                    <p class="text-slate-500 text-center py-8 text-xs font-medium">No active delivery assignments in progress.</p>
+                </div>
             </div>
         </main>
     </div>
 
+    <!-- FIXED DUAL PROJECT INTEGRATION CONFIG SCRIPT -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        // FIXED: Added missing 'push' and 'get/child' variables parameters inside the SDK import statement
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getDatabase, ref, set, get, child, update, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, set, get, child, update, onValue, remove, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // FIXED: Using the requested new config string parameters for agent identity authorizations
         const partnerFirebaseConfig = {
             apiKey: "AIzaSyA1QeDf1E_Kb1ZC15ahw1dY8hk3J0gXopY",
             authDomain: "thodu-65cb9.firebaseapp.com",
@@ -98,7 +135,6 @@
             measurementId: "G-NF17LPGHWV"
         };
 
-        // Old config parameter references used exclusively to capture customer feeds pipelines cross-project
         const userFirebaseConfig = {
             apiKey: "AIzaSyDGI7b17RRfpgctXIVIgPtyECtUBLEcMAU",
             databaseURL: "https://skill-bc495-default-rtdb.firebaseio.com",
@@ -111,7 +147,7 @@
         const partnerDb = getDatabase(partnerApp);
         const userDb = getDatabase(userApp);
 
-        let verificationLoopWorker = null, partnerLat = null, partnerLng = null, partnerAadharVerifiedState = "Unverified", activeAgentName = "", activeAgentPhone = "";
+        let verificationLoopWorker = null, partnerLat = null, partnerLng = null, partnerAadharVerifiedState = "Unverified", activeAgentName = "", activeAgentPhone = "", liveListenersMap = {};
 
         document.addEventListener("DOMContentLoaded", () => {
             document.getElementById('go-to-register').addEventListener('click', () => showView('register'));
@@ -120,7 +156,26 @@
             document.getElementById('btn-complete-setup').addEventListener('click', completePartnerPasswordSetup);
             document.getElementById('btn-login').addEventListener('click', executePartnerLogin);
             document.getElementById('btn-logout').addEventListener('click', () => signOut(partnerAuth));
+            
+            document.getElementById('profile-menu-btn').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('profile-dropdown').classList.toggle('hidden'); });
+            document.addEventListener('click', () => document.getElementById('profile-dropdown').classList.add('hidden'));
+
+            // View toggle sub-tabs
+            document.getElementById('tab-avail-btn').addEventListener('click', () => toggleInternalSubWindowTabs('avail'));
+            document.getElementById('tab-active-btn').addEventListener('click', () => toggleInternalSubWindowTabs('active'));
         });
+
+        function toggleInternalSubWindowTabs(view) {
+            const aBtn = document.getElementById('tab-avail-btn'), activeBtn = document.getElementById('tab-active-btn');
+            const availPanel = document.getElementById('panel-avail-jobs'), activePanel = document.getElementById('panel-active-deliveries');
+            if(view === 'avail') {
+                aBtn.className = "px-3 py-1.5 rounded-lg text-white bg-blue-600 cursor-pointer"; activeBtn.className = "px-3 py-1.5 rounded-lg text-slate-400 hover:text-white cursor-pointer";
+                availPanel.classList.remove('hidden'); activePanel.classList.add('hidden');
+            } else {
+                activeBtn.className = "px-3 py-1.5 rounded-lg text-white bg-blue-600 cursor-pointer"; aBtn.className = "px-3 py-1.5 rounded-lg text-slate-400 hover:text-white cursor-pointer";
+                activePanel.classList.remove('hidden'); availPanel.className = "hidden";
+            }
+        }
 
         function showView(view) {
             document.getElementById('auth-container').classList.add('hidden'); document.getElementById('home-container').classList.add('hidden');
@@ -140,7 +195,11 @@
                             partnerAadharVerifiedState = data.verificationStatus || "Unverified";
                             activeAgentName = data.name || "Agent"; activeAgentPhone = data.phone || "N/A";
                             
-                            const badge = document.getElementById('partner-status-badge'); badge.innerText = `Agent: ${partnerAadharVerifiedState}`;
+                            document.getElementById('prof-agent-name').innerText = activeAgentName;
+                            document.getElementById('prof-agent-uid').innerText = data.uid;
+                            document.getElementById('prof-agent-phone').innerText = activeAgentPhone;
+                            document.getElementById('partner-status-badge').innerText = `Agent: ${partnerAadharVerifiedState}`;
+                            
                             showView('home');
                         }
                     });
@@ -164,71 +223,146 @@
 
         function sync20KmRadiusLiveFeeds() {
             if (!partnerLat || !partnerLng) return;
+            Object.values(liveListenersMap).forEach(un => un());
 
-            // FIXED: Pulling feeds cross-project from userDb reference node paths
-            onValue(ref(userDb, 'helps_posts'), (snap) => {
+            // 1. Available Help Requests Feed
+            liveListenersMap.helps = onValue(ref(userDb, 'helps_posts'), (snap) => {
                 const feed = document.getElementById('agent-helps-feed'); feed.innerHTML = "";
-                if (!snap.exists()) { feed.innerHTML = `<p class="text-xs text-slate-500 p-4">No requests active.</p>`; return; }
-                Object.values(snapshot.val()).forEach(p => {
+                if (!snap.exists()) { feed.innerHTML = `<p class="text-xs text-slate-500 p-4">No assistance requests active.</p>`; return; }
+                Object.values(snap.val()).forEach(p => {
                     const dist = getDistanceHaversine(partnerLat, partnerLng, p.lat, p.lng); if (dist > 20) return;
                     const div = document.createElement('div'); div.className = "p-4 bg-slate-900 border border-slate-800 rounded-xl space-y-2 text-xs";
-                    // FIXED: Map links and working numbers now explicitly visible to localized partners
                     div.innerHTML = `
                         <div class="flex justify-between items-center"><span class="font-bold text-white text-sm">${p.posterName}</span><span class="text-slate-500">${dist.toFixed(1)} km</span></div>
                         <p class="text-slate-400">${p.desc}</p>
                         <div class="flex justify-between items-center text-[11px] text-slate-500 mt-2 font-mono">
-                            <span>📞 Phone Contact: ${p.phone}</span>
-                            <button class="bg-slate-800 hover:bg-slate-700 px-2 py-0.5 rounded text-white btn-maps-link" data-lat="${p.lat}" data-lng="${p.lng}">📍 View Customer Map</button>
+                            <span>📞 Contact Number: ${p.phone}</span>
+                            <button class="bg-slate-800 text-white px-2 py-0.5 rounded btn-maps-link" data-lat="${p.lat}" data-lng="${p.lng}">📍 Route Map</button>
                         </div>
-                        <button class="w-full mt-3 bg-blue-600 text-white font-bold py-2 rounded-xl btn-accept-job" data-uid="${p.uid}" data-pid="helps" data-key="${p.postId}">Accept Help Assignment</button>
+                        <button class="w-full mt-3 bg-blue-600 text-white font-bold py-2 rounded-xl btn-accept-job cursor-pointer" data-uid="${p.uid}" data-pid="helps" data-key="${p.postId}">Accept Help Assignment</button>
                     `;
                     feed.appendChild(div);
                 });
                 bindAcceptJobControlButtons();
             });
 
-            onValue(ref(userDb, 'orders'), (snap) => {
+            // 2. Available Store Orders Feed
+            liveListenersMap.orders = onValue(ref(userDb, 'orders'), (snap) => {
                 const feed = document.getElementById('agent-orders-feed'); feed.innerHTML = "";
+                const progList = document.getElementById('active-jobs-progress-list'); progList.innerHTML = "";
+                
                 if (!snap.exists()) { feed.innerHTML = `<p class="text-xs text-slate-500 p-4">No delivery orders active.</p>`; return; }
+                
+                let activeJobsCount = 0;
                 Object.values(snap.val()).forEach(o => {
-                    const dist = getDistanceHaversine(partnerLat, partnerLng, o.lat, o.lng); if (dist > 20 || o.status !== "Processing") return;
-                    const itemsText = o.items.map(i => `${i.title} (x${i.qty})`).join(', ');
-                    const div = document.createElement('div'); div.className = "p-4 bg-slate-900 border border-slate-800 rounded-xl space-y-2 text-xs";
-                    div.innerHTML = `
-                        <div class="flex justify-between items-center"><span class="font-bold text-white text-sm">${o.shopName}</span><span class="text-amber-500 font-bold">${o.totalBill}</span></div>
-                        <p class="text-slate-400"><b>Items:</b> ${itemsText}</p>
-                        <p class="text-slate-500"><b>Address Book Destination:</b> ${o.deliveryAddress}</p>
-                        <div class="flex justify-between items-center text-[11px] text-slate-500 font-mono mt-2">
-                            <span>📞 Customer Number: ${o.userPhone || 'N/A'}</span>
-                            <button class="bg-slate-800 px-2 py-0.5 rounded text-white btn-maps-link" data-lat="${o.lat}" data-lng="${o.lng}">📍 Route Map</button>
-                        </div>
-                        <button class="w-full mt-3 bg-emerald-600 text-white font-bold py-2 rounded-xl btn-accept-job" data-uid="${o.uid}" data-pid="orders" data-key="${o.orderId}">Accept COD Delivery</button>
-                    `;
-                    feed.appendChild(div);
+                    const dist = getDistanceHaversine(partnerLat, partnerLng, o.lat, o.lng);
+                    
+                    // RENDER ACTIVE ONGOING DELIVERIES LINKED TO THIS SPECIFIC LOGGED AGENT
+                    if ((o.status === "Approved" || o.status === "Picked Up") && o.assignedAgent === partnerAuth.currentUser.uid) {
+                        activeJobsCount++;
+                        const pCard = document.createElement('div'); pCard.className = "p-4 bg-slate-800 border border-slate-700 rounded-2xl space-y-3 text-xs text-slate-200 animate-in fade-in";
+                        
+                        let selectStateBtnHtml = "";
+                        if (o.status === "Approved") {
+                            selectStateBtnHtml = `<button class="w-full bg-blue-600 text-white font-bold py-2 rounded-xl btn-update-step cursor-pointer" data-key="${o.orderId}" data-status="Picked Up">🚀 Mark as Picked Up / On the Way</button>`;
+                        } else if (o.status === "Picked Up") {
+                            selectStateBtnHtml = `<button class="w-full bg-emerald-600 text-white font-bold py-2 rounded-xl btn-update-step cursor-pointer" data-key="${o.orderId}" data-status="Delivered">✅ Complete Delivery (Mark Delivered)</button>`;
+                        }
+
+                        pCard.innerHTML = `
+                            <div class="flex justify-between items-center border-b border-slate-700 pb-2"><h4 class="font-black text-sm text-emerald-400">${o.shopName}</h4><span class="text-slate-400 uppercase font-black tracking-widest text-[9px] bg-slate-900 border border-slate-700 px-2 py-0.5 rounded-full">${o.status}</span></div>
+                            <p class="text-slate-300"><b>Customer:</b> ${o.userName} (📞 ${o.userPhone})</p>
+                            <p class="text-slate-300"><b>Destination:</b> ${o.deliveryAddress}</p>
+                            <button class="w-full text-left bg-slate-900 text-slate-400 p-2 font-mono text-[10px] rounded-xl flex items-center justify-between btn-maps-link" data-lat="${o.lat}" data-lng="${o.lng}"><span>🗺️ Launch Navigation</span><span>➔</span></button>
+                            <div class="pt-1">${selectStateBtnHtml}</div>
+                        `;
+                        progList.appendChild(pCard);
+                    }
+
+                    // RENDER UNASSIGNED AVAILABLE JOBS IN RADIUS
+                    if (o.status === "Processing" && dist <= 20) {
+                        const div = document.createElement('div'); div.className = "p-4 bg-slate-900 border border-slate-800 rounded-xl space-y-2 text-xs";
+                        div.innerHTML = `
+                            <div class="flex justify-between items-center"><span class="font-bold text-white text-sm">${o.shopName}</span><span class="text-amber-500 font-bold">${o.totalBill}</span></div>
+                            <p class="text-slate-400"><b>Address Destination:</b> ${o.deliveryAddress}</p>
+                            <div class="flex justify-between items-center text-[11px] text-slate-500 font-mono mt-2"><span>📞 Phone: ${o.userPhone}</span><button class="bg-slate-800 text-white px-2 py-0.5 rounded btn-maps-link" data-lat="${o.lat}" data-lng="${o.lng}">📍 Route Map</button></div>
+                            <button class="w-full mt-3 bg-emerald-600 text-white font-bold py-2 rounded-xl btn-accept-job cursor-pointer" data-uid="${o.uid}" data-pid="orders" data-key="${o.orderId}">Accept COD Delivery</button>
+                        `;
+                        feed.appendChild(div);
+                    }
                 });
+
+                if (activeJobsCount === 0) {
+                    progList.innerHTML = `<p class="text-slate-500 text-center py-8 text-xs font-medium">No active delivery assignments in progress.</p>`;
+                }
+
                 bindAcceptJobControlButtons();
+                bindActiveDeliveriesStepUpdaters();
+            });
+        }
+
+        function bindActiveDeliveriesStepUpdaters() {
+            document.querySelectorAll('.btn-update-step').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const orderKey = btn.getAttribute('data-key');
+                    const nextState = btn.getAttribute('data-status');
+                    try {
+                        // Push step updates to order nodes globally in userDb
+                        await update(ref(userDb, `orders/${orderKey}`), { status: nextState });
+                        toastNotify(`Order milestone changed to [${nextState}]!`, "#16a34a");
+                    } catch(e) { alert(e.message); }
+                });
             });
         }
 
         function bindAcceptJobControlButtons() {
             document.querySelectorAll('.btn-maps-link').forEach(b => b.addEventListener('click', (e) => {
+                e.stopPropagation();
                 window.open(`https://www.google.com/maps/search/?api=1&query=${b.getAttribute('data-lat')},${b.getAttribute('data-lng')}`, '_blank');
             }));
 
             document.querySelectorAll('.btn-accept-job').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    if (partnerAadharVerifiedState !== "Verified") { alert("Account unverified by admin control rules."); return; }
-                    const userUidKey = btn.getAttribute('data-uid'); const parentId = btn.getAttribute('data-pid'); const objectKey = btn.getAttribute('data-key');
-                    try {
-                        const notiPushRef = push(ref(userDb, `notifications/${userUidKey}`));
-                        await set(notiPushRef, { title: "Order Confirmed!", body: `Agent ${activeAgentName} (Ph: ${activeAgentPhone}) accepted your request.`, timestamp: Date.now() });
-
-                        if (parentId === 'helps') { await remove(ref(userDb, `helps_posts/${objectKey}`)); }
-                        else { await update(ref(userDb, `orders/${objectKey}`), { status: "Approved", agentName: activeAgentName, agentPhone: activeAgentPhone }); }
-                        alert("Job accepted successfully!");
-                    } catch(err) { alert(err.message); }
-                });
+                btn.removeEventListener('click', executeAcceptTransactionPipeline); // clear old listeners maps
+                btn.addEventListener('click', executeAcceptTransactionPipeline);
             });
+        }
+
+        // FIXED: ADDED DEFINED EXPLICIT TRANSACTION FUNCTION FOR JOB ACCEPTANCES
+        async function executeAcceptTransactionPipeline(e) {
+            if (partnerAadharVerifiedState !== "Verified") { alert("Profile validation pending."); return; }
+            const userUidKey = e.target.getAttribute('data-uid');
+            const parentId = e.target.getAttribute('data-pid');
+            const objectKey = e.target.getAttribute('data-key');
+
+            try {
+                const agentUidKey = partnerAuth.currentUser.uid;
+                
+                // Transmit live update parameters to user dashboard notification tables natively
+                const notiPushRef = push(ref(userDb, `notifications/${userUidKey}`));
+                await set(notiPushRef, { 
+                    title: "Order Confirmed!", 
+                    body: `Agent ${activeAgentName} (Ph: ${activeAgentPhone}) has accepted your request and is processing parameters.`, 
+                    timestamp: Date.now() 
+                });
+
+                if (parentId === 'helps') { 
+                    await remove(ref(userDb, `helps_posts/${objectKey}`)); 
+                    toastNotify("Help call picked up and linked!", "#16a34a");
+                } else { 
+                    // Link agent credentials explicitly into global nodes fields properties maps
+                    await update(ref(userDb, `orders/${objectKey}`), { 
+                        status: "Approved", 
+                        assignedAgent: agentUidKey, 
+                        agentName: activeAgentName, 
+                        agentPhone: activeAgentPhone 
+                    });
+                    toastNotify("Delivery order accepted and added to Active panel!", "#16a34a");
+                }
+            } catch(err) { alert(err.message); }
+        }
+
+        function toastNotify(msg, clr="#2563eb") {
+            Toastify({ text: msg, duration: 4000, gravity: "top", position: "right", style: { background: clr, borderRadius: "12px" } }).showToast();
         }
 
         async function executePartnerRegistrationStepOne() {
@@ -236,7 +370,7 @@
             const name = document.getElementById('reg-name').value.trim(); const age = document.getElementById('reg-age').value.trim();
             const aadh = document.getElementById('reg-aadhar').value.trim(); const pan = document.getElementById('reg-pan').value.trim();
             const dl = document.getElementById('reg-dl').value.trim();
-            if (!email || !phone || !name || aadh.length !== 12) return alert("Verify mandatory documents input parameters.");
+            if (!email || !phone || !name || aadh.length !== 12) return alert("Verify documents components columns inputs.");
 
             try {
                 const res = await createUserWithEmailAndPassword(partnerAuth, email, "TEMP_SEED_" + Math.random().toString(36).substring(2, 9));
