@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Quick Helping Partner</title>
+    <!-- Tailwind CSS for high-fidelity professional UI styling -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Toastify for sleek non-blocking feedback notifications -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <!-- Leaflet.js CSS for open source maps mapping engine -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Leaflet.js JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>#live-map-container { height: 100%; width: 100%; border-radius: 1rem; }</style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-blue-100 font-sans min-h-screen text-slate-800">
+
+    <!-- Primary Authentication Panel System -->
+    <div id="auth-container" class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white/90 backdrop-blur-md p-8 rounded-3xl shadow-2xl w-full max-w-md border border-white/40 transition-all duration-300">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
+                    The Quick Helping Partner
+                </h2>
+                <p class="text-xs font-semibold text-slate-400 mt-1 uppercase tracking-wider">Secure Access Hub</p>
+            </div>
+            
+            <!-- A. LOGIN FORM PANEL -->
+            <div id="login-section">
+                <div class="mb-4">
+                    <label class="block text-slate-700 text-xs font-bold uppercase tracking-wider mb-2">Email Address or Phone</label>
+                    <input type="text" id="login-identifier" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-sm transition-all" placeholder="Enter email or phone number">
+                </div>
+                <div class="mb-5">
+                    <label class="block text-slate-700 text-xs font-bold uppercase tracking-wider mb-2">Password</label>
+                    <input type="password" id="login-password" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-sm transition-all" placeholder="••••••••">
+                </div>
+                <button id="btn-login" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-3 px-4 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition shadow-md cursor-pointer active:scale-[0.99]">Login</button>
+                
+                <div class="flex justify-between items-center mt-6 text-xs font-semibold">
+                    <button id="go-to-forgot" class="text-blue-600 hover:underline cursor-pointer">Forgot Password?</button>
+                    <button id="go-to-register" class="text-slate-500 hover:underline cursor-pointer">Create an Account</button>
+                </div>
+            </div>
+
+            <!-- B. REGISTRATION STAGE 1 (Identity Submissions) -->
+            <div id="register-section" class="hidden">
+                <h3 class="text-base font-bold text-slate-700 mb-4 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-blue-500"></span> Sign Up Verification
+                </h3>
+                <div class="mb-4">
+                    <label class="block text-slate-700 text-xs font-bold uppercase tracking-wider mb-1">Phone Number</label>
+                    <input type="tel" id="reg-phone" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none text-sm" placeholder="Enter mobile number">
+                </div>
+                <div class="mb-5">
+                    <label class="block text-slate-700 text-xs font-bold uppercase tracking-wider mb-1">Email Address</label>
+                    <input type="email" id="reg-email" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none text-sm" placeholder="Enter real email inbox">
+                </div>
+                <button id="btn-send-link" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold py-3 px-4 rounded-xl hover:from-emerald-700 hover:to-teal-700 transition shadow-md cursor-pointer active:scale-[0.99]">Send Verification Link</button>
+                <button id="back-to-login" class="w-full text-center text-xs text-slate-400 font-medium hover:underline mt-4 block cursor-pointer">Back to Sign In</button>
+            </div>
+
+            <!-- C. REGISTRATION STAGE 2 (Awaiting Verification) -->
+            <div id="waiting-section" class="hidden text-center py-6">
+                <div class="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <h3 class="text-lg font-bold text-slate-800 mb-1">Awaiting Email Validation</h3>
+                <p class="text-xs text-slate-500 mb-4 leading-relaxed">We dispatched a message link directly to your inbox. Open it and click verify to instantly unlock your account setup panel right here!</p>
+                <p class="text-[11px] text-amber-700 font-bold bg-amber-50 border border-amber-200 p-2.5 rounded-xl">chek in the spams you got a resetpassword email if not found in inbox</p>
+            </div>
+
+            <!-- D. REGISTRATION STAGE 3 (Setup Account Details Only After Verified) -->
+            <div id="setup-account-section" class="hidden">
+                <h3 class="text-lg font-black text-indigo-700 mb-1 text-center">Email Successfully Verified!</h3>
+                <p class="text-xs text-slate-400 text-center mb-5">Provide a name and secure password to initialize your global profile.</p>
+                <div class="mb-4">
+                    <label class="block text-slate-700 text-xs font-bold uppercase tracking-wider mb-1">Your Full Name</label>
+                    <input type="text" id="setup-name" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none text-sm font-medium" placeholder="Enter your name">
+                </div>
+                <div id="setup-password-wrapper" class="mb-5">
+                    <label class="block text-slate-700 text-xs font-bold uppercase tracking-wider mb-1">Set Account Password</label>
+                    <input type="password" id="setup-password" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none text-sm" placeholder="Minimum 6 characters">
+                </div>
+                <button id="btn-complete-setup" class="w-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold py-3 px-4 rounded-xl hover:from-indigo-700 hover:to-violet-700 transition shadow-md cursor-pointer">Finalize & Enter Home</button>
+            </div>
+
+            <!-- E. FORGOT PASSWORD AREA -->
+            <div id="forgot-section" class="hidden">
+                <h3 class="text-base font-bold text-slate-700 mb-1">Reset Password</h3>
+                <p class="text-xs text-slate-400 mb-4">Input your email address to deploy an external account configuration recovery link.</p>
+                <div class="mb-5">
+                    <label class="block text-slate-700 text-xs font-bold uppercase tracking-wider mb-2">Registered Email Address</label>
+                    <input type="email" id="forgot-email" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none text-sm" placeholder="name@example.com">
+                </div>
+                <button id="btn-reset-password" class="w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold py-3 px-4 rounded-xl hover:from-orange-600 hover:to-amber-600 transition shadow-md cursor-pointer">Send Reset Link</button>
+                <button id="forgot-back-to-login" class="w-full text-center text-xs text-slate-400 font-medium hover:underline mt-4 block cursor-pointer">Back to Login</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN DASHBOARD HUB -->
+    <div id="home-container" class="hidden min-h-screen flex flex-col bg-slate-50">
+        <!-- Dashboard Navigation Header Bar -->
+        <nav class="bg-white shadow-sm px-6 py-4 flex justify-between items-center border-b border-slate-100 relative">
+            
+            <!-- LEFT PANEL SIDE: Clickable Named Area Geolocation Display -->
+            <div id="badge-location-trigger" class="flex items-center space-x-2 bg-slate-100 hover:bg-blue-50 hover:border-blue-300 px-3 py-1.5 rounded-xl border border-slate-200 shadow-inner max-w-xs md:max-w-md cursor-pointer transition-all duration-200">
+                <span id="geo-dot" class="w-2 h-2 rounded-full bg-amber-500 shrink-0"></span>
+                <span id="geo-location-display" class="text-xs font-bold text-slate-600 truncate">Identifying your area...</span>
+                <button id="btn-request-location" class="hidden text-[10px] bg-blue-600 text-white font-bold px-2 py-0.5 rounded hover:bg-blue-700 transition cursor-pointer ml-1 shrink-0">Allow GPS</button>
+            </div>
+            
+            <!-- Logo Brand Target Block -->
+            <h1 class="text-xl font-black text-blue-600 tracking-tight absolute left-1/2 transform -translate-x-1/2 hidden lg:block">
+                The Quick Helping Partner
+            </h1>
+            
+            <!-- RIGHT PANEL SIDE: User Profile Control Hub Toggle -->
+            <div class="relative">
+                <button id="profile-menu-btn" class="w-10 h-10 bg-gradient-to-tr from-blue-600 to-indigo-600 text-white rounded-full flex items-center justify-center font-bold tracking-wider font-mono shadow-md focus:outline-none hover:shadow-lg transition cursor-pointer">
+                    ?
+                </button>
+                
+                <!-- Floating Profile Panel Component Card View -->
+                <div id="profile-dropdown" class="hidden absolute right-0 mt-3 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 p-5 z-50 animate-in fade-in duration-200">
+                    <div class="flex items-center space-x-3 border-b border-slate-100 pb-3 mb-4">
+                        <div id="avatar-fallback" class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-black text-base shadow-sm">?</div>
+                        <div class="flex-1 min-w-0">
+                            <!-- Name management interface area block -->
+                            <div id="name-display-box" class="flex items-center justify-between group">
+                                <h4 id="prof-display-name" class="font-bold text-slate-800 text-sm truncate">User Profile Name</h4>
+                                <button id="btn-edit-name" class="text-blue-500 hover:text-blue-700 text-xs font-semibold underline ml-2 cursor-pointer">Edit</button>
+                            </div>
+                            <!-- Inline name modification control fields -->
+                            <div id="name-edit-box" class="hidden flex items-center space-x-1">
+                                <input type="text" id="input-edit-name" class="border rounded px-1.5 py-0.5 text-xs font-medium w-32 focus:outline-blue-500 bg-slate-50">
+                                <button id="btn-save-name" class="bg-blue-600 text-white text-[10px] px-2 py-1 rounded font-bold hover:bg-blue-700 transition cursor-pointer">Save</button>
+                            </div>
+                            <!-- Live Dynamic Verification Status Label Tag -->
+                            <span id="user-aadhar-badge" class="text-[9px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider mt-1 inline-block">Unverified</span>
+                        </div>
+                    </div>
+                    <div class="space-y-2.5 text-xs text-slate-600 max-h-[220px] overflow-y-auto">
+                        <div>
+                            <span class="text-slate-400 font-bold tracking-wide uppercase text-[9px] block">Global UID Key</span>
+                            <span id="prof-uid" class="text-slate-800 font-mono break-all font-semibold select-all">Loading...</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 font-bold tracking-wide uppercase text-[9px] block">Email Address</span>
+                            <span id="prof-email" class="text-slate-800 font-mono break-all font-medium">Loading...</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 font-bold tracking-wide uppercase text-[9px] block">Phone Contact</span>
+                            <span id="prof-phone" class="text-slate-800 font-mono font-medium">Loading...</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 font-bold tracking-wide uppercase text-[9px] block">System Registration Stamp</span>
+                            <span id="prof-joined" class="text-slate-800 font-medium">Loading...</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Link Button for Document Approvals -->
+                    <button id="btn-trigger-aadhar-modal" class="w-full bg-blue-50 text-blue-600 border border-blue-200 font-bold text-xs py-2 rounded-xl mt-4 hover:bg-blue-100 transition cursor-pointer">Verify Aadhar ID</button>
+                    
+                    <button id="btn-logout" class="w-full bg-slate-50 hover:bg-red-50 text-slate-600 hover:text-red-600 font-bold text-xs py-2.5 rounded-xl mt-2 border border-transparent hover:border-red-100 transition cursor-pointer">Sign Out Account</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Dynamic Content Area Mount: Embedded Hosted Sub-User Workspace App iframe -->
+        <main class="flex-grow w-full h-full relative p-2">
+            <iframe id="sub-user-frame" class="w-full h-[82vh] rounded-2xl shadow-inner border border-slate-200/60 bg-white" src="about:blank"></iframe>
+        </main>
+    </div>
+
+    <!-- MODAL OVERLAY BOX: Geolocation Map View -->
+    <div id="map-modal-overlay" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-2xl h-[75vh] flex flex-col overflow-hidden shadow-2xl relative border border-slate-100">
+            <div class="p-4 border-b flex justify-between items-center bg-slate-50">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Your High-Accuracy GPS Position
+                </h3>
+                <button id="btn-close-map" class="text-slate-400 hover:text-slate-600 font-black text-lg p-1 px-2.5 rounded-lg hover:bg-slate-200 transition cursor-pointer">&times;</button>
+            </div>
+            <div class="flex-grow p-4 bg-slate-100">
+                <div id="live-map-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL OVERLAY: Submit Aadhar Document Form Fields -->
+    <div id="aadhar-modal-overlay" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl border border-slate-100 relative">
+            <div class="flex justify-between items-center border-b pb-3 mb-4">
+                <h3 class="font-bold text-slate-800 text-base">Verify Aadhar Documentation</h3>
+                <button id="btn-close-aadhar-modal" class="text-slate-400 hover:text-slate-600 font-black text-lg cursor-pointer">&times;</button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-slate-700 text-xs font-bold uppercase tracking-wider mb-1">Aadhar Card Number</label>
+                    <input type="text" id="aadh-number" maxlength="12" class="w-full px-3 py-2 bg-slate-50 border rounded-xl text-sm" placeholder="12 Digit Card Identity Number">
+                </div>
+                <div>
+                    <label class="block text-slate-700 text-xs font-bold uppercase tracking-wider mb-1">Full Name (As per Aadhar)</label>
+                    <input type="text" id="aadh-name" class="w-full px-3 py-2 bg-slate-50 border rounded-xl text-sm" placeholder="Exact name spelling match">
+                </div>
+                <div>
+                    <label class="block text-slate-700 text-xs font-bold uppercase tracking-wider mb-1">Date of Birth (As per Aadhar)</label>
+                    <input type="date" id="aadh-dob" class="w-full px-3 py-2 bg-slate-50 border rounded-xl text-sm">
+                </div>
+                <button id="btn-submit-aadhar-request" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-2.5 rounded-xl text-sm shadow hover:from-blue-700 transition cursor-pointer">Submit Verification Request</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Global Core Modules Injections Scripts Mapping Map -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getDatabase, ref, set, get, child, update, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDGI7b17RRfpgctXIVIgPtyECtUBLEcMAU",
+            authDomain: "skill-bc495.firebaseapp.com",
+            databaseURL: "https://skill-bc495-default-rtdb.firebaseio.com",
+            projectId: "skill-bc495",
+            storageBucket: "skill-bc495.firebasestorage.app",
+            messagingSenderId: "53919238872",
+            appId: "1:53919238872:web:711de8f103089c653025ad",
+            measurementId: "G-6H5D0771NE"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        let verificationLoopWorker = null;
+        let globalUserLat = null;
+        let globalUserLng = null;
+        let leafletMapInstance = null;
+        let mapMarkerInstance = null;
+        let dbLiveStatusListener = null;
+
+        // UI Panel Control Engine View Toggle
+        const showView = (view) => {
+            document.getElementById('auth-container').classList.add('hidden');
+            document.getElementById('home-container').classList.add('hidden');
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('register-section').classList.add('hidden');
+            document.getElementById('waiting-section').classList.add('hidden');
+            document.getElementById('setup-account-section').classList.add('hidden');
+            document.getElementById('forgot-section').classList.add('hidden');
+
+            if (view === 'home') {
+                document.getElementById('home-container').classList.remove('hidden');
+                triggerExactLocationScanner();
+            } else {
+                document.getElementById('auth-container').classList.remove('hidden');
+                document.getElementById(view + '-section').classList.remove('hidden');
+            }
+        };
+
+        function showToast(text, color = "#2563eb") {
+            Toastify({ text: text, duration: 5000, close: true, gravity: "top", position: "right", style: { background: color, borderRadius: "14px" } }).showToast();
+        }
+
+        // DOM Content Loaded Handler Mapping Listeners Safely
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById('go-to-register').addEventListener('click', () => showView('register'));
+            document.getElementById('back-to-login').addEventListener('click', () => showView('login'));
+            document.getElementById('go-to-forgot').addEventListener('click', () => showView('forgot'));
+            document.getElementById('forgot-back-to-login').addEventListener('click', () => showView('login'));
+            
+            document.getElementById('profile-menu-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                document.getElementById('profile-dropdown').classList.toggle('hidden');
+            });
+            
+            document.addEventListener('click', () => {
+                document.getElementById('profile-dropdown').classList.add('hidden');
+            });
+            
+            document.getElementById('profile-dropdown').addEventListener('click', (e) => e.stopPropagation());
+
+            document.getElementById('btn-edit-name').addEventListener('click', () => {
+                const currentVal = document.getElementById('prof-display-name').innerText;
+                document.getElementById('input-edit-name').value = currentVal;
+                document.getElementById('name-display-box').classList.add('hidden');
+                document.getElementById('name-edit-box').classList.remove('hidden');
+            });
+
+            document.getElementById('btn-request-location').addEventListener('click', () => {
+                triggerExactLocationScanner(true);
+            });
+
+            document.getElementById('badge-location-trigger').addEventListener('click', openLiveInteractiveMapModal);
+            document.getElementById('btn-close-map').addEventListener('click', () => {
+                document.getElementById('map-modal-overlay').classList.add('hidden');
+            });
+
+            document.getElementById('btn-trigger-aadhar-modal').addEventListener('click', () => {
+                document.getElementById('aadhar-modal-overlay').classList.remove('hidden');
+            });
+            document.getElementById('btn-close-aadhar-modal').addEventListener('click', () => {
+                document.getElementById('aadhar-modal-overlay').classList.add('hidden');
+            });
+
+            document.getElementById('btn-send-link').addEventListener('click', registerStepOne);
+            document.getElementById('btn-complete-setup').addEventListener('click', finalizeAccountSetup);
+            document.getElementById('btn-save-name').addEventListener('click', saveProfileNameEdit);
+            document.getElementById('btn-login').addEventListener('click', executeUnifiedLogin);
+            document.getElementById('btn-reset-password').addEventListener('click', processForgotPasswordReset);
+            document.getElementById('btn-logout').addEventListener('click', executeSignOut);
+            document.getElementById('btn-submit-aadhar-request').addEventListener('click', submitAadharVerificationDocumentData);
+        });
+
+        // --- AUTH COMPONENT TRACKING ENGINE ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                if (user.emailVerified) {
+                    clearInterval(verificationLoopWorker);
+                    
+                    if (dbLiveStatusListener) dbLiveStatusListener();
+                    
+                    const userDbRef = ref(db, `users/${user.uid}`);
+                    dbLiveStatusListener = onValue(userDbRef, (snapshot) => {
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            
+                            if (!data.name) {
+                                showView('setup-account');
+                                document.getElementById('setup-password-wrapper').classList.add('hidden'); 
+                                return;
+                            }
+                            
+                            document.getElementById('prof-uid').innerText = data.uid;
+                            document.getElementById('prof-email').innerText = data.email;
+                            document.getElementById('prof-phone').innerText = data.phone || "Unlinked Record";
+                            document.getElementById('prof-joined').innerText = new Date(data.createdAt).toLocaleString();
+                            document.getElementById('prof-display-name').innerText = data.name;
+                            
+                            const letter = data.name.charAt(0).toUpperCase();
+                            document.getElementById('profile-menu-btn').innerText = letter;
+                            document.getElementById('avatar-fallback').innerText = letter;
+
+                            const badge = document.getElementById('user-aadhar-badge');
+                            const triggerBtn = document.getElementById('btn-trigger-aadhar-modal');
+                            const currentStatus = data.aadharStatus || "Unverified";
+                            
+                            badge.innerText = currentStatus;
+                            
+                            if (currentStatus === "Verified") {
+                                badge.className = "text-[9px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider mt-1 inline-block";
+                                triggerBtn.innerText = "Verification Complete";
+                                triggerBtn.disabled = true;
+                                triggerBtn.className = "w-full bg-gray-100 text-gray-400 font-bold text-xs py-2 rounded-xl mt-4 cursor-not-allowed";
+                            } else if (currentStatus === "Pending") {
+                                badge.className = "text-[9px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider mt-1 inline-block";
+                                triggerBtn.innerText = "Awaiting Admin Approval";
+                                triggerBtn.disabled = true;
+                                triggerBtn.className = "w-full bg-gray-100 text-amber-600 font-bold text-xs py-2 rounded-xl mt-4 cursor-not-allowed";
+                            } else if (currentStatus === "Rejected") {
+                                badge.className = "text-[9px] bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider mt-1 inline-block";
+                                triggerBtn.innerText = "Rejected! Try Again";
+                                triggerBtn.disabled = false;
+                                triggerBtn.className = "w-full bg-red-50 text-red-600 border border-red-200 font-bold text-xs py-2 rounded-xl mt-4 hover:bg-red-100 cursor-pointer";
+                            } else {
+                                badge.className = "text-[9px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider mt-1 inline-block";
+                                triggerBtn.innerText = "Verify Aadhar ID";
+                                triggerBtn.disabled = false;
+                                triggerBtn.className = "w-full bg-blue-50 text-blue-600 border border-blue-200 font-bold text-xs py-2 rounded-xl mt-4 hover:bg-blue-100 cursor-pointer";
+                            }
+
+                            // Pass profile tokens via URL queries loops securely to iframe anchor bounds
+                            const subUserIframeUrl = `https://revanthreddy150.github.io/test/?uid=${data.uid}&name=${encodeURIComponent(data.name)}&email=${data.email}&phone=${data.phone || ''}&aadharStatus=${currentStatus}&lat=${globalUserLat || ''}&lng=${globalUserLng || ''}`;
+                            if (document.getElementById('sub-user-frame').src !== subUserIframeUrl && globalUserLat) {
+                                document.getElementById('sub-user-frame').src = subUserIframeUrl;
+                            }
+
+                            showView('home');
+                        } else {
+                            showView('setup-account');
+                        }
+                    });
+                } else {
+                    showView('waiting');
+                    startVerificationLoopTracker(user);
+                }
+            } else {
+                if (dbLiveStatusListener) dbLiveStatusListener();
+                showView('login');
+            }
+        });
+
+        // Enhanced GPS Geolocation API & Area Name Fix Loop
+        function triggerExactLocationScanner(explicitUserClick = false) {
+            const geoDisplay = document.getElementById('geo-location-display');
+            const geoDot = document.getElementById('geo-dot');
+            const reqBtn = document.getElementById('btn-request-location');
+
+            if (!navigator.geolocation) {
+                geoDisplay.innerText = "GPS unsupported";
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    globalUserLat = pos.coords.latitude;
+                    globalUserLng = pos.coords.longitude;
+                    
+                    geoDisplay.innerText = "Fetching area name...";
+
+                    // Reverse Geocoding with comprehensive area backup properties mapping parameters
+                    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${globalUserLat}&lon=${globalUserLng}&zoom=18&addressdetails=1`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data && data.address) {
+                                const areaName = data.address.suburb || data.address.neighbourhood || data.address.residential || data.address.road || data.address.town || data.address.county || "My Area";
+                                const cityName = data.address.city || data.address.town || data.address.state || "";
+                                
+                                geoDisplay.innerText = cityName ? `${areaName}, ${cityName}` : areaName;
+                                geoDot.className = "w-2 h-2 rounded-full bg-emerald-500";
+                                reqBtn.classList.add('hidden');
+
+                                // Sync coordinates data mapping into hosted sub-user iframe window link bounds live
+                                if (auth.currentUser) {
+                                    get(child(ref(db), `users/${auth.currentUser.uid}`)).then(snap => {
+                                        if (snap.exists()) {
+                                            document.getElementById('sub-user-frame').src = `https://revanthreddy150.github.io/test/?uid=${snap.val().uid}&name=${encodeURIComponent(snap.val().name)}&email=${snap.val().email}&phone=${snap.val().phone || ''}&aadharStatus=${snap.val().aadharStatus || 'Unverified'}&lat=${globalUserLat}&lng=${globalUserLng}`;
+                                        }
+                                    });
+                                }
+                            }
+                        })
+                        .catch(() => {
+                            geoDisplay.innerText = `Lat: ${globalUserLat.toFixed(4)}, Lng: ${globalUserLng.toFixed(4)}`;
+                            geoDot.className = "w-2 h-2 rounded-full bg-emerald-500";
+                        });
+                },
+                (err) => {
+                    geoDot.className = "w-2 h-2 rounded-full bg-red-500";
+                    reqBtn.classList.remove('hidden');
+                    geoDisplay.innerText = "Location Denied! Allow settings";
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        }
+
+        function openLiveInteractiveMapModal(e) {
+            if (e.target.id === 'btn-request-location') return; 
+            if (!globalUserLat || !globalUserLng) return showToast("Awaiting GPS location fix...", "#f97316");
+
+            document.getElementById('map-modal-overlay').classList.remove('hidden');
+
+            setTimeout(() => {
+                if (!leafletMapInstance) {
+                    leafletMapInstance = L.map('live-map-container').setView([globalUserLat, globalUserLng], 17);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(leafletMapInstance);
+                    mapMarkerInstance = L.marker([globalUserLat, globalUserLng]).addTo(leafletMapInstance).bindPopup("Current GPS Position").openPopup();
+                } else {
+                    leafletMapInstance.setView([globalUserLat, globalUserLng], 17);
+                    mapMarkerInstance.setLatLng([globalUserLat, globalUserLng]).openPopup();
+                    leafletMapInstance.invalidateSize(); 
+                }
+            }, 250);
+        }
+
+        async function submitAadharVerificationDocumentData() {
+            const cardNum = document.getElementById('aadh-number').value.trim();
+            const cardName = document.getElementById('aadh-name').value.trim();
+            const cardDob = document.getElementById('aadh-dob').value;
+
+            if (cardNum.length !== 12 || isNaN(cardNum)) return showToast("Aadhar must be exactly 12 numeric digits.", "#ef4444");
+            if (!cardName || !cardDob) return showToast("All parameters required.", "#ef4444");
+
+            try {
+                const uid = auth.currentUser.uid;
+                await set(ref(db, 'verification_requests/' + uid), { uid, email: auth.currentUser.email, aadharNumber: cardNum, nameAsPerAadhar: cardName, dobAsPerAadhar: cardDob, submittedAt: Date.now() });
+                await update(ref(db, `users/${uid}`), { aadharStatus: "Pending" });
+                document.getElementById('aadhar-modal-overlay').classList.add('hidden');
+                showToast("Application submitted successfully!", "#16a34a");
+            } catch (err) {
+                showToast(err.message, "#ef4444");
+            }
+        }
+
+        function startVerificationLoopTracker(user) {
+            clearInterval(verificationLoopWorker);
+            verificationLoopWorker = setInterval(async () => {
+                await user.reload();
+                if (user.emailVerified) {
+                    clearInterval(verificationLoopWorker);
+                    window.location.reload();
+                }
+            }, 3000);
+        }
+
+        async function registerStepOne() {
+            const email = document.getElementById('reg-email').value.trim();
+            const phone = document.getElementById('reg-phone').value.trim();
+            if (!email || !phone) return showToast("Provide email and phone inputs.", "#ef4444");
+
+            window.localStorage.setItem('temp_reg_phone', phone);
+            try {
+                const res = await createUserWithEmailAndPassword(auth, email, "PARTNER_" + Math.random().toString(36).substring(2, 10));
+                await sendEmailVerification(res.user);
+                showToast("Verification link dispatched to your inbox!", "#16a34a");
+                showView('waiting');
+            } catch (err) {
+                showToast(err.message, "#ef4444");
+            }
+        }
+
+        async function finalizeAccountSetup() {
+            const name = document.getElementById('setup-name').value.trim();
+            if (!name) return showToast("Name identity string required.", "#ef4444");
+            try {
+                const user = auth.currentUser;
+                await set(ref(db, 'users/' + user.uid), { uid: user.uid, email: user.email, phone: window.localStorage.getItem('temp_reg_phone') || '', name, aadharStatus: "Unverified", createdAt: Date.now() });
+                window.location.reload();
+            } catch (err) {
+                showToast(err.message, "#ef4444");
+            }
+        }
+
+        async function saveProfileNameEdit() {
+            const newNameInput = document.getElementById('input-edit-name').value.trim();
+            if (!newNameInput) return showToast("Name cannot remain text empty.", "#ef4444");
+            try {
+                await update(ref(db, `users/${auth.currentUser.uid}`), { name: newNameInput });
+                document.getElementById('name-edit-box').classList.add('hidden');
+                document.getElementById('name-display-box').classList.remove('hidden');
+                showToast("Name synchronized safely!", "#16a34a");
+            } catch (err) {
+                showToast(err.message, "#ef4444");
+            }
+        }
+
+        async function executeUnifiedLogin() {
+            const identifier = document.getElementById('login-identifier').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+            if (!identifier || !password) return showToast("Fill all entries entirely.", "#ef4444");
+
+            try {
+                let resolvedTargetEmail = identifier;
+                if (!identifier.includes('@')) {
+                    const snap = await get(child(ref(db), `phone_lookup/${identifier.replace(/[^0-9]/g, '')}`));
+                    if (snap.exists()) resolvedTargetEmail = snap.val().email;
+                    else throw new Error("No phone lookup parameters found.");
+                }
+                const loginResultCredential = await signInWithEmailAndPassword(auth, resolvedTargetEmail, password);
+                if (!loginResultCredential.user.emailVerified) showView('waiting');
+            } catch (err) {
+                showToast(err.message, "#ef4444");
+            }
+        }
+
+        async function processForgotPasswordReset() {
+            try {
+                await sendPasswordResetEmail(auth, document.getElementById('forgot-email').value.trim());
+                showToast("chek in the spams you got a resetpassword email", "#f97316");
+                showView('login');
+            } catch (err) {
+                showToast(err.message, "#ef4444");
+            }
+        }
+
+        function executeSignOut() {
+            clearInterval(verificationLoopWorker);
+            signOut(auth);
+        }
+    </script>
+</body>
+</html>
