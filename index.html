@@ -165,7 +165,7 @@
             } else if (activeTab === "medicines") {
                 header.innerText = "💊 Request Medicines or Agent Assistance";
                 container.innerHTML = `
-                    <div class="grid grid-cols-2 gap-2 border-b pb-2 mb-2 uppercase text-center text-[11px] font-bold"><button id="btn-sub-med" class="text-blue-600 border-b-2 border-blue-600 pb-1 cursor-pointer">Medicines</button><button id="btn-sub-age" class="text-slate-400 pb-1 cursor-pointer">Agent Helper</button></div>
+                    <div class="grid grid-cols-2 gap-2 border-b pb-2 mb-2 uppercase text-center text-[11px]"><button id="btn-sub-med" class="text-blue-600 border-b-2 border-blue-600 pb-1">Medicines</button><button id="btn-sub-age" class="text-slate-400 pb-1">Agent Helper</button></div>
                     <div id="subform-payload-block" class="space-y-3"></div>
                 `;
                 document.getElementById('btn-sub-med').addEventListener('click', () => selectMedicineSubformMode("Medicine"));
@@ -272,7 +272,7 @@
             });
         });
 
-        // --- RENDER SHOP DIRECTORIES STACK ---
+        // --- FIXED DISPLAY PARSING ROUTINE ---
         onValue(ref(db, 'approved_shops'), (snapshot) => {
             const foodFeed = document.getElementById('food-feed-output'); foodFeed.innerHTML = "";
             const groceryFeed = document.getElementById('grocery-feed-output'); groceryFeed.innerHTML = "";
@@ -286,17 +286,21 @@
                 const card = document.createElement('div'); card.className = "bg-white rounded-3xl overflow-hidden border border-slate-200/80 flex flex-col shadow-xs cursor-pointer shop-card-node";
                 card.setAttribute('data-uid', s.uid);
                 
-                // FIXED: Property evaluations standardized across both field paths
+                // FIXED: Property lookups aligned to correctly evaluate both request schemas strings parameters
                 const nominalName = s.shopName || s.name || "Business Entity";
                 card.innerHTML = `<img src="${s.shopImgUrl || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600'}" class="h-36 w-full object-cover"><div class="p-4"><h4 class="font-black text-sm text-slate-900 leading-none">${nominalName}</h4><p class="text-xs text-slate-400 mt-1">${s.ownerName} (${dist.toFixed(1)} km away)</p></div>`;
                 
                 const lowerName = nominalName.toLowerCase();
-                if(lowerName.includes('hotel') || lowerName.includes('restaurant') || lowerName.includes('cafe') || lowerName.includes('food') || lowerName.includes('bakery') || lowerName.includes('tiffins')) {
+                if(lowerName.includes('hotel') || lowerName.includes('restaurant') || lowerName.includes('cafe') || lowerName.includes('food') || lowerName.includes('bakery') || lowerName.includes('tiffins') || lowerName.includes('eatery')) {
                     foodFeed.appendChild(card);
                 } else { 
                     groceryFeed.appendChild(card); 
                 }
             });
+            
+            if(foodFeed.children.length === 0) foodFeed.innerHTML = `<p class="text-xs text-slate-400 font-bold p-4">No eateries within 10km.</p>`;
+            if(groceryFeed.children.length === 0) groceryFeed.innerHTML = `<p class="text-xs text-slate-400 font-bold p-4">No grocery stores within 10km.</p>`;
+            
             document.querySelectorAll('.shop-card-node').forEach(c => c.addEventListener('click', () => openShopDetailsModal(allShopsCached[c.getAttribute('data-uid')])));
         });
 
