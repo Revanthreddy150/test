@@ -7,9 +7,8 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
-<body class="bg-slate-50 text-slate-900 p-4 font-sans min-h-screen relative pb-28 selection:bg-blue-200">
+<body class="bg-white text-slate-800 p-4 font-sans min-h-screen relative pb-28 selection:bg-blue-200">
 
-    <!-- NAVIGATION TABS BAR -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6 border-b pb-5 border-slate-200 max-w-5xl mx-auto">
         <button id="tab-food-btn" class="px-4 py-3.5 rounded-2xl text-sm font-black transition bg-blue-600 text-white flex flex-col items-center justify-center gap-1 cursor-pointer shadow-md">
             <span class="text-xl">🍔</span> Order Food
@@ -25,7 +24,6 @@
         </button>
     </div>
 
-    <!-- MAIN DISPLAY PANELS -->
     <div class="max-w-5xl mx-auto">
         <div id="view-food" class="space-y-4">
             <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">🍽️ Nearby Restaurants</h2>
@@ -38,30 +36,27 @@
         </div>
 
         <div id="view-medicines" class="hidden space-y-4">
-            <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">🔒 My Private Requests</h2>
-            <p class="text-xs font-semibold text-slate-400 bg-slate-100 p-2 rounded-xl inline-block">🔒 Other users cannot see your private medicine or helper logs.</p>
+            <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">🔒 Active Medicine & Help Requests</h2>
+            <p class="text-xs font-semibold text-slate-400 bg-slate-100 p-2 rounded-xl inline-block">🔒 Secure Privacy: Completed tasks automatically move to "My Orders".</p>
             <div id="medicines-feed-output" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2"></div>
         </div>
         
         <div id="view-orders" class="hidden space-y-4">
-            <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">📦 Delivery Tracking Status (COD Only)</h2>
+            <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">📦 Order History & Completed Tasks</h2>
             <div id="orders-feed-output" class="space-y-4"></div>
         </div>
     </div>
 
-    <!-- SUCCESS INTERACTIVE OVERLAY -->
     <div id="success-tick-overlay" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[200] flex flex-col items-center justify-center">
         <div class="bg-white p-10 rounded-3xl shadow-2xl flex flex-col items-center text-center max-w-sm">
             <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-3xl font-black mb-4">✓</div>
             <h4 class="text-xl font-black text-slate-900">Request Dispatched!</h4>
-            <p class="text-xs text-slate-500 mt-2 font-medium">Logged securely onto QHP system maps. Awaiting agent acquisition routing...</p>
+            <p class="text-xs text-slate-500 mt-2 font-medium">Logged securely. An agent will accept your task shortly.</p>
         </div>
     </div>
 
-    <!-- FLOATING ACTION BUTTON (+) -->
     <button id="btn-floating-action" class="fixed bottom-6 right-6 w-16 h-14 bg-gradient-to-tr from-blue-600 to-indigo-600 text-white rounded-2xl text-3xl font-black shadow-xl flex items-center justify-center cursor-pointer hover:scale-105 transition-all z-40">+</button>
 
-    <!-- ITEM DETAIL & CART MODAL -->
     <div id="shop-details-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[60] flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl p-6 w-full max-w-5xl h-[85vh] shadow-2xl relative flex flex-col lg:flex-row gap-6">
             <button id="btn-close-shop-modal" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-2xl font-black cursor-pointer">×</button>
@@ -90,11 +85,10 @@
         </div>
     </div>
 
-    <!-- ACTION MODAL -->
     <div id="action-modal-overlay" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl p-6 w-full max-w-lg shadow-2xl relative max-h-[92vh] overflow-y-auto border border-slate-100">
-            <button id="btn-close-action-modal" class="absolute top-4 right-4 text-slate-400 text-2xl font-black cursor-pointer">×</button>
-            <div id="modal-form-routing-header" class="text-slate-800 border-b pb-2 mb-4 font-black text-base">Create Request Entry</div>
+            <button id="btn-close-action-modal" class="absolute top-4 right-4 text-slate-400 text-2xl font-black p-1 cursor-pointer">×</button>
+            <div id="modal-form-routing-header" class="text-slate-800 border-b pb-3 mb-4 font-black text-base">Create Request Entry</div>
             <div id="form-workspace-fields" class="space-y-4 text-xs font-bold"></div>
         </div>
     </div>
@@ -212,7 +206,7 @@
                 items: currentItemsListArray, status: "Pending", submittedAt: Date.now()
             }).then(() => {
                 document.getElementById('action-modal-overlay').classList.add('hidden');
-                alert("Application submitted for Admin review tables integration!");
+                alert("Application submitted for Admin review!");
             });
         }
 
@@ -242,18 +236,38 @@
             document.getElementById('m-submit').addEventListener('click', () => {
                 const c = document.getElementById('m-coords').value.split(',');
                 const pushRef = push(ref(db, 'helps_posts'));
-                set(pushRef, { postId: pushRef.key, uid: userUid, category: mode, posterName: document.getElementById('m-name').value.trim() || userName, phone: document.getElementById('m-phone').value.trim(), desc: document.getElementById('m-desc').value.trim(), lat: parseFloat(c[0]), lng: parseFloat(c[1]), status: "Processing", createdAt: Date.now() })
+                set(pushRef, { postId: pushRef.key, uid: userUid, category: mode, posterName: document.getElementById('m-name').value.trim() || userName, phone: document.getElementById('m-phone').value.trim(), desc: document.getElementById('m-desc').value.trim(), lat: parseFloat(c[0]), lng: parseFloat(c[1]), status: "Processing", timestamp: Date.now() })
                 .then(() => { document.getElementById('action-modal-overlay').classList.add('hidden'); triggerAnimatedGreenSuccessTickOverlayGate(); });
             });
         }
 
-        function calculateDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371; const dLat = (lat2 - lat1) * Math.PI / 180; const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-            return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
-        }
+        // --- DYNAMIC LOCATION RADIUS STACKS ---
+        onValue(ref(db, 'helps_posts'), (snapshot) => {
+            const feed = document.getElementById('medicines-feed-output'); feed.innerHTML = ""; 
+            if (!snapshot.exists()) { feed.innerHTML = `<p class="p-4 text-slate-400 font-bold text-center text-xs col-span-2">No active assistance records found.</p>`; return; }
+            
+            // FIXED: Only filters out uncompleted requests. Completed ones disappear and go to 'My Orders'
+            const privateClaims = Object.values(snapshot.val()).filter(p => p.uid === userUid && p.status !== "Completed");
+            if(privateClaims.length === 0) { feed.innerHTML = `<p class="p-4 text-slate-400 font-bold text-center text-xs col-span-2">No active pending assistance requests found.</p>`; return; }
 
-        // --- FIXED SEPARATED DIRECTORY FILTER ENGINE ---
+            privateClaims.forEach(p => {
+                const card = document.createElement('div'); card.className = "p-4 bg-white border border-slate-200 rounded-2xl text-xs flex flex-col space-y-1.5 relative shadow-xs animate-in fade-in";
+                let timerHtml = "";
+                if(p.status === "In Work" && p.workStartTime) {
+                    const elapsed = Math.floor((Date.now() - p.workStartTime) / 1000 / 60);
+                    timerHtml = `<div class="p-2 bg-blue-50 text-blue-700 font-bold rounded-lg animate-pulse">⏰ Counter: ${elapsed} Mins in Progress</div>`;
+                }
+                card.innerHTML = `
+                    <div class="flex justify-between items-center font-bold"><span class="text-slate-800 text-sm">${p.posterName}</span><span class="text-blue-500 uppercase text-[10px] tracking-widest bg-blue-50 px-2 py-0.5 border border-blue-200 rounded-full">${p.status || 'Processing'}</span></div>
+                    <p class="text-slate-600 font-bold leading-relaxed">📋 Type: ${p.category} | ${p.desc}</p>
+                    ${timerHtml}
+                    ${p.agentName ? `<div class="p-2 bg-slate-50 border rounded-xl text-slate-600"><b>Agent:</b> ${p.agentName} (📞 ${p.agentPhone})</div>` : ''}
+                `;
+                feed.appendChild(card);
+            });
+        });
+
+        // Directories Sync
         onValue(ref(db, 'approved_shops'), (snapshot) => {
             const foodFeed = document.getElementById('food-feed-output'); foodFeed.innerHTML = "";
             const groceryFeed = document.getElementById('grocery-feed-output'); groceryFeed.innerHTML = "";
@@ -270,17 +284,8 @@
                 const nominalName = s.shopName || s.name || "Business Entity";
                 card.innerHTML = `<img src="${s.shopImgUrl || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600'}" class="h-36 w-full object-cover"><div class="p-4"><h4 class="font-black text-sm text-slate-900 leading-none">${nominalName}</h4><p class="text-xs text-slate-400 mt-1">${s.ownerName} (${dist.toFixed(1)} km away)</p></div>`;
                 
-                // FIX: Filters completely based on the Admin stamped parameter string flags
-                if (s.category === "food") {
-                    foodFeed.appendChild(card);
-                } else { 
-                    groceryFeed.appendChild(card); 
-                }
+                if (s.category === "food") { foodFeed.appendChild(card); } else { groceryFeed.appendChild(card); }
             });
-            
-            if(foodFeed.children.length === 0) foodFeed.innerHTML = `<p class="text-xs text-slate-400 font-bold p-4">No eateries found nearby.</p>`;
-            if(groceryFeed.children.length === 0) groceryFeed.innerHTML = `<p class="text-xs text-slate-400 font-bold p-4">No grocery stores found nearby.</p>`;
-            
             document.querySelectorAll('.shop-card-node').forEach(c => c.addEventListener('click', () => openShopDetailsModal(allShopsCached[c.getAttribute('data-uid')])));
         });
 
@@ -352,12 +357,38 @@
             .then(() => { activeCart = []; renderCartInterfaceView(); document.getElementById('shop-details-modal').classList.add('hidden'); triggerAnimatedGreenSuccessTickOverlayGate(); });
         });
 
-        onValue(ref(db, 'orders'), (snapshot) => {
-            const container = document.getElementById('orders-feed-output'); container.innerHTML = ""; if (!snapshot.exists()) return;
-            Object.values(snapshot.val()).filter(o => o.uid === userUid).forEach(order => {
-                const card = document.createElement('div'); card.className = "p-4 bg-white rounded-2xl border border-slate-200/80 flex flex-col space-y-1.5 text-xs shadow-xs";
-                card.innerHTML = `<div class="flex justify-between font-black"><span class="text-sm">${order.shopName}</span><span class="text-blue-600 uppercase text-[10px] tracking-wider font-extrabold">${order.status}</span></div><p class="text-slate-600"><b>Summary:</b> ${order.items.map(i=>i.title+' (x'+i.qty+')').join(', ')}</p><p class="text-slate-500"><b>Destination:</b> ${order.deliveryAddress}</p>${order.agentName ? `<div class="p-2 bg-green-50 border border-green-100 rounded-xl">Partner Assigned: ${order.agentName} (📞 ${order.agentPhone})</div>`:''}`;
-                container.appendChild(card);
+        // --- FIXED COMPLETED TASKS CONCAT FEED MERGER ---
+        onValue(ref(db, 'orders'), (snapshotOrders) => {
+            onValue(ref(db, 'helps_posts'), (snapshotHelps) => {
+                const container = document.getElementById('orders-feed-output'); container.innerHTML = "";
+                let masterArray = [];
+
+                // A. Parse standard Store E-Commerce items
+                if (snapshotOrders.exists()) {
+                    Object.values(snapshotOrders.val()).filter(o => o.uid === userUid).forEach(order => {
+                        masterArray.push({ title: order.shopName, details: order.items.map(i=>i.title+' (x'+i.qty+')').join(', '), extra: `Destination: ${order.deliveryAddress}`, status: order.status, agent: order.agentName, phone: order.agentPhone, timestamp: order.timestamp });
+                    });
+                }
+
+                // B. Parse Completed Medicine / Helper Agents Assignments into History logs
+                if (snapshotHelps.exists()) {
+                    Object.values(snapshotHelps.val()).filter(p => p.uid === userUid && p.status === "Completed").forEach(task => {
+                        masterArray.push({ title: `⚡ ${task.category} Assistance Task`, details: task.desc, extra: `Completed via QHP network agent assignment routing pipeline`, status: "Task Finished ✅", agent: task.agentName, phone: task.agentPhone, timestamp: task.timestamp || Date.now() });
+                    });
+                }
+
+                if (masterArray.length === 0) { container.innerHTML = `<p class="text-slate-400 text-center py-8 text-xs font-bold">No registered dispatch history traces found.</p>`; return; }
+
+                masterArray.sort((x, y) => y.timestamp - x.timestamp).forEach(item => {
+                    const card = document.createElement('div'); card.className = "p-4 bg-white rounded-2xl border border-slate-200/80 flex flex-col space-y-1.5 text-xs shadow-xs animate-in fade-in";
+                    card.innerHTML = `
+                        <div class="flex justify-between font-black"><span class="text-sm text-slate-900">${item.title}</span><span class="text-green-600 font-extrabold uppercase bg-green-50 px-2 py-0.5 rounded-md">${item.status}</span></div>
+                        <p class="text-slate-600 font-semibold"><b>Summary:</b> ${item.details}</p>
+                        <p class="text-[11px] text-slate-400 font-medium">${item.extra}</p>
+                        ${item.agent ? `<div class="p-2 bg-slate-50 border rounded-xl text-slate-600"><b>Completed By Agent:</b> ${item.agent} (📞 ${item.phone})</div>` : ''}
+                    `;
+                    container.appendChild(card);
+                });
             });
         });
     </script>
