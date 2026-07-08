@@ -9,8 +9,7 @@
 </head>
 <body class="bg-slate-50 text-slate-900 p-4 font-sans min-h-screen relative pb-28 selection:bg-blue-200">
 
-    <!-- NAVIGATION TABS BAR -->
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6 border-b pb-5 border-slate-200 max-w-5xl mx-auto">
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6 border-b pb-4 border-slate-200 max-w-5xl mx-auto">
         <button id="tab-food-btn" class="px-4 py-3.5 rounded-2xl text-sm font-black transition bg-blue-600 text-white flex flex-col items-center justify-center gap-1 cursor-pointer shadow-md">
             <span class="text-xl">🍔</span> Order Food
         </button>
@@ -25,9 +24,7 @@
         </button>
     </div>
 
-    <!-- MAIN DISPLAY PANELS -->
     <div class="max-w-5xl mx-auto space-y-6">
-        <!-- GLOBAL CART PREVIEW STICKY BAR -->
         <div id="sticky-cart-preview" class="hidden bg-gradient-to-r from-orange-500 to-amber-500 p-4 rounded-2xl text-white flex justify-between items-center shadow-md animate-bounce">
             <div class="flex items-center gap-2 text-sm font-bold">
                 <span>🛒 Items in Basket:</span>
@@ -38,7 +35,6 @@
 
         <div id="view-food" class="space-y-4">
             <div class="border-b pb-2"><h2 class="text-lg font-black text-slate-800">🍽️ Registered Nearby Restaurants</h2></div>
-            <!-- Dynamic Subdivided Arrays (Own store sits first) -->
             <div id="food-own-stack" class="space-y-3 hidden bg-blue-50/50 p-4 border border-blue-100 rounded-3xl">
                 <span class="text-[10px] bg-blue-600 text-white font-black px-2 py-0.5 rounded-full uppercase tracking-wider">My Managed Profile</span>
                 <div id="food-own-output" class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-2"></div>
@@ -66,7 +62,6 @@
         </div>
     </div>
 
-    <!-- 24 HOURS VERIFICATION FLASH OVERLAY BANNER -->
     <div id="verification-wait-overlay" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[200] flex flex-col items-center justify-center p-4">
         <div class="bg-white p-8 rounded-3xl shadow-2xl text-center max-w-md border-4 border-amber-400">
             <div class="text-4xl mb-3">⏳</div>
@@ -76,7 +71,6 @@
         </div>
     </div>
 
-    <!-- SUCCESS INTERACTIVE TICK SCREEN OVERLAY -->
     <div id="success-tick-overlay" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[200] flex flex-col items-center justify-center">
         <div class="bg-white p-10 rounded-3xl shadow-2xl flex flex-col items-center text-center max-w-sm">
             <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-3xl font-black mb-4">✓</div>
@@ -85,7 +79,8 @@
         </div>
     </div>
 
-    <!-- MULTI-VENDOR CART SHEET OVERLAY SHEET MODAL -->
+    <button id="btn-floating-action" class="fixed bottom-6 right-6 w-16 h-14 bg-gradient-to-tr from-blue-600 to-indigo-600 text-white rounded-2xl text-3xl font-black shadow-xl flex items-center justify-center cursor-pointer hover:scale-105 active:scale-95 transition-all z-40 select-none">+</button>
+
     <div id="shop-cart-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[60] flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl p-6 w-full max-w-md h-[85vh] shadow-2xl relative flex flex-col justify-between">
             <button onclick="document.getElementById('shop-cart-modal').classList.add('hidden')" class="absolute top-4 right-4 text-slate-400 text-2xl font-black cursor-pointer">×</button>
@@ -111,7 +106,6 @@
         </div>
     </div>
 
-    <!-- PROFILE MANAGEMENT DIALOG (ITEMS INVENTORY EDITING FOR OWNERS) -->
     <div id="owner-edit-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl p-6 w-full max-w-lg shadow-2xl relative max-h-[85vh] overflow-y-auto">
             <button onclick="document.getElementById('owner-edit-modal').classList.add('hidden')" class="absolute top-4 right-4 text-slate-400 text-xl font-bold cursor-pointer">×</button>
@@ -128,7 +122,6 @@
         </div>
     </div>
 
-    <!-- REGISTRATION CREATION FRAME DIALOG -->
     <div id="action-modal-overlay" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl p-6 w-full max-w-lg shadow-2xl relative max-h-[92vh] overflow-y-auto border border-slate-100">
             <button id="btn-close-action-modal" class="absolute top-4 right-4 text-slate-400 text-2xl font-black cursor-pointer">×</button>
@@ -139,7 +132,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, set, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, set, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDGI7b17RRfpgctXIVIgPtyECtUBLEcMAU",
@@ -163,7 +156,7 @@
         const profileSavedAddress = decodeURIComponent(params.get('savedAddress') || "");
         const userContactPhone = decodeURIComponent(params.get('phone') || "");
 
-        let activeTab = "food", currentItemsListArray = [], activeMapInstance = null, activeMarkerInstance = null;
+        let activeTab = "food", currentItemsListArray = [], activeMapInstance = null, activeMarkerInstance = null, mapCartCheckout = null, markerCartCheckout = null;
         let allApprovedShops = {}, activeCartArray = [], ownerEditingItemsCache = [];
 
         document.getElementById('tab-food-btn').addEventListener('click', () => switchTab('food'));
@@ -171,10 +164,6 @@
         document.getElementById('tab-medicines-btn').addEventListener('click', () => switchTab('medicines'));
         document.getElementById('tab-orders-btn').addEventListener('click', () => switchTab('orders'));
         document.getElementById('btn-close-action-modal').addEventListener('click', () => document.getElementById('action-modal-overlay').classList.add('hidden'));
-        document.getElementById('btn-trigger-cart-modal').addEventListener('click', () => {
-            document.getElementById('shop-cart-modal').classList.remove('hidden');
-            initializeCartCheckoutDeliveryMap();
-        });
 
         function switchTab(t) {
             activeTab = t;
@@ -186,7 +175,7 @@
             document.getElementById(`view-${t}`).classList.remove('hidden');
         }
 
-        // --- NEW REGISTRATION FLOWS MOUNT ON (+) OVERLAYS ---
+        // --- ADAPTIVE FAB + REGISTER LOGIC ---
         document.getElementById('btn-floating-action').addEventListener('click', () => {
             if (userAadharStatus !== "Verified") { alert("Aadhaar Verification required to create requests."); return; }
             const container = document.getElementById('form-workspace-fields');
@@ -195,17 +184,17 @@
             document.getElementById('action-modal-overlay').classList.remove('hidden');
 
             if (activeTab === "food" || activeTab === "grocery") {
-                header.innerText = activeTab === "food" ? "🍴 Submit Restaurant Profile Application" : "🏪 Submit Grocery Shop Profile Application";
+                header.innerText = activeTab === "food" ? "🍴 Submit Restaurant Registration" : "🏪 Submit Grocery Shop Registration";
                 container.innerHTML = `
-                    <div><label>Business Registration Name</label><input type="text" id="f-name" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl"></div>
-                    <div><label>Working Contact Number</label><input type="tel" id="f-phone" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl"></div>
-                    <div><label>Drop Map Node Spot Location Location</label><div id="f-map" class="h-36 bg-slate-100 rounded-xl border overflow-hidden relative"></div><input type="text" id="f-coords" readonly class="w-full p-1.5 bg-slate-100 border text-xs font-mono mt-1 text-center text-slate-400"></div>
+                    <div><label>Business Name</label><input type="text" id="f-name" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl"></div>
+                    <div><label>Contact Phone Number</label><input type="tel" id="f-phone" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl"></div>
+                    <div><label>Pin Location on Map</label><div id="f-map" class="h-32 bg-slate-100 rounded-xl border relative overflow-hidden"></div><input type="text" id="f-coords" readonly class="w-full p-1.5 bg-slate-100 border text-xs font-mono mt-1 text-center text-slate-400"></div>
                     <div class="border p-3 rounded-xl bg-slate-50 space-y-2">
-                        <span class="text-[10px] block uppercase text-slate-400">Inventory Catalog Menu (Max 50 items)</span>
+                        <span class="text-[10px] block uppercase text-slate-400">Inventory Catalog Menu (Max 50)</span>
                         <div class="flex gap-1"><input type="text" id="f-i-title" class="flex-1 p-1.5 bg-white border text-xs" placeholder="Item Name"><input type="text" id="f-i-price" class="w-16 p-1.5 bg-white border text-xs text-center" placeholder="₹100"><button id="f-i-add" class="bg-slate-900 text-white px-3 rounded-xl text-sm font-bold cursor-pointer">+</button></div>
                         <ul id="f-i-ul" class="text-[11px] font-mono divide-y space-y-0.5 max-h-20 overflow-y-auto text-slate-500"></ul>
                     </div>
-                    <button id="f-submit-btn" class="w-full bg-blue-600 text-white py-3 font-bold rounded-xl text-xs uppercase cursor-pointer">Submit Profile Configuration Request</button>
+                    <button id="f-submit-btn" class="w-full bg-blue-600 text-white py-3 font-bold rounded-xl text-xs uppercase cursor-pointer">Submit Profile Request</button>
                 `;
                 setTimeout(() => buildModalFormMaps('f-map', 'f-coords'), 200);
                 document.getElementById('f-i-add').addEventListener('click', addItemToDynamicInventoryList);
@@ -254,7 +243,6 @@
                 items: currentItemsListArray, status: "Pending", submittedAt: Date.now()
             }).then(() => {
                 document.getElementById('action-modal-overlay').classList.add('hidden');
-                // FIXED: Displays custom review notice modal popup natively
                 document.getElementById('verification-wait-overlay').classList.remove('hidden');
             });
         }
@@ -290,7 +278,7 @@
             });
         }
 
-        // --- RADIUS GEOLOCATION & STORES DISPLAY FEED LOGIC ---
+        // --- DIRECTORY RENDER LOOPS (10KM AND OWNER SEPARATIONS) ---
         onValue(ref(db, 'approved_shops'), (snapshot) => {
             const foodOwn = document.getElementById('food-own-output'); const foodFeed = document.getElementById('food-feed-output');
             const grocOwn = document.getElementById('grocery-own-output'); const grocFeed = document.getElementById('grocery-feed-output');
@@ -303,12 +291,10 @@
 
             Object.values(allApprovedShops).forEach(s => {
                 const dist = calculateDistance(centerLat, centerLng, s.lat, s.lng);
-                // FIXED REQUIREMENT: Absolute radius tracking logic configuration constraints
                 if (dist > 10 && s.uid !== userUid) return;
 
                 const card = document.createElement('div'); card.className = "bg-white rounded-3xl overflow-hidden border border-slate-200 p-4 flex flex-col justify-between shadow-xs";
                 
-                // Item Menu Parsing Block Render Natively
                 let itemsPreviewHtml = "";
                 s.items.forEach((item, index) => {
                     itemsPreviewHtml += `
@@ -328,27 +314,21 @@
                         <p class="text-[11px] text-slate-400 font-semibold mb-3">Managed via: ${s.ownerName} (${dist.toFixed(1)} km)</p>
                         <div class="space-y-1.5 max-h-40 overflow-y-auto pr-1">${itemsPreviewHtml}</div>
                     </div>
-                    ${s.uid === userUid ? `<button class="w-full mt-4 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-black py-2 rounded-xl border border-slate-300 uppercase tracking-wider btn-owner-edit-trigger" data-uid="${s.uid}">Edit Inventory Catalog</button>` : ''}
+                    ${s.uid === userUid ? `<button class="w-full mt-4 bg-slate-100 text-slate-700 text-xs font-black py-2 rounded-xl border border-slate-300 uppercase btn-owner-edit-trigger" data-uid="${s.uid}">Edit Inventory Catalog</button>` : ''}
                 `;
 
-                // ROUTE CORES AND PRIORITIZE OWNER DISPLAY HOOKS
                 if (s.category === "food") {
-                    if (s.uid === userUid) {
-                        document.getElementById('food-own-stack').classList.remove('hidden'); foodOwn.appendChild(card);
-                    } else { foodFeed.appendChild(card); }
+                    if (s.uid === userUid) { document.getElementById('food-own-stack').classList.remove('hidden'); foodOwn.appendChild(card); } else { foodFeed.appendChild(card); }
                 } else if (s.category === "grocery") {
-                    if (s.uid === userUid) {
-                        document.getElementById('grocery-own-stack').classList.remove('hidden'); grocOwn.appendChild(card);
-                    } else { grocFeed.appendChild(card); }
+                    if (s.uid === userUid) { document.getElementById('grocery-own-stack').classList.remove('hidden'); grocOwn.appendChild(card); } else { grocFeed.appendChild(card); }
                 }
             });
 
-            // Bind inline action button clicks triggers
             document.querySelectorAll('.btn-pool-add').forEach(btn => btn.addEventListener('click', executeCrossBasketPoolAddAction));
             document.querySelectorAll('.btn-owner-edit-trigger').forEach(btn => btn.addEventListener('click', (e) => openOwnerCatalogEditorModal(e.target.getAttribute('data-uid'))));
         });
 
-        // --- MULTI VENDOR CROSS BASKET ADD ACTION CORE ENGINE ---
+        // --- POOLED MULTI-VENDOR CART LOGIC ---
         function executeCrossBasketPoolAddAction(e) {
             const title = e.target.getAttribute('data-title');
             const price = parseInt(e.target.getAttribute('data-price')) || 0;
@@ -357,7 +337,6 @@
 
             const existing = activeCartArray.find(i => i.title === title && i.vendorUid === vendorUid);
             if (existing) { existing.qty++; } else { activeCartArray.push({ title, price, qty: 1, vendorName, vendorUid }); }
-            
             refreshGlobalCartInterfaceDOMState();
         }
 
@@ -369,25 +348,21 @@
             let totalCount = 0; activeCartArray.forEach(i => totalCount += i.qty);
             stickyCount.innerText = totalCount; sticky.classList.remove('hidden');
 
-            // Render details view inside modal layer natively
             const wrap = document.getElementById('cart-items-wrapper'); wrap.innerHTML = "";
             let grandBillTotal = 0;
 
             activeCartArray.forEach((item, idx) => {
                 const itemCost = item.price * item.qty; grandBillTotal += itemCost;
-                const row = document.createElement('div'); row.className = "py-2.5 flex flex-col space-y-1 text-slate-800 border-b";
+                const row = document.createElement('div'); row.className = "py-2 flex flex-col space-y-1 text-slate-800 border-b";
                 row.innerHTML = `
                     <div class="flex justify-between items-center">
-                        <div>
-                            <span class="font-black text-slate-900">${item.title}</span>
-                            <span class="text-[9px] block text-slate-400 uppercase tracking-wide">Vendor: ${item.vendorName}</span>
-                        </div>
-                        <span class="font-mono font-bold text-sm text-slate-900">₹${itemCost}</span>
+                        <div><span class="font-black text-slate-900">${item.title}</span><span class="text-[9px] block text-slate-400 uppercase">Vendor: ${item.vendorName}</span></div>
+                        <span class="font-mono font-bold text-xs text-slate-900">₹${itemCost}</span>
                     </div>
-                    <div class="flex justify-start items-center gap-2 mt-1">
-                        <button class="bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-black text-xs cursor-pointer btn-cart-dec" data-idx="${idx}">-</button>
+                    <div class="flex items-center gap-2 mt-1">
+                        <button class="bg-slate-200 px-2 py-0.5 rounded font-black text-xs cursor-pointer btn-cart-dec" data-idx="${idx}">-</button>
                         <span class="font-mono text-xs px-1">${item.qty}</span>
-                        <button class="bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-black text-xs cursor-pointer btn-cart-inc" data-idx="${idx}">+</button>
+                        <button class="bg-slate-200 px-2 py-0.5 rounded font-black text-xs cursor-pointer btn-cart-inc" data-idx="${idx}">+</button>
                     </div>
                 `;
                 wrap.appendChild(row);
@@ -422,7 +397,6 @@
             }, 250);
         }
 
-        // --- SUBMIT COD POOLED ORDERS IN BULK WITH STATUS SET AS PENDING ---
         document.getElementById('btn-checkout-cart').addEventListener('click', () => {
             if(activeCartArray.length === 0) return;
             const deliveryAddress = document.getElementById('cart-delivery-address-input').value.trim();
@@ -430,12 +404,12 @@
             const clientName = document.getElementById('cart-cust-name').value.trim();
             const coords = document.getElementById('cart-selected-coords').value.split(',');
 
-            if(!deliveryAddress || !contactPhone || !clientName) return alert("Fill out client, address and contact parameters fields.");
+            if(!deliveryAddress || !contactPhone || !clientName) return alert("Please complete form entries entirely.");
 
             const pushOrderRef = push(ref(db, 'orders'));
             set(pushOrderRef, {
                 orderId: pushOrderRef.key, uid: userUid, userName: clientName,
-                shopName: "Pooled Cross-Vendor Order Basket", items: activeCartArray,
+                shopName: "Pooled Cross-Vendor Basket", items: activeCartArray,
                 totalBill: document.getElementById('cart-grand-total').innerText,
                 status: "Pending", deliveryAddress, userPhone: contactPhone,
                 lat: parseFloat(coords[0]), lng: parseFloat(coords[1]), timestamp: Date.now()
@@ -446,7 +420,7 @@
             });
         });
 
-        // --- CATALOG INVENTORY OWNERS EDITING LAYER PIPELINE ---
+        // --- OWNER RE-APPROVAL RE-SUBMISSIONS INVENTORY EDIT Core ---
         function openOwnerCatalogEditorModal(uid) {
             const shopObj = allApprovedShops[uid]; if(!shopObj) return;
             ownerEditingItemsCache = [...shopObj.items];
@@ -454,10 +428,8 @@
             document.getElementById('owner-edit-modal').classList.remove('hidden');
 
             document.getElementById('btn-save-owner-changes').onclick = async () => {
-                // Put back under verification review queue logic parameters safely
                 const destinationReviewNode = shopObj.category === "food" ? "restaurant_requests/" : "shop_requests/";
-                shopObj.items = ownerEditingItemsCache;
-                shopObj.status = "Pending";
+                shopObj.items = ownerEditingItemsCache; shopObj.status = "Pending";
                 
                 await set(ref(db, destinationReviewNode + userUid), shopObj);
                 await remove(ref(db, `approved_shops/${userUid}`));
@@ -467,8 +439,7 @@
         }
 
         document.getElementById('btn-append-edit-item').addEventListener('click', () => {
-            const t = document.getElementById('edit-new-title').value.trim();
-            const p = document.getElementById('edit-new-price').value.trim();
+            const t = document.getElementById('edit-new-title').value.trim(); const p = document.getElementById('edit-new-price').value.trim();
             if(!t || !p) return;
             ownerEditingItemsCache.push({ title: t, price: p });
             document.getElementById('edit-new-title').value = ""; document.getElementById('edit-new-price').value = "";
@@ -478,8 +449,8 @@
         function renderOwnerEditorItemsListDOM() {
             const ul = document.getElementById('owner-edit-items-list'); ul.innerHTML = "";
             ownerEditingItemsCache.forEach((item, idx) => {
-                const li = document.createElement('li'); li.className = "py-2 flex justify-between items-center";
-                li.innerHTML = `<span>${item.title} (₹${item.price})</span><button class="bg-red-50 text-red-600 px-2 py-0.5 rounded-xl font-bold cursor-pointer" onclick="this.parentElement.remove();">Delete</button>`;
+                const li = document.createElement('li'); li.className = "py-1.5 flex justify-between items-center";
+                li.innerHTML = `<span>${item.title} (₹${item.price})</span><button class="text-red-500 font-bold cursor-pointer" onclick="this.parentElement.remove();">Delete</button>`;
                 ul.appendChild(li);
             });
         }
@@ -489,31 +460,25 @@
             setTimeout(() => { overlay.classList.add('hidden'); switchTab('orders'); }, 3000);
         }
 
-        // --- ORDERS PROGRESS CONCAT TIMELINE LOGS TRACKING ---
-        onValue(ref(db, 'orders'), (snapshotOrders) => {
-            onValue(ref(db, 'helps_posts'), (snapshotHelps) => {
-                const container = document.getElementById('orders-feed-output'); container.innerHTML = ""; let masterArray = [];
-                if (snapshotOrders.exists()) {
-                    Object.values(snapshotOrders.val()).filter(o => o.uid === userUid).forEach(order => {
-                        masterArray.push({ title: order.shopName, details: order.items.map(i=>i.title+' (x'+i.qty+')').join(', '), extra: `Destination: ${order.deliveryAddress}`, status: order.status, agent: order.agentName, phone: order.agentPhone, timestamp: order.timestamp });
-                    });
-                }
-                if (snapshotHelps.exists()) {
-                    Object.values(snapshotHelps.val()).filter(p => p.uid === userUid && p.status === "Completed").forEach(task => {
-                        masterArray.push({ title: `⚡ ${task.category} Assistance Task`, details: task.desc, extra: `Completed via QHP agent routing pipeline`, status: "Task Finished ✅", agent: task.agentName, phone: task.agentPhone, timestamp: task.timestamp || Date.now() });
-                    });
-                }
-                if (masterArray.length === 0) { container.innerHTML = `<p class="text-slate-400 text-center py-8 text-xs font-bold">No registered dispatch history traces found.</p>`; return; }
-                masterArray.sort((x, y) => y.timestamp - x.timestamp).forEach(item => {
-                    const card = document.createElement('div'); card.className = "p-4 bg-white rounded-2xl border border-slate-200/80 flex flex-col space-y-1.5 text-xs shadow-xs animate-in fade-in";
-                    
-                    let adjustedStatusHtml = `<span class="text-amber-600 font-extrabold bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md uppercase">${item.status}</span>`;
-                    if(item.status === "Confirmed") adjustedStatusHtml = `<span class="text-green-600 font-extrabold bg-green-50 border border-green-200 px-2 py-0.5 rounded-md uppercase">Confirmed</span>`;
-                    else if (item.status === "Delivered" || item.status.includes("✅")) adjustedStatusHtml = `<span class="text-emerald-700 font-extrabold bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-md uppercase">Delivered</span>`;
+        // --- LOG DATA FEED FEEDS PROGRESS MONITOR ---
+        onValue(ref(db, 'helps_posts'), (snapshot) => {
+            const feed = document.getElementById('medicines-feed-output'); feed.innerHTML = ""; 
+            if (!snapshot.exists()) return;
+            const privateClaims = Object.values(snapshot.val()).filter(p => p.uid === userUid && p.status !== "Completed");
+            privateClaims.forEach(p => {
+                const card = document.createElement('div'); card.className = "p-4 bg-white border rounded-2xl text-xs space-y-1 animate-in fade-in";
+                card.innerHTML = `<div class="flex justify-between font-bold"><span>${p.posterName}</span><span class="text-blue-600 font-mono uppercase">${p.status}</span></div><p class="text-slate-600 font-medium">📋 Type: ${p.category} | ${p.desc}</p>`;
+                feed.appendChild(card);
+            });
+        });
 
-                    card.innerHTML = `<div class="flex justify-between items-center font-black"><span>${item.title}</span>${adjustedStatusHtml}</div><p class="text-slate-600 font-semibold"><b>Summary:</b> ${item.details}</p><p class="text-[11px] text-slate-400 font-medium">${item.extra}</p>${item.agent ? `<div class="p-2 bg-slate-50 border rounded-xl text-slate-600"><b>Completed By Agent:</b> ${item.agent} (📞 ${item.phone})</div>` : ''}`;
-                    container.appendChild(card);
-                });
+        onValue(ref(db, 'orders'), (snapshotOrders) => {
+            const container = document.getElementById('orders-feed-output'); container.innerHTML = ""; if (!snapshotOrders.exists()) return;
+            Object.values(snapshotOrders.val()).filter(o => o.uid === userUid).forEach(order => {
+                const card = document.createElement('div'); card.className = "p-4 bg-white rounded-3xl border border-slate-200 text-xs shadow-xs space-y-1";
+                let badgeClass = order.status === "Pending" ? "text-amber-600 bg-amber-50 border-amber-200" : "text-green-600 bg-green-50 border-green-200";
+                card.innerHTML = `<div class="flex justify-between font-black"><span>${order.shopName}</span><span class="border px-2 py-0.5 rounded-md uppercase tracking-wider ${badgeClass}">${order.status}</span></div><p class="text-slate-600 font-semibold"><b>Basket:</b> ${order.items.map(i=>i.title+' (x'+i.qty+')').join(', ')}</p><p class="text-slate-400 font-mono">Bill: ${order.totalBill}</p>${order.agentName ? `<div class="p-2 bg-slate-50 border rounded-xl text-slate-600">Agent: ${order.agentName} (📞 ${order.agentPhone})</div>` : ''}`;
+                container.appendChild(card);
             });
         });
     </script>
