@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+\<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Sub User Workspace Hub</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link class="fluid-css-map" rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body class="bg-slate-50 text-slate-900 p-4 font-sans min-h-screen relative pb-28 selection:bg-blue-200">
@@ -36,6 +36,7 @@
             <button id="btn-trigger-cart-modal" class="bg-white text-orange-600 px-4 py-1.5 rounded-xl font-black text-xs uppercase cursor-pointer shadow">View Basket & Check Out</button>
         </div>
 
+        <!-- VIEW: FOOD -->
         <div id="view-food" class="space-y-4">
             <div class="border-b pb-2"><h2 class="text-lg font-black text-slate-800">🍽️ Registered Nearby Restaurants</h2></div>
             <div id="food-own-stack" class="space-y-3 hidden bg-blue-50/50 p-4 border border-blue-100 rounded-3xl">
@@ -45,6 +46,7 @@
             <div id="food-feed-output" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
         </div>
 
+        <!-- VIEW: GROCERY -->
         <div id="view-grocery" class="hidden space-y-4">
             <div class="border-b pb-2"><h2 class="text-lg font-black text-slate-800">🏪 Local Grocery Shops</h2></div>
             <div id="grocery-own-stack" class="space-y-3 hidden bg-emerald-50/50 p-4 border border-emerald-100 rounded-3xl">
@@ -54,41 +56,34 @@
             <div id="grocery-feed-output" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
         </div>
 
+        <!-- VIEW: MEDICINES -->
         <div id="view-medicines" class="hidden space-y-4">
             <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">🔒 My Active Medicine & Help Requests</h2>
-            <p class="text-xs font-semibold text-slate-400 bg-slate-100 p-2 rounded-xl inline-block">🔒 Secure Privacy: Completed tasks automatically move to "My Orders".</p>
             <div id="medicines-feed-output" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2"></div>
         </div>
         
+        <!-- VIEW: ORDERS -->
         <div id="view-orders" class="hidden space-y-4">
             <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">📦 Order History & Completed Tasks</h2>
             <div id="orders-feed-output" class="space-y-4"></div>
         </div>
     </div>
 
-    <!-- 24 HOURS VERIFICATION BANNER -->
-    <div id="verification-wait-overlay" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[200] flex flex-col items-center justify-center p-4">
-        <div class="bg-white p-8 rounded-3xl shadow-2xl text-center max-w-md border-4 border-amber-400">
-            <div class="text-4xl mb-3">⏳</div>
-            <h3 class="text-xl font-black text-slate-900">Application Under Review</h3>
-            <p class="text-sm text-slate-600 mt-2 leading-relaxed font-semibold">It will take 24 hours to approve. Our agents will call and verify your profile details, so please wait patiently.</p>
-            <button onclick="document.getElementById('verification-wait-overlay').classList.add('hidden')" class="mt-5 bg-slate-900 text-white px-6 py-2 rounded-xl text-xs font-bold cursor-pointer">Understood</button>
+    <!-- DYNAMIC SHOP DETAILS & MENU CATALOG MODAL -->
+    <div id="shop-details-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[60] flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-4xl h-[80vh] shadow-2xl relative flex flex-col">
+            <button id="btn-close-shop-modal" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-2xl font-black cursor-pointer">×</button>
+            <div class="border-b pb-2 mb-4">
+                <h3 id="modal-shop-name" class="font-black text-slate-900 text-2xl">Shop Items</h3>
+                <p id="modal-shop-meta" class="text-xs font-bold text-slate-400 uppercase tracking-wide"></p>
+            </div>
+            <div id="modal-items-grid" class="flex-grow overflow-y-auto space-y-3 grid grid-cols-1 sm:grid-cols-2 gap-4 content-start pr-1">
+                <!-- Populated dynamically when a shop card is selected -->
+            </div>
         </div>
     </div>
 
-    <!-- SUCCESS INTERACTIVE TICK OVERLAY -->
-    <div id="success-tick-overlay" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[200] flex flex-col items-center justify-center">
-        <div class="bg-white p-10 rounded-3xl shadow-2xl flex flex-col items-center text-center max-w-sm">
-            <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-3xl font-black mb-4">✓</div>
-            <h4 class="text-xl font-black text-slate-900">Dispatched!</h4>
-            <p class="text-xs text-slate-500 mt-2 font-medium">Logged securely. Tracking updates loaded in orders panel.</p>
-        </div>
-    </div>
-
-    <!-- FLOATING ACTION BUTTON (+) PLACED BOTTOM RIGHT -->
-    <button id="btn-floating-action" class="fixed bottom-6 right-6 w-16 h-14 bg-gradient-to-tr from-blue-600 to-indigo-600 text-white rounded-2xl text-3xl font-black shadow-xl flex items-center justify-center cursor-pointer hover:scale-105 transition-all z-40 select-none">+</button>
-
-    <!-- MULTI-VENDOR CART SHEET MODAL -->
+    <!-- MULTI-VENDOR BULK CHECKOUT CART MODAL -->
     <div id="shop-cart-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[60] flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl p-6 w-full max-w-md h-[85vh] shadow-2xl relative flex flex-col justify-between">
             <button onclick="document.getElementById('shop-cart-modal').classList.add('hidden')" class="absolute top-4 right-4 text-slate-400 text-2xl font-black cursor-pointer">×</button>
@@ -97,12 +92,12 @@
                 <div id="cart-items-wrapper" class="space-y-3 divide-y divide-slate-100 text-xs font-semibold"></div>
                 
                 <div class="border-t pt-3 space-y-3 text-xs font-bold">
-                    <div><label class="text-slate-400 block mb-1">Customer Full Name</label><input type="text" id="cart-cust-name" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl" placeholder="Your name"></div>
+                    <div><label class="text-slate-400 block mb-1">Customer Full Name</label><input type="text" id="cart-cust-name" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl"></div>
                     <div><label class="text-slate-400 block mb-1">Confirm Phone Number</label><input type="tel" id="cart-phone-input" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl"></div>
                     <div><label class="text-slate-400 block mb-1">Delivery Address Destination</label><textarea id="cart-delivery-address-input" rows="2" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl font-medium text-slate-700"></textarea></div>
                     <div class="space-y-1">
                         <label class="text-slate-400 block">Pin Precise Destination Spot on Map</label>
-                        <div id="cart-checkout-map" class="h-24 w-full bg-slate-100 rounded-xl border relative overflow-hidden"></div>
+                        <div id="cart-checkout-map" class="h-28 w-full bg-slate-100 rounded-xl border relative overflow-hidden"></div>
                         <input type="text" id="cart-selected-coords" readonly class="w-full p-1.5 bg-slate-100 border text-[9px] font-mono text-slate-500 rounded-lg text-center">
                     </div>
                 </div>
@@ -130,6 +125,28 @@
             </div>
         </div>
     </div>
+
+    <!-- 24 HOURS VERIFICATION BANNER -->
+    <div id="verification-wait-overlay" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[200] flex flex-col items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-3xl shadow-2xl text-center max-w-md border-4 border-amber-400">
+            <div class="text-4xl mb-3">⏳</div>
+            <h3 class="text-xl font-black text-slate-900">Application Under Review</h3>
+            <p class="text-sm text-slate-600 mt-2 leading-relaxed font-semibold">It will take 24 hours to approve. Our agents will call and verify your profile details, so please wait patiently.</p>
+            <button onclick="document.getElementById('verification-wait-overlay').classList.add('hidden')" class="mt-5 bg-slate-900 text-white px-6 py-2 rounded-xl text-xs font-bold cursor-pointer">Understood</button>
+        </div>
+    </div>
+
+    <!-- SUCCESS INTERACTIVE TICK OVERLAY -->
+    <div id="success-tick-overlay" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[200] flex flex-col items-center justify-center">
+        <div class="bg-white p-10 rounded-3xl shadow-2xl flex flex-col items-center text-center max-w-sm">
+            <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-3xl font-black mb-4">✓</div>
+            <h4 class="text-xl font-black text-slate-900">Dispatched!</h4>
+            <p class="text-xs text-slate-500 mt-2 font-medium">Logged securely. Tracking updates loaded in orders panel.</p>
+        </div>
+    </div>
+
+    <!-- FLOATING ACTION BUTTON (+) PLACED BOTTOM RIGHT -->
+    <button id="btn-floating-action" class="fixed bottom-6 right-6 w-16 h-14 bg-gradient-to-tr from-blue-600 to-indigo-600 text-white rounded-2xl text-3xl font-black shadow-xl flex items-center justify-center cursor-pointer hover:scale-105 active:scale-95 transition-all z-40 select-none">+</button>
 
     <!-- ACTION SUBMISSION MODAL -->
     <div id="action-modal-overlay" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
@@ -176,6 +193,7 @@
         document.getElementById('tab-medicines-btn').addEventListener('click', () => switchTab('medicines'));
         document.getElementById('tab-orders-btn').addEventListener('click', () => switchTab('orders'));
         document.getElementById('btn-close-action-modal').addEventListener('click', () => document.getElementById('action-modal-overlay').classList.add('hidden'));
+        document.getElementById('btn-close-shop-modal').addEventListener('click', () => document.getElementById('shop-details-modal').classList.add('hidden'));
 
         function switchTab(t) {
             activeTab = t;
@@ -187,6 +205,7 @@
             document.getElementById(`view-${t}`).classList.remove('hidden');
         }
 
+        // --- SUBMIT REGISTRATIONS AND DISPATCH FORMS ---
         document.getElementById('btn-floating-action').addEventListener('click', () => {
             if (userAadharStatus !== "Verified") { alert("Aadhaar Verification required to create requests."); return; }
             const container = document.getElementById('form-workspace-fields'); const header = document.getElementById('modal-form-routing-header');
@@ -220,65 +239,7 @@
             }
         });
 
-        function buildModalFormMaps(mapId, coordsId) {
-            activeMapInstance = L.map(mapId).setView([centerLat, centerLng], 15); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(activeMapInstance);
-            activeMarkerInstance = L.marker([centerLat, centerLng], { draggable: true }).addTo(activeMapInstance);
-            document.getElementById(coordsId).value = `${centerLat}, ${centerLng}`;
-            activeMapInstance.on('click', (e) => { activeMarkerInstance.setLatLng(e.latlng); document.getElementById(coordsId).value = `${e.latlng.lat}, ${e.latlng.lng}`; });
-        }
-
-        function addItemToDynamicInventoryList(e) {
-            e.preventDefault(); const t = document.getElementById('f-i-title').value.trim(); const p = document.getElementById('f-i-price').value.trim();
-            if(!t || !p || currentItemsListArray.length >= 50) return;
-            currentItemsListArray.push({ title: t, price: p });
-            const li = document.createElement('li'); li.className = "py-0.5 flex justify-between"; li.innerHTML = `<span>${t}</span><span>₹${p}</span>`;
-            document.getElementById('f-i-ul').appendChild(li); document.getElementById('f-i-title').value = ""; document.getElementById('f-i-price').value = "";
-        }
-
-        function submitShopOrRestaurantRegistrationRequest() {
-            const name = document.getElementById('f-name').value.trim(); const phone = document.getElementById('f-phone').value.trim(); const coords = document.getElementById('f-coords').value.split(',');
-            if(!name || !phone || currentItemsListArray.length === 0) return alert("Please fill all properties.");
-            const destinationNodePath = activeTab === "food" ? "restaurant_requests/" : "shop_requests/";
-            set(ref(db, destinationNodePath + userUid), { uid: userUid, name, ownerName: userName, phone, lat: parseFloat(coords[0]), lng: parseFloat(coords[1]), items: currentItemsListArray, status: "Pending", submittedAt: Date.now() })
-            .then(() => { document.getElementById('action-modal-overlay').classList.add('hidden'); document.getElementById('verification-wait-overlay').classList.remove('hidden'); });
-        }
-
-        function selectMedicineSubformMode(mode) {
-            const medBtn = document.getElementById('btn-sub-med'); const ageBtn = document.getElementById('btn-sub-age'); const block = document.getElementById('subform-payload-block'); block.innerHTML = "";
-            if(mode === "Medicine") {
-                medBtn.className = "text-blue-600 border-b-2 border-blue-600 pb-1 cursor-pointer"; ageBtn.className = "text-slate-400 pb-1 cursor-pointer";
-                block.innerHTML = `
-                    <div><label>Patient Full Name</label><input type="text" id="m-name" class="w-full p-2 bg-slate-50 border rounded-xl"></div>
-                    <div><label>Phone Number</label><input type="tel" id="m-phone" class="w-full p-2 bg-slate-50 border rounded-xl"></div>
-                    <div><label>Drop Map Pin</label><div id="m-map" class="h-28 bg-slate-100 rounded-xl relative overflow-hidden"></div><input type="text" id="m-coords" readonly class="w-full p-1 bg-slate-100 border text-center font-mono text-[10px] mt-1"></div>
-                    <div><label>Medicines List</label><textarea id="m-desc" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl h-14" placeholder="Enter medicine details..."></textarea></div>
-                    <button id="m-submit" class="w-full bg-blue-600 text-white font-bold py-2 rounded-xl cursor-pointer">Post Medical Help Call</button>
-                `;
-            } else {
-                ageBtn.className = "text-blue-600 border-b-2 border-blue-600 pb-1 cursor-pointer"; medBtn.className = "text-slate-400 pb-1 cursor-pointer";
-                block.innerHTML = `
-                    <div><label>Your Full Name</label><input type="text" id="m-name" class="w-full p-2 bg-slate-50 border rounded-xl"></div>
-                    <div><label>Contact Phone</label><input type="tel" id="m-phone" class="w-full p-2 bg-slate-50 border rounded-xl"></div>
-                    <div><label>Drop Map Pin</label><div id="m-map" class="h-28 bg-slate-100 rounded-xl relative overflow-hidden"></div><input type="text" id="m-coords" readonly class="w-full p-1 bg-slate-100 border text-center font-mono text-[10px] mt-1"></div>
-                    <div><label>Task Work Needed</label><textarea id="m-desc" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl h-14" placeholder="Describe task details..."></textarea></div>
-                    <button id="m-submit" class="w-full bg-emerald-600 text-white font-bold py-2 rounded-xl cursor-pointer">Book Local Agent Assistant</button>
-                `;
-            }
-            setTimeout(() => buildModalFormMaps('m-map', 'm-coords'), 150);
-            document.getElementById('m-submit').addEventListener('click', () => {
-                const c = document.getElementById('m-coords').value.split(','); const pushRef = push(ref(db, 'helps_posts'));
-                set(pushRef, { postId: pushRef.key, uid: userUid, category: mode, posterName: document.getElementById('m-name').value.trim() || userName, phone: document.getElementById('m-phone').value.trim(), desc: document.getElementById('m-desc').value.trim(), lat: parseFloat(c[0]), lng: parseFloat(c[1]), status: "Processing", createdAt: Date.now() })
-                .then(() => { document.getElementById('action-modal-overlay').classList.add('hidden'); triggerAnimatedGreenSuccessTickOverlayGate(); });
-            });
-        }
-
-        function calculateDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371; const dLat = (lat2 - lat1) * Math.PI / 180; const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-            return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
-        }
-
-        // --- FIXED: READ FROM THE STAMPED approved_shops LOCATION CORE ENGINES ---
+        // --- FETCH AND RENDER STOREFRONT SCHEMAS ---
         onValue(ref(db, 'approved_shops'), (snapshot) => {
             const foodOwn = document.getElementById('food-own-output'); const foodFeed = document.getElementById('food-feed-output');
             const grocOwn = document.getElementById('grocery-own-output'); const grocFeed = document.getElementById('grocery-feed-output');
@@ -286,43 +247,26 @@
             foodOwn.innerHTML = ""; foodFeed.innerHTML = ""; grocOwn.innerHTML = ""; grocFeed.innerHTML = "";
             document.getElementById('food-own-stack').classList.add('hidden'); document.getElementById('grocery-own-stack').classList.add('hidden');
 
-            if (!snapshot.exists()) {
-                foodFeed.innerHTML = `<p class="text-xs text-slate-400 font-bold p-4">No eateries found nearby.</p>`;
-                grocFeed.innerHTML = `<p class="text-xs text-slate-400 font-bold p-4">No grocery stores found nearby.</p>`;
-                return;
-            }
+            if (!snapshot.exists()) return;
             allShopsCached = snapshot.val();
 
             Object.values(allShopsCached).forEach(s => {
                 const dist = calculateDistance(centerLat, centerLng, s.lat, s.lng);
                 if (dist > 10 && s.uid !== userUid) return;
 
-                const card = document.createElement('div'); card.className = "bg-white rounded-3xl overflow-hidden border border-slate-200 p-4 flex flex-col justify-between shadow-xs animate-in fade-in";
+                const card = document.createElement('div'); 
+                card.className = "bg-white rounded-3xl overflow-hidden border border-slate-200/80 flex flex-col shadow-xs cursor-pointer hover:shadow-md transition duration-200 p-3 shop-card-node-gate";
                 card.setAttribute('data-uid', s.uid);
-                const nominalName = s.shopName || s.name || "Business Entity";
                 
-                let itemsPreviewHtml = "";
-                if (s.items && Array.isArray(s.items)) {
-                    s.items.forEach((item) => {
-                        itemsPreviewHtml += `
-                            <div class="flex justify-between items-center bg-slate-50 p-2 rounded-xl border border-slate-100">
-                                <span class="font-bold text-xs truncate max-w-[140px]">${item.title}</span>
-                                <div class="flex items-center gap-1.5 shrink-0">
-                                    <span class="text-blue-600 font-mono text-xs font-bold">₹${item.price}</span>
-                                    <button class="btn-pool-add bg-slate-900 text-white text-[10px] px-2 py-1 font-black rounded-lg uppercase tracking-wide cursor-pointer" data-vendor="${nominalName}" data-vuid="${s.uid}" data-title="${item.title}" data-price="${item.price}">Add</button>
-                                </div>
-                            </div>`;
-                    });
-                }
-
+                const nominalName = s.shopName || s.name || "Business Profile";
+                // FIXED REQUIREMENT: Explicit cover banner layout rendered cleanly above the descriptor title
                 card.innerHTML = `
-                    <div>
-                        <img src="${s.shopImgUrl || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600'}" class="h-28 w-full object-cover rounded-xl shadow-inner mb-3">
-                        <h4 class="font-black text-sm text-slate-900">${nominalName}</h4>
-                        <p class="text-[11px] text-slate-400 font-semibold mb-3">Managed via: ${s.ownerName} (${dist.toFixed(1)} km)</p>
-                        <div class="space-y-1.5 max-h-40 overflow-y-auto pr-1">${itemsPreviewHtml}</div>
+                    <img src="${s.shopImgUrl || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600'}" class="h-40 w-full object-cover rounded-2xl shadow-inner mb-3">
+                    <div class="px-2 pb-1">
+                        <h4 class="font-black text-base text-slate-900 tracking-tight leading-none">${nominalName}</h4>
+                        <p class="text-xs font-bold text-slate-400 mt-1.5">Owner: ${s.ownerName} (${dist.toFixed(1)} km away)</p>
                     </div>
-                    ${s.uid === userUid ? `<button class="w-full mt-4 bg-slate-100 text-slate-700 text-xs font-black py-2 rounded-xl border border-slate-300 uppercase btn-owner-edit-trigger" data-uid="${s.uid}">Edit Inventory Catalog</button>` : ''}
+                    ${s.uid === userUid ? `<button class="w-full mt-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-black py-2 rounded-xl border border-slate-200 uppercase tracking-wider btn-owner-edit-trigger stop-propagation-gate" data-uid="${s.uid}">Edit Catalog</button>` : ''}
                 `;
 
                 if (s.category === "food") {
@@ -332,12 +276,42 @@
                 }
             });
 
-            if(foodFeed.children.length === 0 && foodOwn.children.length === 0) foodFeed.innerHTML = `<p class="text-xs text-slate-400 font-bold p-4">No eateries found nearby.</p>`;
-            if(grocFeed.children.length === 0 && grocOwn.children.length === 0) grocFeed.innerHTML = `<p class="text-xs text-slate-400 font-bold p-4">No grocery stores found nearby.</p>`;
-            
-            document.querySelectorAll('.btn-pool-add').forEach(btn => btn.addEventListener('click', executeCrossBasketPoolAddAction));
-            document.querySelectorAll('.btn-owner-edit-trigger').forEach(btn => btn.addEventListener('click', (e) => openOwnerCatalogEditorModal(e.target.getAttribute('data-uid'))));
+            // Bind click handler execution routes to cards
+            document.querySelectorAll('.shop-card-node-gate').forEach(card => {
+                card.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('stop-propagation-gate')) return;
+                    openShopDetailsModal(allShopsCached[card.getAttribute('data-uid')]);
+                });
+            });
+
+            document.querySelectorAll('.btn-owner-edit-trigger').forEach(btn => btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openOwnerCatalogEditorModal(e.target.getAttribute('data-uid'));
+            }));
         });
+
+        // --- OPEN MODAL POPUP VIEW TO DISPLAY AND CHOOSE CATALOG ITEMS ---
+        function openShopDetailsModal(shop) {
+            const name = shop.shopName || shop.name;
+            document.getElementById('modal-shop-name').innerText = name;
+            document.getElementById('modal-shop-meta').innerText = `Managed via: ${shop.ownerName} (📞 ${shop.phone})`;
+            
+            const grid = document.getElementById('modal-items-grid'); grid.innerHTML = "";
+            shop.items.forEach((item, idx) => {
+                const div = document.createElement('div'); div.className = "bg-slate-50 rounded-2xl p-3 border border-slate-200/60 flex items-center justify-between shadow-inner gap-4";
+                div.innerHTML = `
+                    <div class="min-w-0 flex-1">
+                        <span class="font-black text-slate-900 text-sm block truncate">${item.title}</span>
+                        <span class="text-blue-600 font-mono text-sm font-extrabold mt-0.5 block">₹${item.price}</span>
+                    </div>
+                    <button class="btn-pool-add bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-black px-4 py-2 rounded-xl uppercase tracking-wider cursor-pointer transition shrink-0 shadow-md" data-vendor="${name}" data-vuid="${shop.uid}" data-title="${item.title}" data-price="${item.price}">Add to basket</button>
+                `;
+                grid.appendChild(div);
+            });
+
+            document.querySelectorAll('#modal-items-grid .btn-pool-add').forEach(btn => btn.addEventListener('click', executeCrossBasketPoolAddAction));
+            document.getElementById('shop-details-modal').classList.remove('hidden');
+        }
 
         function executeCrossBasketPoolAddAction(e) {
             const title = e.target.getAttribute('data-title'); const price = parseInt(e.target.getAttribute('data-price')) || 0;
@@ -355,7 +329,7 @@
 
             const wrap = document.getElementById('cart-items-wrapper'); wrap.innerHTML = ""; let grandBillTotal = 0;
             activeCartArray.forEach((item, idx) => {
-                const itemCost = item.price * item.qty; grandBillTotal += itemCost; const row = document.createElement('div'); row.className = "py-2 flex flex-col space-y-1 text-slate-800 border-b";
+                const itemCost = item.price * item.qty; grandBillTotal += itemCost; const row = document.createElement('div'); row.className = "py-2 flex flex-col space-y-1 text-slate-800 border-b font-bold";
                 row.innerHTML = `<div class="flex justify-between items-center"><div><span class="font-black text-slate-900">${item.title}</span><span class="text-[9px] block text-slate-400 uppercase">Vendor: ${item.vendorName}</span></div><span class="font-mono font-bold text-xs text-slate-900">₹${itemCost}</span></div><div class="flex items-center gap-2 mt-1"><button class="bg-slate-200 px-2 py-0.5 rounded font-black text-xs cursor-pointer btn-cart-dec" data-idx="${idx}">-</button><span class="font-mono text-xs px-1">${item.qty}</span><button class="bg-slate-200 px-2 py-0.5 rounded font-black text-xs cursor-pointer btn-cart-inc" data-idx="${idx}">+</button></div>`;
                 wrap.appendChild(row);
             });
@@ -415,7 +389,7 @@
             setTimeout(() => { overlay.classList.add('hidden'); switchTab('orders'); }, 3000);
         }
 
-        // --- TIMELINES CONCAT LOG PANELS ---
+        // --- CONCAT DISPATCH HISTORIES TIMELINES PANELS ---
         onValue(ref(db, 'helps_posts'), (snapshot) => {
             const feed = document.getElementById('medicines-feed-output'); feed.innerHTML = ""; if (!snapshot.exists()) return;
             const privateClaims = Object.values(snapshot.val()).filter(p => p.uid === userUid && p.status !== "Completed");
@@ -444,7 +418,7 @@
                 masterArray.sort((x, y) => y.timestamp - x.timestamp).forEach(item => {
                     const card = document.createElement('div'); card.className = "p-4 bg-white rounded-3xl border border-slate-200 text-xs shadow-xs space-y-1.5 animate-in fade-in";
                     let badgeClass = (item.status === "Pending" || item.status === "Processing") ? "text-amber-600 bg-amber-50 border-amber-200" : "text-green-600 bg-green-50 border-green-200";
-                    card.innerHTML = `<div class="flex justify-between font-black"><span>${item.title}</span><span class="border px-2 py-0.5 rounded-md uppercase tracking-wider text-[10px] ${badgeClass}">${item.status}</span></div><p class="text-slate-600 font-semibold"><b>Summary:</b> ${item.details}</p><p class="text-slate-400 font-medium">${item.extra}</p>${item.agent ? `<div class="p-2 bg-slate-50 border rounded-xl text-slate-600">Agent: ${item.agent} (📞 ${item.phone})</div>` : ''}<div class="text-[10px] text-slate-400 font-mono">Timestamp: ${formatFullTimeWithSeconds(item.timestamp)}</div>`;
+                    card.innerHTML = `<div class="flex justify-between font-black"><span>${item.title}</span><span class="border px-2 py-0.5 rounded-md uppercase tracking-wider text-[10px] ${badgeClass}">${item.status}</span></div><p class="text-slate-600 font-semibold"><b>Summary:</b> ${item.details}</p><p class="text-slate-400 font-medium">${item.extra}</p>${item.agent ? `<div class="p-2 bg-slate-50 border border-slate-100 rounded-xl text-slate-600">Agent: ${item.agent} (📞 ${item.phone})</div>` : ''}<div class="text-[10px] text-slate-400 font-mono">Timestamp: ${formatFullTimeWithSeconds(item.timestamp)}</div>`;
                     container.appendChild(card);
                 });
             });
