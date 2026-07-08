@@ -9,6 +9,7 @@
 </head>
 <body class="bg-slate-50 text-slate-900 p-4 font-sans min-h-screen relative pb-28 selection:bg-blue-200">
 
+    <!-- NAVIGATION TABS BAR -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6 border-b pb-5 border-slate-200 max-w-5xl mx-auto">
         <button id="tab-food-btn" class="px-4 py-3.5 rounded-2xl text-sm font-black transition bg-blue-600 text-white flex flex-col items-center justify-center gap-1 cursor-pointer shadow-md">
             <span class="text-xl">🍔</span> Order Food
@@ -24,20 +25,38 @@
         </button>
     </div>
 
-    <div class="max-w-5xl mx-auto">
+    <!-- MAIN DISPLAY PANELS -->
+    <div class="max-w-5xl mx-auto space-y-6">
+        <!-- GLOBAL CART PREVIEW STICKY BAR -->
+        <div id="sticky-cart-preview" class="hidden bg-gradient-to-r from-orange-500 to-amber-500 p-4 rounded-2xl text-white flex justify-between items-center shadow-md animate-bounce">
+            <div class="flex items-center gap-2 text-sm font-bold">
+                <span>🛒 Items in Basket:</span>
+                <span id="sticky-cart-count" class="bg-white text-orange-600 px-2 py-0.5 rounded-lg font-mono">0</span>
+            </div>
+            <button id="btn-trigger-cart-modal" class="bg-white text-orange-600 px-4 py-1.5 rounded-xl font-black text-xs uppercase cursor-pointer shadow">View Basket & Check Out</button>
+        </div>
+
         <div id="view-food" class="space-y-4">
-            <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">🍽️ Nearby Restaurants</h2>
+            <div class="border-b pb-2"><h2 class="text-lg font-black text-slate-800">🍽️ Registered Nearby Restaurants</h2></div>
+            <!-- Dynamic Subdivided Arrays (Own store sits first) -->
+            <div id="food-own-stack" class="space-y-3 hidden bg-blue-50/50 p-4 border border-blue-100 rounded-3xl">
+                <span class="text-[10px] bg-blue-600 text-white font-black px-2 py-0.5 rounded-full uppercase tracking-wider">My Managed Profile</span>
+                <div id="food-own-output" class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-2"></div>
+            </div>
             <div id="food-feed-output" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
         </div>
 
         <div id="view-grocery" class="hidden space-y-4">
-            <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">🏪 Local Grocery Shops</h2>
+            <div class="border-b pb-2"><h2 class="text-lg font-black text-slate-800">🏪 Local Grocery Shops</h2></div>
+            <div id="grocery-own-stack" class="space-y-3 hidden bg-emerald-50/50 p-4 border border-emerald-100 rounded-3xl">
+                <span class="text-[10px] bg-emerald-600 text-white font-black px-2 py-0.5 rounded-full uppercase tracking-wider">My Managed Profile</span>
+                <div id="grocery-own-output" class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-2"></div>
+            </div>
             <div id="grocery-feed-output" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
         </div>
 
         <div id="view-medicines" class="hidden space-y-4">
             <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">🔒 My Active Medicine & Help Requests</h2>
-            <p class="text-xs font-semibold text-slate-400 bg-slate-100 p-2 rounded-xl inline-block">🔒 Secure Privacy: Completed tasks automatically move to "My Orders".</p>
             <div id="medicines-feed-output" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2"></div>
         </div>
         
@@ -47,44 +66,69 @@
         </div>
     </div>
 
+    <!-- 24 HOURS VERIFICATION FLASH OVERLAY BANNER -->
+    <div id="verification-wait-overlay" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[200] flex flex-col items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-3xl shadow-2xl text-center max-w-md border-4 border-amber-400">
+            <div class="text-4xl mb-3">⏳</div>
+            <h3 class="text-xl font-black text-slate-900">Application Under Review</h3>
+            <p class="text-sm text-slate-600 mt-2 leading-relaxed font-semibold">It will take 24 hours to approve. Our agents will call and verify your profile details, so please wait patiently.</p>
+            <button onclick="document.getElementById('verification-wait-overlay').classList.add('hidden')" class="mt-5 bg-slate-900 text-white px-6 py-2 rounded-xl text-xs font-bold cursor-pointer">Understood</button>
+        </div>
+    </div>
+
+    <!-- SUCCESS INTERACTIVE TICK SCREEN OVERLAY -->
     <div id="success-tick-overlay" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[200] flex flex-col items-center justify-center">
         <div class="bg-white p-10 rounded-3xl shadow-2xl flex flex-col items-center text-center max-w-sm">
             <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-3xl font-black mb-4">✓</div>
-            <h4 class="text-xl font-black text-slate-900">Request Dispatched!</h4>
-            <p class="text-xs text-slate-500 mt-2 font-medium">Logged securely. An agent will accept your task shortly.</p>
+            <h4 class="text-xl font-black text-slate-900">Dispatched!</h4>
+            <p class="text-xs text-slate-500 mt-2 font-medium">Logged securely. Tracking updates loaded in orders panel.</p>
         </div>
     </div>
 
-    <button id="btn-floating-action" class="fixed bottom-6 right-6 w-16 h-14 bg-gradient-to-tr from-blue-600 to-indigo-600 text-white rounded-2xl text-3xl font-black shadow-xl flex items-center justify-center cursor-pointer hover:scale-105 transition-all z-40">+</button>
-
-    <div id="shop-details-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[60] flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl p-6 w-full max-w-5xl h-[85vh] shadow-2xl relative flex flex-col lg:flex-row gap-6">
-            <button id="btn-close-shop-modal" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-2xl font-black cursor-pointer">×</button>
-            <div class="flex-1 flex flex-col min-h-0">
-                <div class="border-b pb-2 mb-3"><h3 id="modal-shop-name" class="font-black text-slate-900 text-xl">Catalog Items</h3><p id="modal-shop-meta" class="text-xs font-bold text-slate-400 uppercase"></p></div>
-                <div id="modal-items-grid" class="flex-grow overflow-y-auto space-y-3 grid grid-cols-1 sm:grid-cols-2 gap-4 content-start pr-1"></div>
-            </div>
-            <div class="w-full lg:w-80 border-t lg:border-t-0 lg:border-l pt-4 lg:pt-0 lg:pl-5 flex flex-col justify-between min-h-0">
-                <div class="flex flex-col min-h-0 flex-grow overflow-y-auto pr-1 space-y-4">
-                    <h4 class="font-black text-slate-800 text-sm uppercase tracking-wider">🛒 Basket</h4>
-                    <div id="cart-items-wrapper" class="space-y-3 divide-y divide-slate-100 text-xs font-semibold"></div>
-                    <div class="border-t pt-3 space-y-3 text-xs font-bold">
-                        <div><label class="text-slate-400 block mb-1">Confirm Phone Number</label><input type="tel" id="cart-phone-input" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 focus:outline-blue-500"></div>
-                        <div><label class="text-slate-400 block mb-1">Delivery Address Destination</label><textarea id="cart-delivery-address-input" rows="2" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl font-medium text-slate-700 focus:outline-blue-500"></textarea></div>
-                        <div class="space-y-1">
-                            <div id="cart-checkout-map" class="h-24 w-full bg-slate-100 rounded-xl border relative overflow-hidden"></div>
-                            <input type="text" id="cart-selected-coords" readonly class="w-full p-1.5 bg-slate-100 border text-[9px] font-mono text-slate-500 rounded-lg text-center">
-                        </div>
+    <!-- MULTI-VENDOR CART SHEET OVERLAY SHEET MODAL -->
+    <div id="shop-cart-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[60] flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-md h-[85vh] shadow-2xl relative flex flex-col justify-between">
+            <button onclick="document.getElementById('shop-cart-modal').classList.add('hidden')" class="absolute top-4 right-4 text-slate-400 text-2xl font-black cursor-pointer">×</button>
+            <div class="flex flex-col min-h-0 flex-grow overflow-y-auto pr-1 space-y-4">
+                <h4 class="font-black text-slate-800 text-base uppercase tracking-wider border-b pb-2">🛒 Basket Cross-Pooling Checkout</h4>
+                <div id="cart-items-wrapper" class="space-y-3 divide-y divide-slate-100 text-xs font-semibold"></div>
+                
+                <div class="border-t pt-3 space-y-3 text-xs font-bold">
+                    <div><label class="text-slate-400 block mb-1">Customer Full Name</label><input type="text" id="cart-cust-name" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl" placeholder="Your name"></div>
+                    <div><label class="text-slate-400 block mb-1">Confirm Phone Number</label><input type="tel" id="cart-phone-input" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl"></div>
+                    <div><label class="text-slate-400 block mb-1">Delivery Address Destination</label><textarea id="cart-delivery-address-input" rows="2" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl font-medium text-slate-700"></textarea></div>
+                    <div class="space-y-1">
+                        <label class="text-slate-400 block">Pin Precise Destination Spot on Map</label>
+                        <div id="cart-checkout-map" class="h-28 w-full bg-slate-100 rounded-xl border relative overflow-hidden"></div>
+                        <input type="text" id="cart-selected-coords" readonly class="w-full p-1.5 bg-slate-100 border text-[9px] font-mono text-slate-500 rounded-lg text-center">
                     </div>
                 </div>
-                <div class="border-t pt-3 space-y-2">
-                    <div class="flex justify-between font-black text-sm text-slate-900"><span>Grand Total:</span><span id="cart-grand-total" class="text-blue-600">₹0</span></div>
-                    <button id="btn-checkout-cart" class="w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white font-black text-xs py-3 rounded-2xl cursor-pointer">Place COD Order</button>
-                </div>
+            </div>
+            <div class="border-t pt-3 space-y-2 mt-2">
+                <div class="flex justify-between font-black text-sm text-slate-900"><span>Grand Total Bill:</span><span id="cart-grand-total" class="text-blue-600">₹0</span></div>
+                <button id="btn-checkout-cart" class="w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white font-black text-xs py-3 rounded-2xl cursor-pointer shadow">Book Cart Items Node (COD)</button>
             </div>
         </div>
     </div>
 
+    <!-- PROFILE MANAGEMENT DIALOG (ITEMS INVENTORY EDITING FOR OWNERS) -->
+    <div id="owner-edit-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-lg shadow-2xl relative max-h-[85vh] overflow-y-auto">
+            <button onclick="document.getElementById('owner-edit-modal').classList.add('hidden')" class="absolute top-4 right-4 text-slate-400 text-xl font-bold cursor-pointer">×</button>
+            <h3 class="font-black text-slate-900 text-base border-b pb-2 mb-4">⚙️ Manage Catalog Inventory</h3>
+            <div class="space-y-3">
+                <div class="flex gap-1">
+                    <input type="text" id="edit-new-title" class="flex-1 p-2 bg-slate-50 border border-slate-200 text-xs rounded-xl" placeholder="Item Name">
+                    <input type="text" id="edit-new-price" class="w-20 p-2 bg-slate-50 border border-slate-200 text-xs text-center rounded-xl" placeholder="₹120">
+                    <button id="btn-append-edit-item" class="bg-slate-900 text-white px-4 rounded-xl text-xs font-bold cursor-pointer">+</button>
+                </div>
+                <ul id="owner-edit-items-list" class="divide-y text-xs font-semibold max-h-48 overflow-y-auto"></ul>
+                <button id="btn-save-owner-changes" class="w-full bg-blue-600 text-white text-xs font-bold py-3 rounded-xl uppercase tracking-wider shadow cursor-pointer mt-4">Submit and Request Re-Approval</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- REGISTRATION CREATION FRAME DIALOG -->
     <div id="action-modal-overlay" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl p-6 w-full max-w-lg shadow-2xl relative max-h-[92vh] overflow-y-auto border border-slate-100">
             <button id="btn-close-action-modal" class="absolute top-4 right-4 text-slate-400 text-2xl font-black cursor-pointer">×</button>
@@ -119,15 +163,18 @@
         const profileSavedAddress = decodeURIComponent(params.get('savedAddress') || "");
         const userContactPhone = decodeURIComponent(params.get('phone') || "");
 
-        let activeTab = "food", currentItemsListArray = [], activeMapInstance = null, activeMarkerInstance = null, mapCartCheckout = null, markerCartCheckout = null;
-        let allShopsCached = {}, activeCart = [], activeCartShopUid = null, activeCartShopName = null;
+        let activeTab = "food", currentItemsListArray = [], activeMapInstance = null, activeMarkerInstance = null;
+        let allApprovedShops = {}, activeCartArray = [], ownerEditingItemsCache = [];
 
         document.getElementById('tab-food-btn').addEventListener('click', () => switchTab('food'));
         document.getElementById('tab-grocery-btn').addEventListener('click', () => switchTab('grocery'));
         document.getElementById('tab-medicines-btn').addEventListener('click', () => switchTab('medicines'));
         document.getElementById('tab-orders-btn').addEventListener('click', () => switchTab('orders'));
         document.getElementById('btn-close-action-modal').addEventListener('click', () => document.getElementById('action-modal-overlay').classList.add('hidden'));
-        document.getElementById('btn-close-shop-modal').addEventListener('click', () => document.getElementById('shop-details-modal').classList.add('hidden'));
+        document.getElementById('btn-trigger-cart-modal').addEventListener('click', () => {
+            document.getElementById('shop-cart-modal').classList.remove('hidden');
+            initializeCartCheckoutDeliveryMap();
+        });
 
         function switchTab(t) {
             activeTab = t;
@@ -139,6 +186,7 @@
             document.getElementById(`view-${t}`).classList.remove('hidden');
         }
 
+        // --- NEW REGISTRATION FLOWS MOUNT ON (+) OVERLAYS ---
         document.getElementById('btn-floating-action').addEventListener('click', () => {
             if (userAadharStatus !== "Verified") { alert("Aadhaar Verification required to create requests."); return; }
             const container = document.getElementById('form-workspace-fields');
@@ -147,17 +195,17 @@
             document.getElementById('action-modal-overlay').classList.remove('hidden');
 
             if (activeTab === "food" || activeTab === "grocery") {
-                header.innerText = activeTab === "food" ? "🍴 Submit Restaurant Registration" : "🏪 Submit Grocery Shop Registration";
+                header.innerText = activeTab === "food" ? "🍴 Submit Restaurant Profile Application" : "🏪 Submit Grocery Shop Profile Application";
                 container.innerHTML = `
-                    <div><label>Business Name</label><input type="text" id="f-name" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl"></div>
-                    <div><label>Contact Phone Number</label><input type="tel" id="f-phone" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl"></div>
-                    <div><label>Pin Location on Map</label><div id="f-map" class="h-32 bg-slate-100 rounded-xl border border-slate-200 relative overflow-hidden"></div><input type="text" id="f-coords" readonly class="w-full p-1.5 bg-slate-100 border text-xs font-mono mt-1 text-center text-slate-400"></div>
+                    <div><label>Business Registration Name</label><input type="text" id="f-name" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl"></div>
+                    <div><label>Working Contact Number</label><input type="tel" id="f-phone" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl"></div>
+                    <div><label>Drop Map Node Spot Location Location</label><div id="f-map" class="h-36 bg-slate-100 rounded-xl border overflow-hidden relative"></div><input type="text" id="f-coords" readonly class="w-full p-1.5 bg-slate-100 border text-xs font-mono mt-1 text-center text-slate-400"></div>
                     <div class="border p-3 rounded-xl bg-slate-50 space-y-2">
-                        <span class="text-[10px] block uppercase text-slate-400">Inventory Catalog (Max 50)</span>
-                        <div class="flex gap-1"><input type="text" id="f-i-title" class="flex-1 p-1.5 bg-white border text-xs" placeholder="Item Name"><input type="text" id="f-i-price" class="w-16 p-1.5 bg-white border text-xs text-center" placeholder="₹60"><button id="f-i-add" class="bg-slate-900 text-white px-3 rounded-xl text-sm font-bold cursor-pointer">+</button></div>
-                        <ul id="f-i-ul" class="text-[11px] font-mono divide-y space-y-0.5 max-h-20 overflow-y-auto text-slate-600"></ul>
+                        <span class="text-[10px] block uppercase text-slate-400">Inventory Catalog Menu (Max 50 items)</span>
+                        <div class="flex gap-1"><input type="text" id="f-i-title" class="flex-1 p-1.5 bg-white border text-xs" placeholder="Item Name"><input type="text" id="f-i-price" class="w-16 p-1.5 bg-white border text-xs text-center" placeholder="₹100"><button id="f-i-add" class="bg-slate-900 text-white px-3 rounded-xl text-sm font-bold cursor-pointer">+</button></div>
+                        <ul id="f-i-ul" class="text-[11px] font-mono divide-y space-y-0.5 max-h-20 overflow-y-auto text-slate-500"></ul>
                     </div>
-                    <button id="f-submit-btn" class="w-full bg-blue-600 text-white py-2.5 font-bold rounded-xl text-xs uppercase cursor-pointer">Submit Profile Request</button>
+                    <button id="f-submit-btn" class="w-full bg-blue-600 text-white py-3 font-bold rounded-xl text-xs uppercase cursor-pointer">Submit Profile Configuration Request</button>
                 `;
                 setTimeout(() => buildModalFormMaps('f-map', 'f-coords'), 200);
                 document.getElementById('f-i-add').addEventListener('click', addItemToDynamicInventoryList);
@@ -188,7 +236,7 @@
             const p = document.getElementById('f-i-price').value.trim();
             if(!t || !p || currentItemsListArray.length >= 50) return;
             currentItemsListArray.push({ title: t, price: p });
-            const li = document.createElement('li'); li.className = "py-0.5 flex justify-between"; li.innerHTML = `<span>${t}</span><span>${p}</span>`;
+            const li = document.createElement('li'); li.className = "py-0.5 flex justify-between"; li.innerHTML = `<span>${t}</span><span>₹${p}</span>`;
             document.getElementById('f-i-ul').appendChild(li);
             document.getElementById('f-i-title').value = ""; document.getElementById('f-i-price').value = "";
         }
@@ -206,7 +254,8 @@
                 items: currentItemsListArray, status: "Pending", submittedAt: Date.now()
             }).then(() => {
                 document.getElementById('action-modal-overlay').classList.add('hidden');
-                alert("Request sent to Admin review dashboard!");
+                // FIXED: Displays custom review notice modal popup natively
+                document.getElementById('verification-wait-overlay').classList.remove('hidden');
             });
         }
 
@@ -218,7 +267,7 @@
                 block.innerHTML = `
                     <div><label>Patient Full Name</label><input type="text" id="m-name" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl"></div>
                     <div><label>Phone Number</label><input type="tel" id="m-phone" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl"></div>
-                    <div><label>Drop Map Pin</label><div id="m-map" class="h-28 bg-slate-100 rounded-xl border border-slate-200 overflow-hidden relative"></div><input type="text" id="m-coords" readonly class="w-full p-1 bg-slate-100 border text-center font-mono text-[10px] text-slate-400 mt-1"></div>
+                    <div><label>Drop Map Pin</label><div id="m-map" class="h-28 bg-slate-100 rounded-xl border relative overflow-hidden"></div><input type="text" id="m-coords" readonly class="w-full p-1 bg-slate-100 border text-center font-mono text-[10px] mt-1"></div>
                     <div><label>Medicines List</label><textarea id="m-desc" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl h-14" placeholder="Enter medicine details..."></textarea></div>
                     <button id="m-submit" class="w-full bg-blue-600 text-white font-bold py-2 rounded-xl cursor-pointer">Post Medical Help Call</button>
                 `;
@@ -227,7 +276,7 @@
                 block.innerHTML = `
                     <div><label>Your Full Name</label><input type="text" id="m-name" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl"></div>
                     <div><label>Contact Phone</label><input type="tel" id="m-phone" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl"></div>
-                    <div><label>Drop Map Pin</label><div id="m-map" class="h-28 bg-slate-100 rounded-xl border border-slate-200 overflow-hidden relative"></div><input type="text" id="m-coords" readonly class="w-full p-1 bg-slate-100 border text-center font-mono text-[10px] text-slate-400 mt-1"></div>
+                    <div><label>Drop Map Pin</label><div id="m-map" class="h-28 bg-slate-100 rounded-xl border relative overflow-hidden"></div><input type="text" id="m-coords" readonly class="w-full p-1 bg-slate-100 border text-center font-mono text-[10px] mt-1"></div>
                     <div><label>Task Work Needed</label><textarea id="m-desc" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl h-14" placeholder="Describe assistance task details..."></textarea></div>
                     <button id="m-submit" class="w-full bg-emerald-600 text-white font-bold py-2 rounded-xl cursor-pointer">Book Local Agent Assistant</button>
                 `;
@@ -241,84 +290,131 @@
             });
         }
 
-        // --- REALTIME SYNC LOOPS ---
-        onValue(ref(db, 'helps_posts'), (snapshot) => {
-            const feed = document.getElementById('medicines-feed-output'); feed.innerHTML = ""; 
-            if (!snapshot.exists()) { feed.innerHTML = `<p class="p-4 text-slate-400 font-bold text-center text-xs col-span-2">No active assistance records found.</p>`; return; }
-            
-            // Only displays ongoing tasks. Completed items clear from here and move to "My Orders"
-            const privateClaims = Object.values(snapshot.val()).filter(p => p.uid === userUid && p.status !== "Completed");
-            if(privateClaims.length === 0) { feed.innerHTML = `<p class="p-4 text-slate-400 font-bold text-center text-xs col-span-2">No active pending assistance requests found.</p>`; return; }
-
-            privateClaims.forEach(p => {
-                const card = document.createElement('div'); card.className = "p-4 bg-white border border-slate-200 rounded-2xl text-xs flex flex-col space-y-1.5 relative shadow-xs animate-in fade-in";
-                let timerHtml = "";
-                if(p.status === "In Work" && p.workStartTime) {
-                    const elapsed = Math.floor((Date.now() - p.workStartTime) / 1000 / 60);
-                    timerHtml = `<div class="p-2 bg-blue-50 text-blue-700 font-bold rounded-lg animate-pulse">⏰ Counter: ${elapsed} Mins in Progress</div>`;
-                }
-                card.innerHTML = `
-                    <div class="flex justify-between items-center font-bold"><span>${p.posterName}</span><span class="text-blue-500 uppercase text-[10px] bg-blue-50 px-2 py-0.5 rounded-full">${p.status || 'Processing'}</span></div>
-                    <p class="text-slate-600 font-bold leading-relaxed">📋 Type: ${p.category} | ${p.desc}</p>
-                    ${timerHtml}
-                    ${p.agentName ? `<div class="p-2 bg-slate-50 border rounded-xl text-slate-600"><b>Agent:</b> ${p.agentName} (📞 ${p.agentPhone})</div>` : ''}
-                `;
-                feed.appendChild(card);
-            });
-        });
-
+        // --- RADIUS GEOLOCATION & STORES DISPLAY FEED LOGIC ---
         onValue(ref(db, 'approved_shops'), (snapshot) => {
-            const foodFeed = document.getElementById('food-feed-output'); foodFeed.innerHTML = "";
-            const groceryFeed = document.getElementById('grocery-feed-output'); groceryFeed.innerHTML = "";
-            if (!snapshot.exists()) return;
+            const foodOwn = document.getElementById('food-own-output'); const foodFeed = document.getElementById('food-feed-output');
+            const grocOwn = document.getElementById('grocery-own-output'); const grocFeed = document.getElementById('grocery-feed-output');
+            
+            foodOwn.innerHTML = ""; foodFeed.innerHTML = ""; grocOwn.innerHTML = ""; grocFeed.innerHTML = "";
+            document.getElementById('food-own-stack').classList.add('hidden'); document.getElementById('grocery-own-stack').classList.add('hidden');
 
-            allShopsCached = snapshot.val();
-            Object.values(allShopsCached).forEach(s => {
+            if (!snapshot.exists()) return;
+            allApprovedShops = snapshot.val();
+
+            Object.values(allApprovedShops).forEach(s => {
                 const dist = calculateDistance(centerLat, centerLng, s.lat, s.lng);
+                // FIXED REQUIREMENT: Absolute radius tracking logic configuration constraints
                 if (dist > 10 && s.uid !== userUid) return;
 
-                const card = document.createElement('div'); card.className = "bg-white rounded-3xl overflow-hidden border border-slate-200/80 flex flex-col shadow-xs cursor-pointer shop-card-node animate-in fade-in";
-                card.setAttribute('data-uid', s.uid);
+                const card = document.createElement('div'); card.className = "bg-white rounded-3xl overflow-hidden border border-slate-200 p-4 flex flex-col justify-between shadow-xs";
                 
-                const nominalName = s.shopName || s.name || "Business Entity";
-                card.innerHTML = `<img src="${s.shopImgUrl || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600'}" class="h-36 w-full object-cover"><div class="p-4"><h4 class="font-black text-sm text-slate-900 leading-none">${nominalName}</h4><p class="text-xs text-slate-400 mt-1">${s.ownerName} (${dist.toFixed(1)} km away)</p></div>`;
-                
-                // CRITICAL ALIGNMENT FIX: Strictly maps by system standardized tags
+                // Item Menu Parsing Block Render Natively
+                let itemsPreviewHtml = "";
+                s.items.forEach((item, index) => {
+                    itemsPreviewHtml += `
+                        <div class="flex justify-between items-center bg-slate-50 p-2 rounded-xl border border-slate-100">
+                            <span class="font-bold text-xs truncate max-w-[140px]">${item.title}</span>
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                <span class="text-blue-600 font-mono text-xs font-bold">₹${item.price}</span>
+                                <button class="btn-pool-add bg-slate-900 text-white text-[10px] px-2 py-1 font-black rounded-lg uppercase tracking-wide cursor-pointer" data-vendor="${s.shopName || s.name}" data-vuid="${s.uid}" data-title="${item.title}" data-price="${item.price}">Add</button>
+                            </div>
+                        </div>`;
+                });
+
+                card.innerHTML = `
+                    <div>
+                        <img src="${s.shopImgUrl || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600'}" class="h-28 w-full object-cover rounded-xl shadow-inner mb-3">
+                        <h4 class="font-black text-sm text-slate-900">${s.shopName || s.name}</h4>
+                        <p class="text-[11px] text-slate-400 font-semibold mb-3">Managed via: ${s.ownerName} (${dist.toFixed(1)} km)</p>
+                        <div class="space-y-1.5 max-h-40 overflow-y-auto pr-1">${itemsPreviewHtml}</div>
+                    </div>
+                    ${s.uid === userUid ? `<button class="w-full mt-4 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-black py-2 rounded-xl border border-slate-300 uppercase tracking-wider btn-owner-edit-trigger" data-uid="${s.uid}">Edit Inventory Catalog</button>` : ''}
+                `;
+
+                // ROUTE CORES AND PRIORITIZE OWNER DISPLAY HOOKS
                 if (s.category === "food") {
-                    foodFeed.appendChild(card);
-                } else if (s.category === "grocery") { 
-                    groceryFeed.appendChild(card); 
+                    if (s.uid === userUid) {
+                        document.getElementById('food-own-stack').classList.remove('hidden'); foodOwn.appendChild(card);
+                    } else { foodFeed.appendChild(card); }
+                } else if (s.category === "grocery") {
+                    if (s.uid === userUid) {
+                        document.getElementById('grocery-own-stack').classList.remove('hidden'); grocOwn.appendChild(card);
+                    } else { grocFeed.appendChild(card); }
                 }
             });
-            
-            if(foodFeed.children.length === 0) foodFeed.innerHTML = `<p class="text-xs text-slate-400 font-bold p-4">No eateries found nearby.</p>`;
-            if(groceryFeed.children.length === 0) groceryFeed.innerHTML = `<p class="text-xs text-slate-400 font-bold p-4">No grocery stores found nearby.</p>`;
-            
-            document.querySelectorAll('.shop-card-node').forEach(c => c.addEventListener('click', () => openShopDetailsModal(allShopsCached[c.getAttribute('data-uid')])));
+
+            // Bind inline action button clicks triggers
+            document.querySelectorAll('.btn-pool-add').forEach(btn => btn.addEventListener('click', executeCrossBasketPoolAddAction));
+            document.querySelectorAll('.btn-owner-edit-trigger').forEach(btn => btn.addEventListener('click', (e) => openOwnerCatalogEditorModal(e.target.getAttribute('data-uid'))));
         });
 
-        function openShopDetailsModal(shop) {
-            document.getElementById('modal-shop-name').innerText = shop.shopName || shop.name;
-            document.getElementById('modal-shop-meta').innerText = `Owner: ${shop.ownerName}`;
-            activeCartShopUid = shop.uid; activeCartShopName = shop.shopName || shop.name;
-            document.getElementById('cart-delivery-address-input').value = profileSavedAddress;
-            document.getElementById('cart-phone-input').value = userContactPhone;
+        // --- MULTI VENDOR CROSS BASKET ADD ACTION CORE ENGINE ---
+        function executeCrossBasketPoolAddAction(e) {
+            const title = e.target.getAttribute('data-title');
+            const price = parseInt(e.target.getAttribute('data-price')) || 0;
+            const vendorName = e.target.getAttribute('data-vendor');
+            const vendorUid = e.target.getAttribute('data-vuid');
+
+            const existing = activeCartArray.find(i => i.title === title && i.vendorUid === vendorUid);
+            if (existing) { existing.qty++; } else { activeCartArray.push({ title, price, qty: 1, vendorName, vendorUid }); }
             
-            const grid = document.getElementById('modal-items-grid'); grid.innerHTML = "";
-            shop.items.forEach((item, idx) => {
-                const div = document.createElement('div'); div.className = "bg-slate-50 rounded-2xl p-3 border border-slate-100 flex flex-col justify-between space-y-2";
-                div.innerHTML = `<img src="${item.imgUrl || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=300'}" class="h-24 w-full object-cover rounded-xl"><div class="flex justify-between items-center text-xs font-bold"><span>${item.title}</span><span class="text-blue-600">${item.price}</span></div><button class="btn-add-to-cart bg-slate-900 text-white text-[10px] font-black py-1.5 rounded-xl uppercase cursor-pointer" data-title="${item.title}" data-price="${item.price}">Add to Cart</button>`;
-                grid.appendChild(div);
+            refreshGlobalCartInterfaceDOMState();
+        }
+
+        function refreshGlobalCartInterfaceDOMState() {
+            const sticky = document.getElementById('sticky-cart-preview');
+            const stickyCount = document.getElementById('sticky-cart-count');
+            if(activeCartArray.length === 0) { sticky.classList.add('hidden'); return; }
+            
+            let totalCount = 0; activeCartArray.forEach(i => totalCount += i.qty);
+            stickyCount.innerText = totalCount; sticky.classList.remove('hidden');
+
+            // Render details view inside modal layer natively
+            const wrap = document.getElementById('cart-items-wrapper'); wrap.innerHTML = "";
+            let grandBillTotal = 0;
+
+            activeCartArray.forEach((item, idx) => {
+                const itemCost = item.price * item.qty; grandBillTotal += itemCost;
+                const row = document.createElement('div'); row.className = "py-2.5 flex flex-col space-y-1 text-slate-800 border-b";
+                row.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <span class="font-black text-slate-900">${item.title}</span>
+                            <span class="text-[9px] block text-slate-400 uppercase tracking-wide">Vendor: ${item.vendorName}</span>
+                        </div>
+                        <span class="font-mono font-bold text-sm text-slate-900">₹${itemCost}</span>
+                    </div>
+                    <div class="flex justify-start items-center gap-2 mt-1">
+                        <button class="bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-black text-xs cursor-pointer btn-cart-dec" data-idx="${idx}">-</button>
+                        <span class="font-mono text-xs px-1">${item.qty}</span>
+                        <button class="bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-black text-xs cursor-pointer btn-cart-inc" data-idx="${idx}">+</button>
+                    </div>
+                `;
+                wrap.appendChild(row);
             });
-            document.querySelectorAll('.btn-add-to-cart').forEach(btn => btn.addEventListener('click', (e) => addItemToCartArray(e.target.getAttribute('data-title'), e.target.getAttribute('data-price'))));
-            document.getElementById('shop-details-modal').classList.remove('hidden');
-            initializeCartCheckoutDeliveryMap();
+
+            document.getElementById('cart-grand-total').innerText = `₹${grandBillTotal}`;
+            
+            document.querySelectorAll('.btn-cart-dec').forEach(b => b.addEventListener('click', (e) => {
+                const idx = parseInt(e.target.getAttribute('data-idx'));
+                if(activeCartArray[idx].qty > 1) activeCartArray[idx].qty--; else activeCartArray.splice(idx, 1);
+                refreshGlobalCartInterfaceDOMState();
+            }));
+            document.querySelectorAll('.btn-cart-inc').forEach(b => b.addEventListener('click', (e) => {
+                activeCartArray[parseInt(e.target.getAttribute('data-idx'))].qty++;
+                refreshGlobalCartInterfaceDOMState();
+            }));
         }
 
         function initializeCartCheckoutDeliveryMap() {
+            document.getElementById('cart-cust-name').value = userName;
+            document.getElementById('cart-phone-input').value = userContactPhone;
+            document.getElementById('cart-delivery-address-input').value = profileSavedAddress;
+
             setTimeout(() => {
                 if (!mapCartCheckout) {
-                    mapCartCheckout = L.map('cart-checkout-map').setView([centerLat, centerLng], 16); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapCartCheckout);
+                    mapCartCheckout = L.map('cart-checkout-map').setView([centerLat, centerLng], 16);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapCartCheckout);
                     markerCartCheckout = L.marker([centerLat, centerLng]).addTo(mapCartCheckout);
                     document.getElementById('cart-selected-coords').value = `${centerLat}, ${centerLng}`;
                     mapCartCheckout.on('click', (e) => { markerCartCheckout.setLatLng(e.latlng); document.getElementById('cart-selected-coords').value = `${e.latlng.lat}, ${e.latlng.lng}`; });
@@ -326,26 +422,66 @@
             }, 250);
         }
 
-        function addItemToCartArray(title, price) {
-            const numericPrice = parseInt(price.replace(/[^0-9]/g, '')) || 0;
-            const existing = activeCart.find(i => i.title === title);
-            if (existing) { existing.qty++; } else { activeCart.push({ title, price: numericPrice, qty: 1 }); }
-            renderCartInterfaceView();
+        // --- SUBMIT COD POOLED ORDERS IN BULK WITH STATUS SET AS PENDING ---
+        document.getElementById('btn-checkout-cart').addEventListener('click', () => {
+            if(activeCartArray.length === 0) return;
+            const deliveryAddress = document.getElementById('cart-delivery-address-input').value.trim();
+            const contactPhone = document.getElementById('cart-phone-input').value.trim();
+            const clientName = document.getElementById('cart-cust-name').value.trim();
+            const coords = document.getElementById('cart-selected-coords').value.split(',');
+
+            if(!deliveryAddress || !contactPhone || !clientName) return alert("Fill out client, address and contact parameters fields.");
+
+            const pushOrderRef = push(ref(db, 'orders'));
+            set(pushOrderRef, {
+                orderId: pushOrderRef.key, uid: userUid, userName: clientName,
+                shopName: "Pooled Cross-Vendor Order Basket", items: activeCartArray,
+                totalBill: document.getElementById('cart-grand-total').innerText,
+                status: "Pending", deliveryAddress, userPhone: contactPhone,
+                lat: parseFloat(coords[0]), lng: parseFloat(coords[1]), timestamp: Date.now()
+            }).then(() => {
+                activeCartArray = []; refreshGlobalCartInterfaceDOMState();
+                document.getElementById('shop-cart-modal').classList.add('hidden');
+                triggerAnimatedGreenSuccessTickOverlayGate();
+            });
+        });
+
+        // --- CATALOG INVENTORY OWNERS EDITING LAYER PIPELINE ---
+        function openOwnerCatalogEditorModal(uid) {
+            const shopObj = allApprovedShops[uid]; if(!shopObj) return;
+            ownerEditingItemsCache = [...shopObj.items];
+            renderOwnerEditorItemsListDOM();
+            document.getElementById('owner-edit-modal').classList.remove('hidden');
+
+            document.getElementById('btn-save-owner-changes').onclick = async () => {
+                // Put back under verification review queue logic parameters safely
+                const destinationReviewNode = shopObj.category === "food" ? "restaurant_requests/" : "shop_requests/";
+                shopObj.items = ownerEditingItemsCache;
+                shopObj.status = "Pending";
+                
+                await set(ref(db, destinationReviewNode + userUid), shopObj);
+                await remove(ref(db, `approved_shops/${userUid}`));
+                document.getElementById('owner-edit-modal').classList.add('hidden');
+                document.getElementById('verification-wait-overlay').classList.remove('hidden');
+            };
         }
 
-        function renderCartInterfaceView() {
-            const wrap = document.getElementById('cart-items-wrapper'); wrap.innerHTML = "";
-            if (activeCart.length === 0) { wrap.innerHTML = `<p class="text-slate-400 text-center py-4">Your cart is empty.</p>`; document.getElementById('cart-grand-total').innerText = "₹0"; return; }
-            let total = 0;
-            activeCart.forEach((item, index) => {
-                const cost = item.price * item.qty; total += cost;
-                const row = document.createElement('div'); row.className = "flex justify-between items-center py-2 text-xs border-b font-bold";
-                row.innerHTML = `<div><span>${item.title}</span><div class="flex space-x-1 mt-1"><button class="btn-m bg-slate-200 px-1.5 rounded cursor-pointer" data-idx="${index}">-</button><span>${item.qty}</span><button class="btn-p bg-slate-200 px-1.5 rounded cursor-pointer" data-idx="${index}">+</button></div></div><span>₹${cost}</span>`;
-                wrap.appendChild(row);
+        document.getElementById('btn-append-edit-item').addEventListener('click', () => {
+            const t = document.getElementById('edit-new-title').value.trim();
+            const p = document.getElementById('edit-new-price').value.trim();
+            if(!t || !p) return;
+            ownerEditingItemsCache.push({ title: t, price: p });
+            document.getElementById('edit-new-title').value = ""; document.getElementById('edit-new-price').value = "";
+            renderOwnerEditorItemsListDOM();
+        });
+
+        function renderOwnerEditorItemsListDOM() {
+            const ul = document.getElementById('owner-edit-items-list'); ul.innerHTML = "";
+            ownerEditingItemsCache.forEach((item, idx) => {
+                const li = document.createElement('li'); li.className = "py-2 flex justify-between items-center";
+                li.innerHTML = `<span>${item.title} (₹${item.price})</span><button class="bg-red-50 text-red-600 px-2 py-0.5 rounded-xl font-bold cursor-pointer" onclick="this.parentElement.remove();">Delete</button>`;
+                ul.appendChild(li);
             });
-            document.getElementById('cart-grand-total').innerText = `₹${total}`;
-            document.querySelectorAll('.btn-m').forEach(b => b.addEventListener('click', (e) => { const idx = parseInt(e.target.getAttribute('data-idx')); if(activeCart[idx].qty > 1) activeCart[idx].qty--; else activeCart.splice(idx, 1); renderCartInterfaceView(); }));
-            document.querySelectorAll('.btn-p').forEach(b => b.addEventListener('click', (e) => { activeCart[parseInt(e.target.getAttribute('data-idx'))].qty++; renderCartInterfaceView(); }));
         }
 
         function triggerAnimatedGreenSuccessTickOverlayGate() {
@@ -353,46 +489,29 @@
             setTimeout(() => { overlay.classList.add('hidden'); switchTab('orders'); }, 3000);
         }
 
-        document.getElementById('btn-checkout-cart').addEventListener('click', () => {
-            if (activeCart.length === 0) return;
-            const deliveryDestinationStr = document.getElementById('cart-delivery-address-input').value.trim();
-            const contactPhone = document.getElementById('cart-phone-input').value.trim();
-            const selectedCoords = document.getElementById('cart-selected-coords').value.split(',');
-            if(!deliveryDestinationStr || !contactPhone) return alert("Fill delivery destination phone and values entirely.");
-
-            const pushOrderRef = push(ref(db, 'orders'));
-            set(pushOrderRef, { orderId: pushOrderRef.key, uid: userUid, userName, shopUid: activeCartShopUid, shopName: activeCartShopName, items: activeCart, totalBill: document.getElementById('cart-grand-total').innerText, status: "Processing", deliveryAddress: deliveryDestinationStr, userPhone: contactPhone, lat: parseFloat(selectedCoords[0]), lng: parseFloat(selectedCoords[1]), timestamp: Date.now() })
-            .then(() => { activeCart = []; renderCartInterfaceView(); document.getElementById('shop-details-modal').classList.add('hidden'); triggerAnimatedGreenSuccessTickOverlayGate(); });
-        });
-
-        // --- COMPLETED COMBINED HISTORICAL DISPATCH VIEW ---
+        // --- ORDERS PROGRESS CONCAT TIMELINE LOGS TRACKING ---
         onValue(ref(db, 'orders'), (snapshotOrders) => {
             onValue(ref(db, 'helps_posts'), (snapshotHelps) => {
-                const container = document.getElementById('orders-feed-output'); container.innerHTML = "";
-                let masterArray = [];
-
+                const container = document.getElementById('orders-feed-output'); container.innerHTML = ""; let masterArray = [];
                 if (snapshotOrders.exists()) {
                     Object.values(snapshotOrders.val()).filter(o => o.uid === userUid).forEach(order => {
                         masterArray.push({ title: order.shopName, details: order.items.map(i=>i.title+' (x'+i.qty+')').join(', '), extra: `Destination: ${order.deliveryAddress}`, status: order.status, agent: order.agentName, phone: order.agentPhone, timestamp: order.timestamp });
                     });
                 }
-
                 if (snapshotHelps.exists()) {
                     Object.values(snapshotHelps.val()).filter(p => p.uid === userUid && p.status === "Completed").forEach(task => {
-                        masterArray.push({ title: `⚡ ${task.category} Assistance Task`, details: task.desc, extra: `Completed via QHP network agent assignment routing pipeline`, status: "Task Finished ✅", agent: task.agentName, phone: task.agentPhone, timestamp: task.timestamp || Date.now() });
+                        masterArray.push({ title: `⚡ ${task.category} Assistance Task`, details: task.desc, extra: `Completed via QHP agent routing pipeline`, status: "Task Finished ✅", agent: task.agentName, phone: task.agentPhone, timestamp: task.timestamp || Date.now() });
                     });
                 }
-
-                if (masterArray.length === 0) { container.innerHTML = `<p class="text-slate-400 text-center py-8 text-xs font-bold">No registered traces found.</p>`; return; }
-
+                if (masterArray.length === 0) { container.innerHTML = `<p class="text-slate-400 text-center py-8 text-xs font-bold">No registered dispatch history traces found.</p>`; return; }
                 masterArray.sort((x, y) => y.timestamp - x.timestamp).forEach(item => {
                     const card = document.createElement('div'); card.className = "p-4 bg-white rounded-2xl border border-slate-200/80 flex flex-col space-y-1.5 text-xs shadow-xs animate-in fade-in";
-                    card.innerHTML = `
-                        <div class="flex justify-between items-center font-black"><span>${item.title}</span><span class="text-green-600 font-extrabold uppercase bg-green-50 px-2.5 py-0.5 rounded-md">${item.status}</span></div>
-                        <p class="text-slate-600 font-semibold"><b>Summary:</b> ${item.details}</p>
-                        <p class="text-[11px] text-slate-400 font-medium">${item.extra}</p>
-                        ${item.agent ? `<div class="p-2 bg-slate-50 border rounded-xl text-slate-600"><b>Completed By Agent:</b> ${item.agent} (📞 ${item.phone})</div>` : ''}
-                    `;
+                    
+                    let adjustedStatusHtml = `<span class="text-amber-600 font-extrabold bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md uppercase">${item.status}</span>`;
+                    if(item.status === "Confirmed") adjustedStatusHtml = `<span class="text-green-600 font-extrabold bg-green-50 border border-green-200 px-2 py-0.5 rounded-md uppercase">Confirmed</span>`;
+                    else if (item.status === "Delivered" || item.status.includes("✅")) adjustedStatusHtml = `<span class="text-emerald-700 font-extrabold bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-md uppercase">Delivered</span>`;
+
+                    card.innerHTML = `<div class="flex justify-between items-center font-black"><span>${item.title}</span>${adjustedStatusHtml}</div><p class="text-slate-600 font-semibold"><b>Summary:</b> ${item.details}</p><p class="text-[11px] text-slate-400 font-medium">${item.extra}</p>${item.agent ? `<div class="p-2 bg-slate-50 border rounded-xl text-slate-600"><b>Completed By Agent:</b> ${item.agent} (📞 ${item.phone})</div>` : ''}`;
                     container.appendChild(card);
                 });
             });
