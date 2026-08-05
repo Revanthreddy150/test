@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Auth Web</title>
+    <style>
+        * { box-sizing: border-box; font-family: Arial, sans-serif; margin: 0; padding: 0; }
+        body { background-color: #f4f6f9; }
+
+        /* Navigation Bar */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #075e54;
+            color: white;
+            padding: 15px 30px;
+        }
+
+        .profile-container { position: relative; display: inline-block; }
+        .profile-btn {
+            background: #25d366;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Profile Dropdown Card */
+        .profile-card {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 45px;
+            background: white;
+            color: #333;
+            width: 220px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-radius: 8px;
+            padding: 15px;
+            z-index: 100;
+        }
+
+        .profile-card h4 { margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .profile-card p { font-size: 14px; margin: 5px 0; color: #555; }
+        .logout-btn {
+            width: 100%;
+            margin-top: 10px;
+            padding: 8px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* Centered Cards */
+        .card {
+            max-width: 400px;
+            margin: 80px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .wa-btn {
+            width: 100%;
+            padding: 12px;
+            background: #25d366;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <!-- USER DASHBOARD PAGE -->
+    <div id="userPage" class="hidden">
+        <nav>
+            <h2>My Company Web</h2>
+            <div class="profile-container">
+                <button class="profile-btn" onclick="toggleProfile()">👤 Profile</button>
+                <div class="profile-card" id="profileDropdown">
+                    <h4 id="profileName">User Name</h4>
+                    <p><strong>Phone:</strong> <span id="profilePhone">Loading...</span></p>
+                    <button class="logout-btn" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="card">
+            <h1>Welcome to Your Dashboard!</h1>
+            <p style="margin-top: 10px;">You are successfully logged in via WhatsApp.</p>
+        </div>
+    </div>
+
+    <!-- LOGIN PAGE -->
+    <div id="loginPage" class="card">
+        <h2>Login with WhatsApp</h2>
+        <p style="color:#666; font-size: 14px; margin-top: 5px;">Enter your name to start verification</p>
+        
+        <input type="text" id="userName" placeholder="Enter your full name" required />
+        <button class="wa-btn" onclick="startWhatsAppLogin()">Login with WhatsApp</button>
+        
+        <p id="statusMsg" style="margin-top: 15px; font-size: 14px; color: #075e54;"></p>
+    </div>
+
+    <script>
+        // CONFIG: Replace with your actual backend URL (or keep localhost for testing)
+        const BACKEND_URL = "http://localhost:3000"; 
+        const COMPANY_WHATSAPP_NUMBER = "919876543210"; // Replace with your company phone number (with country code)
+
+        let pollingInterval = null;
+
+        // Check login status on page load
+        window.onload = function() {
+            const user = JSON.parse(localStorage.getItem('userData'));
+            if (user) {
+                showUserPage(user);
+            }
+        };
+
+        function startWhatsAppLogin() {
+            const name = document.getElementById('userName').value.trim();
+            if (!name) {
+                alert('Please enter your name first!');
+                return;
+            }
+
+            // Generate unique verification token
+            const token = "VERIFY_" + Math.floor(100000 + Math.random() * 900000);
+
+            // Construct message text
+            const textMessage = `Hello, verify my login token: ${token} | Name: ${name}`;
+            const waUrl = `https://wa.me/${COMPANY_WHATSAPP_NUMBER}?text=${encodeURIComponent(textMessage)}`;
+
+            document.getElementById('statusMsg').innerText = "Waiting for WhatsApp verification...";
+
+            // Open WhatsApp
+            window.open(waUrl, '_blank');
+
+            // Poll the server to check when user sends the message
+            pollingInterval = setInterval(() => checkVerification(token, name), 3000);
+        }
+
+        async function checkVerification(token, name) {
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/check-verification/${token}`);
+                const data = await res.json();
+
+                if (data.verified) {
+                    clearInterval(pollingInterval);
+                    const userData = {
+                        name: name,
+                        phone: data.phone
+                    };
+                    localStorage.setItem('userData', JSON.stringify(userData));
+                    showUserPage(userData);
+                }
+            } catch (err) {
+                console.error("Error checking verification:", err);
+            }
+        }
+
+        function showUserPage(user) {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('userPage').classList.remove('hidden');
+            document.getElementById('profileName').innerText = user.name;
+            document.getElementById('profilePhone').innerText = "+" + user.phone;
+        }
+
+        function toggleProfile() {
+            const card = document.getElementById('profileDropdown');
+            card.style.display = card.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function logout() {
+            localStorage.removeItem('userData');
+            location.reload();
+        }
+    </script>
+</body>
+</html>
